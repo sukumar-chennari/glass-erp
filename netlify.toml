@@ -1,0 +1,12 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  VITE_USE_MOCK_API    = "true"
+  VITE_MOCK_DELAY_MS   = "350"
+
+[[redirects]]
+  from   = "/*"
+  to     = "/index.html"
+  status = 200
