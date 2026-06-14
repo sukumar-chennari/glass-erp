@@ -1,0 +1,28 @@
+.wrap {
+  display:         flex;
+  flex-direction:  column;
+  align-items:     center;
+  justify-content: center;
+  padding:         var(--space-16) var(--space-6);
+  text-align:      center;
+  gap:             var(--space-3);
+}
+
+.iconWrap {
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-2);
+}
+
+.title {
+  font-size:   var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color:       var(--color-text-secondary);
+}
+
+.message {
+  font-size: var(--font-size-base);
+  color:     var(--color-text-muted);
+  max-width: 320px;
+}
+
+.action { margin-top: var(--space-2); }

@@ -1,0 +1,54 @@
+.nameCell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.productName {
+  font-weight: 600;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+}
+
+.sku {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  font-family: monospace;
+}
+
+.qtyCell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.qty {
+  font-weight: 700;
+  font-size: var(--font-size-base);
+  min-width: 28px;
+  text-align: center;
+}
+
+.qtyLow {
+  color: var(--color-warning-text);
+}
+
+.qtyOut {
+  color: var(--color-danger-text);
+}
+
+.threshold {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.updated {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.actions {
+  display: flex;
+  gap: 4px;
+  justify-content: flex-end;
+}

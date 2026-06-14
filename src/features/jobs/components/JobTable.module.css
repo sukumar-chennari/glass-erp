@@ -1,0 +1,51 @@
+.jobNumber {
+  font-weight: 600;
+  font-size: var(--font-size-sm);
+  color: var(--color-primary);
+  font-family: monospace;
+}
+
+.nameCell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.customerName {
+  font-weight: 600;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+}
+
+.regNo {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  font-family: monospace;
+}
+
+.vehicleCell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.vehicleName {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+}
+
+.position {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.amount {
+  font-weight: 600;
+  font-size: var(--font-size-sm);
+}
+
+.actions {
+  display: flex;
+  gap: 4px;
+  justify-content: flex-end;
+}

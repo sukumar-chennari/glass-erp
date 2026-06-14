@@ -1,0 +1,29 @@
+.root {
+  display:  flex;
+  min-height: 100vh;
+}
+
+/* The main area shifts right by sidebar width */
+.main {
+  flex:           1;
+  min-width:      0;
+  margin-left:    var(--sidebar-width);
+  display:        flex;
+  flex-direction: column;
+  transition:     margin-left var(--transition-slow);
+}
+
+.main.sidebarCollapsed {
+  margin-left: var(--sidebar-width-collapsed);
+}
+
+.pageContent {
+  flex:       1;
+  padding:    var(--space-10) var(--space-10);
+  overflow-y: auto;
+}
+
+@media (max-width: 768px) {
+  .main         { margin-left: 0; }
+  .pageContent  { padding: var(--space-4); }
+}

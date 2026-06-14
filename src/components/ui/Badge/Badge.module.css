@@ -1,0 +1,70 @@
+.badge {
+  display:       inline-flex;
+  align-items:   center;
+  gap:           var(--space-1);
+  padding:       2px var(--space-2);
+  border-radius: var(--radius-full);
+  font-size:     var(--font-size-xs);
+  font-weight:   var(--font-weight-bold);
+  letter-spacing:var(--letter-spacing-wide);
+  line-height:   1;
+  white-space:   nowrap;
+  border:        1px solid transparent;
+}
+
+/* ── Variants ── */
+.success {
+  color:        var(--color-success-text);
+  background:   var(--color-success-bg);
+  border-color: var(--color-success-border);
+}
+
+.warning {
+  color:        var(--color-warning-text);
+  background:   var(--color-warning-bg);
+  border-color: var(--color-warning-border);
+}
+
+.danger {
+  color:        var(--color-danger-text);
+  background:   var(--color-danger-bg);
+  border-color: var(--color-danger-border);
+}
+
+.info {
+  color:        var(--color-info-text);
+  background:   var(--color-info-bg);
+  border-color: var(--color-info-border);
+}
+
+.neutral {
+  color:        var(--color-neutral-text);
+  background:   var(--color-neutral-bg);
+  border-color: var(--color-neutral-border);
+}
+
+.primary {
+  color:        var(--color-primary);
+  background:   var(--color-primary-subtle);
+  border-color: var(--color-primary-border);
+}
+
+/* ── Sizes ── */
+.sm {
+  padding:   1px var(--space-1);
+  font-size: var(--font-size-2xs);
+}
+
+.lg {
+  padding:   var(--space-1) var(--space-3);
+  font-size: var(--font-size-sm);
+}
+
+/* ── Dot indicator ── */
+.dot {
+  width:         6px;
+  height:        6px;
+  border-radius: var(--radius-full);
+  background:    currentColor;
+  flex-shrink:   0;
+}

@@ -1,0 +1,26 @@
+.grid {
+  display:               grid;
+  grid-template-columns: 1fr 1fr;
+  gap:                   var(--space-6);
+  margin-bottom:         var(--space-6);
+}
+
+@media (max-width: 1024px) {
+  .grid { grid-template-columns: 1fr; }
+}
+
+/* ── Pending claims: highlight overdue rows ── */
+.overdueRow td { color: var(--color-danger-text); }
+.overdueRow td:first-child { font-weight: var(--font-weight-semibold); }
+
+/* ── Phone link ── */
+.phone {
+  color:     var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  display:   block;
+  margin-top:1px;
+}
+
+.jobsGrid {
+  margin-bottom: var(--space-6);
+}

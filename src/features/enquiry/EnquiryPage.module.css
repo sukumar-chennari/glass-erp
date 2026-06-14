@@ -1,0 +1,227 @@
+.panels {
+  display:   flex;
+  gap:       24px;
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+
+/* ── Send Panel ── */
+.sendPanel {
+  flex:      1;
+  min-width: 300px;
+  max-width: 460px;
+}
+
+/* ── Setup Panel ── */
+.setupPanel {
+  flex:         1;
+  min-width:    280px;
+  max-width:    400px;
+  border-color: rgba(99, 102, 241, 0.25) !important;
+  background:   rgba(99, 102, 241, 0.04) !important;
+}
+
+/* ── Section title ── */
+.panelTitle {
+  font-size:     18px;
+  font-weight:   700;
+  color:         #fff;
+  margin-bottom: 20px;
+}
+
+/* ── Alert ── */
+.alert {
+  padding:       12px 16px;
+  border-radius: 10px;
+  margin-bottom: 16px;
+  font-size:     13px;
+  font-weight:   600;
+  border:        1px solid;
+}
+
+.alertSuccess {
+  background:   rgba(37, 211, 102, 0.15);
+  border-color: rgba(37, 211, 102, 0.3);
+  color:        #25d366;
+}
+
+.alertError {
+  background:   rgba(244, 63, 94, 0.15);
+  border-color: rgba(244, 63, 94, 0.3);
+  color:        #f43f5e;
+}
+
+/* ── Form elements ── */
+.formGroup {
+  margin-bottom: 20px;
+}
+
+.label {
+  display:       block;
+  font-size:     13px;
+  font-weight:   600;
+  color:         rgba(255, 255, 255, 0.9);
+  margin-bottom: 8px;
+}
+
+.phoneRow {
+  display:     flex;
+  gap:         10px;
+  align-items: center;
+}
+
+.prefix {
+  background:    rgba(255, 255, 255, 0.07);
+  border:        1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  padding:       12px 14px;
+  font-size:     13px;
+  color:         rgba(255, 255, 255, 0.6);
+  white-space:   nowrap;
+  flex-shrink:   0;
+}
+
+.phoneInput {
+  flex:          1;
+  padding:       12px 16px;
+  background:    rgba(255, 255, 255, 0.05);
+  border:        1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  color:         #fff;
+  font-size:     13px;
+  font-family:   inherit;
+  outline:       none;
+  transition:    border-color 0.2s;
+}
+
+.phoneInput::placeholder { color: rgba(255, 255, 255, 0.4); }
+.phoneInput:focus {
+  border-color: rgba(99, 102, 241, 0.5);
+  box-shadow:   0 0 0 3px rgba(99, 102, 241, 0.12);
+}
+
+/* ── WhatsApp button ── */
+.waBtn {
+  width:           100%;
+  padding:         14px;
+  border:          none;
+  border-radius:   12px;
+  background:      linear-gradient(135deg, #25d366, #128c7e);
+  color:           #fff;
+  font-size:       14px;
+  font-weight:     700;
+  cursor:          pointer;
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  gap:             10px;
+  box-shadow:      0 8px 24px rgba(37, 211, 102, 0.3);
+  transition:      transform 0.2s ease, box-shadow 0.2s ease;
+  font-family:     inherit;
+}
+
+.waBtn:hover {
+  transform:  translateY(-2px);
+  box-shadow: 0 12px 32px rgba(37, 211, 102, 0.4);
+}
+
+/* ── Saved URL display ── */
+.savedUrlBox {
+  margin-top:    20px;
+  padding:       14px;
+  background:    rgba(255, 255, 255, 0.03);
+  border-radius: 10px;
+  border:        1px solid rgba(255, 255, 255, 0.07);
+}
+
+.savedUrlLabel {
+  font-size:      11px;
+  font-weight:    700;
+  color:          rgba(255, 255, 255, 0.35);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom:  8px;
+}
+
+.savedUrlText {
+  font-size:  12px;
+  color:      rgba(99, 102, 241, 0.9);
+  word-break: break-all;
+}
+
+.savedUrlEmpty {
+  font-size: 12px;
+  color:     rgba(255, 255, 255, 0.35);
+}
+
+/* ── Setup panel body ── */
+.setupDesc {
+  font-size:     12px;
+  color:         rgba(255, 255, 255, 0.45);
+  margin-bottom: 18px;
+  line-height:   1.7;
+}
+
+.setupDesc strong { color: rgba(255, 255, 255, 0.75); }
+
+.steps {
+  display:       flex;
+  flex-direction:column;
+  gap:           10px;
+  margin-bottom: 20px;
+}
+
+.step {
+  background:    rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  padding:       14px;
+}
+
+.stepTitle {
+  font-size:     12px;
+  font-weight:   700;
+  color:         #a78bfa;
+  margin-bottom: 8px;
+}
+
+.stepDesc {
+  font-size:   12px;
+  color:       rgba(255, 255, 255, 0.5);
+  line-height: 1.7;
+}
+
+.stepDesc strong { color: #fff; }
+
+.urlRow {
+  display:     flex;
+  gap:         8px;
+  margin-top:  8px;
+  align-items: center;
+}
+
+.urlInput {
+  flex:          1;
+  padding:       10px 12px;
+  background:    rgba(255, 255, 255, 0.05);
+  border:        1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  color:         #fff;
+  font-size:     12px;
+  font-family:   inherit;
+  outline:       none;
+  transition:    border-color 0.2s;
+  min-width:     0;
+}
+
+.urlInput::placeholder { color: rgba(255, 255, 255, 0.35); }
+.urlInput:focus { border-color: rgba(99, 102, 241, 0.5); }
+
+.setupNote {
+  padding:       12px;
+  background:    rgba(37, 211, 102, 0.08);
+  border:        1px solid rgba(37, 211, 102, 0.2);
+  border-radius: 10px;
+  font-size:     12px;
+  color:         rgba(255, 255, 255, 0.5);
+  line-height:   1.6;
+}

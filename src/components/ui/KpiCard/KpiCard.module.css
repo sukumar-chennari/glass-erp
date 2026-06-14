@@ -1,0 +1,110 @@
+.card {
+  border-radius: var(--radius-2xl);
+  padding:       var(--space-5);
+  display:       flex;
+  align-items:   center;
+  gap:           var(--space-4);
+  border:        1px solid rgba(255, 255, 255, 0.08);
+  position:      relative;
+  overflow:      hidden;
+  transition:    transform 0.2s ease, box-shadow 0.2s ease;
+  cursor:        default;
+}
+
+.card:hover {
+  transform:  translateY(-3px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
+}
+
+/* ── Decorative circle ── */
+.card::before {
+  content:       '';
+  position:      absolute;
+  top:           -20px; right: -20px;
+  width:         80px;  height: 80px;
+  border-radius: 50%;
+  background:    var(--kpi-accent-color, rgba(255,255,255,0.1));
+  opacity:       0.12;
+}
+
+/* ── Icon box ── */
+.iconBox {
+  width:          44px;
+  height:         44px;
+  border-radius:  var(--radius-full);
+  background:     rgba(255, 255, 255, 0.15);
+  display:        flex;
+  align-items:    center;
+  justify-content:center;
+  flex-shrink:    0;
+  color:          rgba(255, 255, 255, 0.9);
+}
+
+/* ── Text content ── */
+.content {
+  flex: 1;
+  min-width: 0;
+}
+
+.label {
+  font-size:      var(--font-size-xs);
+  font-weight:    var(--font-weight-semibold);
+  color:          rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom:  var(--space-1);
+}
+
+.value {
+  font-size:     22px;
+  font-weight:   var(--font-weight-extrabold);
+  color:         #ffffff;
+  line-height:   1;
+  margin-bottom: var(--space-1);
+  word-break:    break-all;
+}
+
+.change {
+  font-size:  var(--font-size-xs);
+  font-weight:var(--font-weight-semibold);
+  color:      rgba(255, 255, 255, 0.5);
+}
+
+.change.trendUp   { color: #10b981; }
+.change.trendDown { color: #f43f5e; }
+
+/* ── Variant gradient backgrounds ── */
+.variantPrimary {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.25), rgba(99, 102, 241, 0.08));
+  --kpi-accent-color: #6366f1;
+}
+
+.variantAccent {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.25), rgba(168, 85, 247, 0.08));
+  --kpi-accent-color: #a855f7;
+}
+
+.variantSuccess {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(16, 185, 129, 0.08));
+  --kpi-accent-color: #10b981;
+}
+
+.variantWarning {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(245, 158, 11, 0.08));
+  --kpi-accent-color: #f59e0b;
+}
+
+.variantDanger {
+  background: linear-gradient(135deg, rgba(236, 72, 153, 0.25), rgba(236, 72, 153, 0.08));
+  --kpi-accent-color: #ec4899;
+}
+
+.variantInfo {
+  background: linear-gradient(135deg, rgba(20, 184, 166, 0.25), rgba(20, 184, 166, 0.08));
+  --kpi-accent-color: #14b8a6;
+}
+
+.variantNeutral {
+  background: linear-gradient(135deg, rgba(79, 70, 229, 0.25), rgba(79, 70, 229, 0.08));
+  --kpi-accent-color: #4f46e5;
+}

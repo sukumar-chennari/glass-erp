@@ -1,0 +1,78 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+}
+
+.divider {
+  border: none;
+  border-top: 1px solid var(--color-border);
+  margin: var(--space-2) 0 0;
+}
+
+.sectionLabel {
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-1);
+}
+
+.itemRow {
+  display: grid;
+  grid-template-columns: 1fr 80px 100px auto;
+  gap: var(--space-3);
+  align-items: end;
+}
+
+.removeBtn {
+  margin-bottom: 2px;
+}
+
+.addItemBtn {
+  align-self: flex-start;
+}
+
+.totalsBox {
+  background: var(--color-bg-subtle);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.totalRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.totalRowBold {
+  composes: totalRow;
+  font-weight: 700;
+  font-size: var(--font-size-base);
+  color: var(--color-text-primary);
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--space-2);
+  margin-top: var(--space-1);
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+}
+
+@media (max-width: 600px) {
+  .row     { grid-template-columns: 1fr; }
+  .itemRow { grid-template-columns: 1fr 1fr; }
+}

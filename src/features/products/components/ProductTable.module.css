@@ -1,0 +1,57 @@
+.nameCell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.productName {
+  font-weight: 600;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+}
+
+.sku {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  font-family: monospace;
+}
+
+.vehicleCell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.vehicle {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+}
+
+.vehicleYear {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.price {
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.stockQty {
+  font-weight: 600;
+  font-size: var(--font-size-sm);
+}
+
+.stockLow {
+  color: var(--color-warning-text);
+}
+
+.stockOut {
+  color: var(--color-danger-text);
+}
+
+.actions {
+  display: flex;
+  gap: 4px;
+  justify-content: flex-end;
+}

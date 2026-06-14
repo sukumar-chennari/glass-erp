@@ -1,0 +1,45 @@
+.nameCell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.customerName {
+  font-weight: 600;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+}
+
+.email {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.vehicleList {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.vehicle {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+}
+
+.regNo {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  font-family: monospace;
+}
+
+.jobCount {
+  font-weight: 600;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+}
+
+.actions {
+  display: flex;
+  gap: 4px;
+  justify-content: flex-end;
+}
