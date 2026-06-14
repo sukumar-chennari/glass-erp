@@ -23,7 +23,23 @@
   overflow-y: auto;
 }
 
+/* Mobile overlay behind the sidebar */
+.mobileOverlay {
+  display: none;
+}
+
 @media (max-width: 768px) {
-  .main         { margin-left: 0; }
-  .pageContent  { padding: var(--space-4); }
+  .main              { margin-left: 0; }
+  .main.sidebarCollapsed { margin-left: 0; }
+  .pageContent       { padding: var(--space-4) var(--space-3); }
+
+  .mobileOverlay {
+    display:    block;
+    position:   fixed;
+    inset:      0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index:    calc(var(--z-sticky) - 1);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+  }
 }

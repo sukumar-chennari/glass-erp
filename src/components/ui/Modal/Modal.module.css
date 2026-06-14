@@ -84,10 +84,19 @@
   .dialog {
     border-radius: var(--radius-xl);
     max-height:    calc(100dvh - var(--space-4));
+    max-width:     calc(100vw - var(--space-4));
   }
+  .title  { font-size: 20px; }
   .body   { padding: var(--space-5); }
   .header { padding: var(--space-4) var(--space-5); }
-  .footer { padding: var(--space-4) var(--space-5); }
+  .footer { padding: var(--space-4) var(--space-5); flex-wrap: wrap; }
+  .footer > * { flex: 1; min-width: 0; }
+}
+
+@media (max-width: 400px) {
+  .dialog { max-width: 100vw; border-radius: var(--radius-lg) var(--radius-lg) 0 0; align-self: flex-end; }
+  .overlay { align-items: flex-end; padding: 0; }
+  .title  { font-size: 18px; }
 }
 
 @keyframes fadeIn {

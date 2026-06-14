@@ -24,5 +24,9 @@
 }
 
 @media (max-width: 640px) {
-  .grid { grid-template-columns: 1fr 1fr; }
+  .grid { grid-template-columns: 1fr 1fr; gap: var(--space-3); }
+}
+
+@media (max-width: 400px) {
+  .grid { grid-template-columns: 1fr; }
 }

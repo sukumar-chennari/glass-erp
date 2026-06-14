@@ -2,15 +2,17 @@ import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import type { ToastPayload } from '@/types/ui';
 
 interface UiState {
-  sidebarCollapsed: boolean;
-  activeModal:      string | null;
-  toasts:           ToastPayload[];
+  sidebarCollapsed:   boolean;
+  sidebarMobileOpen:  boolean;
+  activeModal:        string | null;
+  toasts:             ToastPayload[];
 }
 
 const initialState: UiState = {
-  sidebarCollapsed: false,
-  activeModal:      null,
-  toasts:           [],
+  sidebarCollapsed:  false,
+  sidebarMobileOpen: false,
+  activeModal:       null,
+  toasts:            [],
 };
 
 const uiSlice = createSlice({
@@ -22,6 +24,12 @@ const uiSlice = createSlice({
     },
     setSidebarCollapsed(state, action: PayloadAction<boolean>) {
       state.sidebarCollapsed = action.payload;
+    },
+    toggleMobileSidebar(state) {
+      state.sidebarMobileOpen = !state.sidebarMobileOpen;
+    },
+    closeMobileSidebar(state) {
+      state.sidebarMobileOpen = false;
     },
     openModal(state, action: PayloadAction<string>) {
       state.activeModal = action.payload;
@@ -42,6 +50,8 @@ const uiSlice = createSlice({
 export const {
   toggleSidebar,
   setSidebarCollapsed,
+  toggleMobileSidebar,
+  closeMobileSidebar,
   openModal,
   closeModal,
   addToast,

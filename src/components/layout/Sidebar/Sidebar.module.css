@@ -216,6 +216,27 @@
   color:     var(--sidebar-label);
 }
 
+/* ── Mobile: hide sidebar off-screen, slide in when open ── */
+@media (max-width: 768px) {
+  .sidebar {
+    transform:  translateX(-100%);
+    transition: transform var(--transition-slow), width var(--transition-slow);
+  }
+  .sidebar.mobileOpen {
+    transform: translateX(0);
+  }
+  /* Always show full sidebar on mobile (never collapsed icon-only mode) */
+  .sidebar.collapsed {
+    width: var(--sidebar-width);
+    transform: translateX(-100%);
+  }
+  .sidebar.collapsed.mobileOpen {
+    transform: translateX(0);
+  }
+  /* Hide desktop collapse toggle on mobile */
+  .collapseBtn { display: none; }
+}
+
 /* ── Collapse toggle ── */
 .collapseBtn {
   position:       absolute;

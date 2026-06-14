@@ -11,6 +11,15 @@
   padding: var(--space-5);
 }
 
+@media (max-width: 768px) {
+  .grid     { grid-template-columns: 1fr; }
+  .statGrid { grid-template-columns: 1fr 1fr; padding: var(--space-3); }
+}
+
+@media (max-width: 480px) {
+  .statGrid { grid-template-columns: 1fr; }
+}
+
 .statBox {
   background: var(--color-bg-subtle);
   border-radius: var(--radius-md);

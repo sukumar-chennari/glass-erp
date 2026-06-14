@@ -17,6 +17,10 @@
   gap: var(--space-4);
 }
 
+@media (max-width: 600px) {
+  .row { grid-template-columns: 1fr; }
+}
+
 .sectionTitle {
   font-size: var(--font-size-sm);
   font-weight: 700;

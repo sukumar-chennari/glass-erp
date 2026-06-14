@@ -2,19 +2,20 @@ import { NavLink } from 'react-router-dom';
 import * as LucideIcons from 'lucide-react';
 import { ChevronLeft, Diamond } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { toggleSidebar } from '@/store/slices/uiSlice';
+import { toggleSidebar, closeMobileSidebar } from '@/store/slices/uiSlice';
 import { NAV_ITEMS, NAV_SECTION_LABELS, type NavItem } from '@/constants/nav';
 import { LABELS } from '@/constants/labels';
 import styles from './Sidebar.module.css';
 
 export function Sidebar() {
-  const dispatch   = useAppDispatch();
-  const collapsed  = useAppSelector((s) => s.ui.sidebarCollapsed);
+  const dispatch    = useAppDispatch();
+  const collapsed   = useAppSelector((s) => s.ui.sidebarCollapsed);
+  const mobileOpen  = useAppSelector((s) => s.ui.sidebarMobileOpen);
 
   const sections: NavItem['section'][] = ['main', 'management'];
 
   return (
-    <aside className={`${styles.sidebar} ${collapsed ? styles.collapsed : ''}`}>
+    <aside className={`${styles.sidebar} ${collapsed ? styles.collapsed : ''} ${mobileOpen ? styles.mobileOpen : ''}`}>
       {/* Brand */}
       <div className={styles.brand}>
         <div className={styles.logoBox}>
@@ -60,6 +61,7 @@ export function Sidebar() {
                           `${styles.navLink} ${isActive ? styles.active : ''}`
                         }
                         title={collapsed ? item.label : undefined}
+                        onClick={() => dispatch(closeMobileSidebar())}
                       >
                         <span className={styles.navIcon}>
                           {Icon ? <Icon size={18} /> : null}

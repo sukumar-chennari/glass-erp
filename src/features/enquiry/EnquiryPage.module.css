@@ -8,17 +8,22 @@
 /* ── Send Panel ── */
 .sendPanel {
   flex:      1;
-  min-width: 300px;
+  min-width: min(300px, 100%);
   max-width: 460px;
 }
 
 /* ── Setup Panel ── */
 .setupPanel {
   flex:         1;
-  min-width:    280px;
+  min-width:    min(280px, 100%);
   max-width:    400px;
   border-color: rgba(99, 102, 241, 0.25) !important;
   background:   rgba(99, 102, 241, 0.04) !important;
+}
+
+@media (max-width: 680px) {
+  .panels    { flex-direction: column; gap: 16px; }
+  .sendPanel, .setupPanel { min-width: 0; max-width: 100%; flex: none; width: 100%; }
 }
 
 /* ── Section title ── */
