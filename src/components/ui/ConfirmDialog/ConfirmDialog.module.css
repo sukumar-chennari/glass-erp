@@ -6,7 +6,7 @@
 }
 
 .icon {
-  color: var(--color-danger, #dc2626);
+  color: var(--color-danger-text);
   flex-shrink: 0;
   margin-top: 2px;
 }

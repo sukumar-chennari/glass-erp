@@ -12,9 +12,9 @@
   gap:           6px;
   padding:       8px 18px;
   border-radius: 10px;
-  border:        1px solid rgba(255, 255, 255, 0.08);
-  background:    rgba(255, 255, 255, 0.03);
-  color:         rgba(255, 255, 255, 0.5);
+  border:        1px solid var(--color-tab-border);
+  background:    var(--color-tab-bg);
+  color:         var(--color-tab-text);
   font-size:     12px;
   font-weight:   600;
   cursor:        pointer;
@@ -22,18 +22,18 @@
 }
 
 .filterTab:hover {
-  background: rgba(255, 255, 255, 0.07);
-  color:      rgba(255, 255, 255, 0.8);
+  background: var(--color-tab-hover-bg);
+  color:      var(--color-tab-hover-text);
 }
 
 .filterTabActive {
-  background:   linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(168, 85, 247, 0.2));
-  border-color: rgba(99, 102, 241, 0.5);
-  color:        #fff;
+  background:   var(--color-tab-active-bg);
+  border-color: var(--color-tab-active-border);
+  color:        var(--color-tab-active-text);
 }
 
 .filterCount {
-  background:    rgba(255, 255, 255, 0.15);
+  background:    var(--color-tab-count-bg);
   border-radius: 10px;
   padding:       1px 7px;
   font-size:     10px;
@@ -41,7 +41,7 @@
 }
 
 .filterTabActive .filterCount {
-  background: rgba(255, 255, 255, 0.25);
+  background: var(--color-tab-count-active);
 }
 
 /* ── Card grid ── */
@@ -65,7 +65,7 @@
 .skeletonCard {
   height:        160px;
   border-radius: 14px;
-  background:    linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(99,102,241,0.06) 50%, rgba(255,255,255,0.04) 75%);
+  background:    linear-gradient(90deg, var(--color-skeleton-from) 25%, var(--color-skeleton-mid) 50%, var(--color-skeleton-from) 75%);
   background-size: 200% 100%;
   animation:     shimmer 1.5s infinite;
 }
@@ -84,11 +84,11 @@
 .emptyTitle {
   font-size:     18px;
   font-weight:   600;
-  color:         rgba(255, 255, 255, 0.45);
+  color:         var(--color-text-muted);
   margin-bottom: 8px;
 }
 
 .emptyHint {
   font-size: 13px;
-  color:     rgba(255, 255, 255, 0.25);
+  color:     var(--color-text-disabled);
 }

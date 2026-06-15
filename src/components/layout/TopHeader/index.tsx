@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { NAV_ITEMS } from '@/constants/nav';
 import { useAppDispatch } from '@/store/hooks';
 import { toggleMobileSidebar } from '@/store/slices/uiSlice';
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import styles from './TopHeader.module.css';
 
 export function TopHeader() {
@@ -44,6 +45,8 @@ export function TopHeader() {
           <Bell size={18} />
           <span className={styles.notifDot} />
         </button>
+
+        <ThemeToggle />
 
         <button className={styles.iconBtn} aria-label="Settings">
           <Settings size={18} />

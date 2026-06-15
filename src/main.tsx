@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { Provider }   from 'react-redux';
 import { store }      from '@/store';
 import { ToastProvider } from '@/components/ui/Toast';
+import { ThemeProvider } from '@/context/ThemeContext';
 import App            from './App';
 import '@/styles/globals.css';
 
@@ -11,10 +12,12 @@ if (!root) throw new Error('#root element not found in index.html');
 
 createRoot(root).render(
   <StrictMode>
-    <Provider store={store}>
-      <ToastProvider>
-        <App />
-      </ToastProvider>
-    </Provider>
+    <ThemeProvider>
+      <Provider store={store}>
+        <ToastProvider>
+          <App />
+        </ToastProvider>
+      </Provider>
+    </ThemeProvider>
   </StrictMode>,
 );

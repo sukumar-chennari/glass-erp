@@ -10,7 +10,7 @@
 }
 
 .icon {
-  color: var(--color-danger, #dc2626);
+  color: var(--color-danger-text);
 }
 
 .title {

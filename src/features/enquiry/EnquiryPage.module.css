@@ -17,8 +17,8 @@
   flex:         1;
   min-width:    min(280px, 100%);
   max-width:    400px;
-  border-color: rgba(99, 102, 241, 0.25) !important;
-  background:   rgba(99, 102, 241, 0.04) !important;
+  border-color: var(--color-primary-border) !important;
+  background:   var(--color-primary-subtle) !important;
 }
 
 @media (max-width: 680px) {
@@ -30,7 +30,7 @@
 .panelTitle {
   font-size:     18px;
   font-weight:   700;
-  color:         #fff;
+  color:         var(--color-text-primary);
   margin-bottom: 20px;
 }
 
@@ -45,15 +45,15 @@
 }
 
 .alertSuccess {
-  background:   rgba(37, 211, 102, 0.15);
-  border-color: rgba(37, 211, 102, 0.3);
-  color:        #25d366;
+  background:   var(--color-success-bg);
+  border-color: var(--color-success-border);
+  color:        var(--color-success-text);
 }
 
 .alertError {
-  background:   rgba(244, 63, 94, 0.15);
-  border-color: rgba(244, 63, 94, 0.3);
-  color:        #f43f5e;
+  background:   var(--color-danger-bg);
+  border-color: var(--color-danger-border);
+  color:        var(--color-danger-text);
 }
 
 /* ── Form elements ── */
@@ -65,7 +65,7 @@
   display:       block;
   font-size:     13px;
   font-weight:   600;
-  color:         rgba(255, 255, 255, 0.9);
+  color:         var(--color-text-primary);
   margin-bottom: 8px;
 }
 
@@ -76,12 +76,12 @@
 }
 
 .prefix {
-  background:    rgba(255, 255, 255, 0.07);
-  border:        1px solid rgba(255, 255, 255, 0.12);
+  background:    var(--color-bg-subtle);
+  border:        1px solid var(--color-border-input);
   border-radius: 10px;
   padding:       12px 14px;
   font-size:     13px;
-  color:         rgba(255, 255, 255, 0.6);
+  color:         var(--color-text-muted);
   white-space:   nowrap;
   flex-shrink:   0;
 }
@@ -89,23 +89,23 @@
 .phoneInput {
   flex:          1;
   padding:       12px 16px;
-  background:    rgba(255, 255, 255, 0.05);
-  border:        1px solid rgba(255, 255, 255, 0.1);
+  background:    var(--color-bg-input);
+  border:        1px solid var(--color-border-input);
   border-radius: 10px;
-  color:         #fff;
+  color:         var(--color-text-primary);
   font-size:     13px;
   font-family:   inherit;
   outline:       none;
   transition:    border-color 0.2s;
 }
 
-.phoneInput::placeholder { color: rgba(255, 255, 255, 0.4); }
+.phoneInput::placeholder { color: var(--color-text-disabled); }
 .phoneInput:focus {
-  border-color: rgba(99, 102, 241, 0.5);
-  box-shadow:   0 0 0 3px rgba(99, 102, 241, 0.12);
+  border-color: var(--color-border-focus);
+  box-shadow:   0 0 0 3px var(--color-focus-ring);
 }
 
-/* ── WhatsApp button ── */
+/* ── WhatsApp button — intentional brand green, unchanged across themes ── */
 .waBtn {
   width:           100%;
   padding:         14px;
@@ -134,15 +134,15 @@
 .savedUrlBox {
   margin-top:    20px;
   padding:       14px;
-  background:    rgba(255, 255, 255, 0.03);
+  background:    var(--color-card-bg);
   border-radius: 10px;
-  border:        1px solid rgba(255, 255, 255, 0.07);
+  border:        1px solid var(--color-card-border);
 }
 
 .savedUrlLabel {
   font-size:      11px;
   font-weight:    700;
-  color:          rgba(255, 255, 255, 0.35);
+  color:          var(--color-text-disabled);
   text-transform: uppercase;
   letter-spacing: 0.8px;
   margin-bottom:  8px;
@@ -150,24 +150,24 @@
 
 .savedUrlText {
   font-size:  12px;
-  color:      rgba(99, 102, 241, 0.9);
+  color:      var(--color-primary);
   word-break: break-all;
 }
 
 .savedUrlEmpty {
   font-size: 12px;
-  color:     rgba(255, 255, 255, 0.35);
+  color:     var(--color-text-disabled);
 }
 
 /* ── Setup panel body ── */
 .setupDesc {
   font-size:     12px;
-  color:         rgba(255, 255, 255, 0.45);
+  color:         var(--color-text-muted);
   margin-bottom: 18px;
   line-height:   1.7;
 }
 
-.setupDesc strong { color: rgba(255, 255, 255, 0.75); }
+.setupDesc strong { color: var(--color-text-secondary); }
 
 .steps {
   display:       flex;
@@ -177,7 +177,7 @@
 }
 
 .step {
-  background:    rgba(255, 255, 255, 0.05);
+  background:    var(--color-glass-bg);
   border-radius: 10px;
   padding:       14px;
 }
@@ -185,17 +185,17 @@
 .stepTitle {
   font-size:     12px;
   font-weight:   700;
-  color:         #a78bfa;
+  color:         var(--color-accent);
   margin-bottom: 8px;
 }
 
 .stepDesc {
   font-size:   12px;
-  color:       rgba(255, 255, 255, 0.5);
+  color:       var(--color-text-muted);
   line-height: 1.7;
 }
 
-.stepDesc strong { color: #fff; }
+.stepDesc strong { color: var(--color-text-primary); }
 
 .urlRow {
   display:     flex;
@@ -207,10 +207,10 @@
 .urlInput {
   flex:          1;
   padding:       10px 12px;
-  background:    rgba(255, 255, 255, 0.05);
-  border:        1px solid rgba(255, 255, 255, 0.1);
+  background:    var(--color-bg-input);
+  border:        1px solid var(--color-border-input);
   border-radius: 10px;
-  color:         #fff;
+  color:         var(--color-text-primary);
   font-size:     12px;
   font-family:   inherit;
   outline:       none;
@@ -218,15 +218,15 @@
   min-width:     0;
 }
 
-.urlInput::placeholder { color: rgba(255, 255, 255, 0.35); }
-.urlInput:focus { border-color: rgba(99, 102, 241, 0.5); }
+.urlInput::placeholder { color: var(--color-text-disabled); }
+.urlInput:focus { border-color: var(--color-border-focus); }
 
 .setupNote {
   padding:       12px;
-  background:    rgba(37, 211, 102, 0.08);
-  border:        1px solid rgba(37, 211, 102, 0.2);
+  background:    var(--color-success-bg);
+  border:        1px solid var(--color-success-border);
   border-radius: 10px;
   font-size:     12px;
-  color:         rgba(255, 255, 255, 0.5);
+  color:         var(--color-text-muted);
   line-height:   1.6;
 }

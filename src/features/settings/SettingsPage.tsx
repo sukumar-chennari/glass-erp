@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
 import { Button } from '@/components/ui/Button';
 import { useToast } from '@/components/ui/Toast';
+import { AppearanceSection } from './components/AppearanceSection';
 import type { SelectOption } from '@/types/ui';
 import styles from './SettingsPage.module.css';
 
@@ -182,6 +183,17 @@ export function SettingsPage() {
             checked={invoiceDueAlert}
             onChange={setInvoiceDueAlert}
           />
+        </div>
+      </SectionCard>
+
+      {/* Appearance */}
+      <SectionCard>
+        <div className={styles.section}>
+          <h3 className={styles.sectionTitle}>Appearance</h3>
+          <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-muted)', marginBottom: 'var(--space-4)' }}>
+            Choose a colour theme. Your selection is saved automatically and persists across sessions.
+          </p>
+          <AppearanceSection />
         </div>
       </SectionCard>
 

@@ -1,0 +1,92 @@
+/* ── Preset grid ── */
+.presetGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-4);
+}
+
+/* ── Preset card ── */
+.preset {
+  border:        2px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding:       var(--space-4);
+  cursor:        pointer;
+  background:    var(--color-bg-subtle);
+  transition:    border-color 0.2s ease, transform 0.15s ease, box-shadow 0.15s ease;
+  display:       flex;
+  flex-direction:column;
+  gap:           var(--space-3);
+  position:      relative;
+}
+
+.preset:hover {
+  border-color: var(--color-border-strong);
+  transform:    translateY(-2px);
+  box-shadow:   var(--shadow-md);
+}
+
+.preset.active {
+  border-color: var(--color-primary);
+  box-shadow:   0 0 0 3px var(--color-focus-ring);
+}
+
+/* ── Active checkmark ── */
+.activeBadge {
+  position:       absolute;
+  top:            10px;
+  right:          10px;
+  width:          20px;
+  height:         20px;
+  border-radius:  var(--radius-full);
+  background:     var(--color-primary);
+  color:          var(--color-text-on-primary);
+  display:        flex;
+  align-items:    center;
+  justify-content:center;
+  font-size:      11px;
+  font-weight:    700;
+  flex-shrink:    0;
+}
+
+/* ── Swatch strip ── */
+.swatches {
+  display:       flex;
+  border-radius: var(--radius-lg);
+  overflow:      hidden;
+  height:        56px;
+  flex-shrink:   0;
+}
+
+.swatchSidebar { flex: 0 0 28%; }
+.swatchBody    { flex: 1; display: flex; flex-direction: column; gap: 2px; padding: 6px; }
+.swatchHeader  { height: 10px; border-radius: var(--radius-sm); opacity: 0.7; }
+.swatchCard1   { flex: 1; border-radius: var(--radius-sm); opacity: 0.9; }
+.swatchCard2   { flex: 1; border-radius: var(--radius-sm); opacity: 0.6; }
+
+.swatchPrimary {
+  width:  12px;
+  height: 12px;
+  border-radius: var(--radius-full);
+  margin-top: var(--space-1);
+}
+
+/* ── Labels ── */
+.presetLabel {
+  font-size:   var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  color:       var(--color-text-primary);
+}
+
+.presetDesc {
+  font-size: var(--font-size-xs);
+  color:     var(--color-text-muted);
+  line-height: 1.5;
+}
+
+@media (max-width: 900px) {
+  .presetGrid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 480px) {
+  .presetGrid { grid-template-columns: 1fr; }
+}

@@ -3,13 +3,13 @@ import { Button } from '@/components/ui/Button';
 import type { Claim } from '@/types/models/claim';
 import styles from './ClaimCard.module.css';
 
-const STATUS_STYLE: Record<string, { bg: string; color: string; border: string }> = {
-  'Submitted':    { bg: 'rgba(99,102,241,0.2)',  color: '#818cf8', border: 'rgba(99,102,241,0.3)'  },
-  'Under Review': { bg: 'rgba(245,158,11,0.2)',  color: '#f59e0b', border: 'rgba(245,158,11,0.3)'  },
-  'Surveyed':     { bg: 'rgba(168,85,247,0.2)',  color: '#a855f7', border: 'rgba(168,85,247,0.3)'  },
-  'Approved':     { bg: 'rgba(16,185,129,0.2)',  color: '#10b981', border: 'rgba(16,185,129,0.3)'  },
-  'Partial':      { bg: 'rgba(251,146,60,0.2)',  color: '#fb923c', border: 'rgba(251,146,60,0.3)'  },
-  'Rejected':     { bg: 'rgba(244,63,94,0.2)',   color: '#f43f5e', border: 'rgba(244,63,94,0.3)'   },
+const STATUS_CLASS: Record<string, string> = {
+  'Submitted':    styles.pillSubmitted,
+  'Under Review': styles.pillUnderReview,
+  'Surveyed':     styles.pillSurveyed,
+  'Approved':     styles.pillApproved,
+  'Partial':      styles.pillPartial,
+  'Rejected':     styles.pillRejected,
 };
 
 const DOT_CLASS: Record<string, string> = {
@@ -36,25 +36,32 @@ export function ClaimCard({ claim, onEdit, onDelete }: ClaimCardProps) {
     ? Math.min(100, Math.round((claim.approvedAmount / claim.claimedAmount) * 100))
     : 0;
 
-  const progressBg =
-    claim.status === 'Approved'     ? 'linear-gradient(90deg, #10b981, #059669)' :
-    claim.status === 'Partial'      ? 'linear-gradient(90deg, #f59e0b, #d97706)' :
-    claim.status === 'Rejected'     ? '#f43f5e' :
-    claim.status === 'Under Review' ? 'linear-gradient(90deg, #6366f1, #a855f7)' :
-    'linear-gradient(90deg, #6366f1, #a855f7)';
+  const pillClass = STATUS_CLASS[claim.status] ?? styles.pillDefault;
 
-  const approvedColor =
-    claim.status === 'Approved' ? '#10b981' :
-    claim.status === 'Partial'  ? '#f59e0b' :
-    'rgba(255,255,255,0.3)';
+  const progressClass =
+    claim.status === 'Approved'     ? styles.progressApproved :
+    claim.status === 'Partial'      ? styles.progressPartial  :
+    claim.status === 'Rejected'     ? styles.progressRejected :
+    styles.progressPending;
 
-  const balanceColor = claim.customerBalance > 0 ? '#f43f5e' : '#10b981';
+  const approvedAmtClass =
+    !hasApproval               ? styles.amtPending  :
+    claim.status === 'Approved' ? styles.amtApproved :
+    styles.amtPartial;
+
+  const balanceClass =
+    !hasApproval               ? styles.amtPending :
+    claim.customerBalance > 0   ? styles.balanceOwed :
+    styles.balancePaid;
+
+  const progressLabelClass =
+    pct === 0                  ? styles.progressLabelWaiting  :
+    claim.status === 'Approved' ? styles.progressLabelApproved :
+    styles.progressLabelPartial;
 
   const submittedDate = new Date(claim.submittedAt).toLocaleDateString('en-IN', {
     day: '2-digit', month: 'short', year: 'numeric',
   });
-
-  const st = STATUS_STYLE[claim.status] ?? { bg: 'rgba(255,255,255,0.1)', color: '#fff', border: 'transparent' };
 
   return (
     <div className={styles.card}>
@@ -62,10 +69,7 @@ export function ClaimCard({ claim, onEdit, onDelete }: ClaimCardProps) {
       <div className={styles.header}>
         <div className={styles.idWrap}>
           <span className={styles.id}>{claim.claimNumber}</span>
-          <span
-            className={styles.statusPill}
-            style={{ background: st.bg, color: st.color, borderColor: st.border }}
-          >
+          <span className={`${styles.statusPill} ${pillClass}`}>
             {claim.status}
           </span>
         </div>
@@ -103,14 +107,14 @@ export function ClaimCard({ claim, onEdit, onDelete }: ClaimCardProps) {
           <span className={styles.amtArrow}>→</span>
           <div className={styles.amtItem}>
             <div className={styles.amtLbl}>Approved</div>
-            <div className={styles.amtVal} style={{ color: hasApproval ? approvedColor : 'rgba(255,255,255,0.3)' }}>
+            <div className={`${styles.amtVal} ${approvedAmtClass}`}>
               {hasApproval ? fmt(claim.approvedAmount) : 'Pending'}
             </div>
           </div>
           <span className={styles.amtArrow}>→</span>
           <div className={styles.amtItem}>
             <div className={styles.amtLbl}>Customer Pays</div>
-            <div className={styles.amtVal} style={{ color: hasApproval ? balanceColor : 'rgba(255,255,255,0.3)' }}>
+            <div className={`${styles.amtVal} ${balanceClass}`}>
               {hasApproval
                 ? (claim.customerBalance > 0 ? fmt(claim.customerBalance) : '₹0')
                 : 'TBD'}
@@ -120,13 +124,10 @@ export function ClaimCard({ claim, onEdit, onDelete }: ClaimCardProps) {
 
         {/* Progress bar */}
         <div className={styles.progressBar}>
-          <div className={styles.progressFill} style={{ width: `${pct}%`, background: progressBg }} />
+          <div className={`${styles.progressFill} ${progressClass}`} style={{ width: `${pct}%` }} />
         </div>
-        <div className={styles.progressLabel}>
-          {pct > 0
-            ? <span style={{ color: approvedColor }}>{pct}% covered</span>
-            : <span style={{ color: 'rgba(255,255,255,0.35)' }}>Awaiting decision</span>
-          }
+        <div className={`${styles.progressLabel} ${progressLabelClass}`}>
+          {pct > 0 ? `${pct}% covered` : 'Awaiting decision'}
         </div>
       </div>
 

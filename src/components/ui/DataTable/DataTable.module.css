@@ -9,7 +9,7 @@
   font-size:       var(--font-size-base);
 }
 
-/* ── Head ── */
+/* Head */
 .thead { background: transparent; }
 
 .th {
@@ -17,12 +17,12 @@
   text-align:     left;
   font-size:      var(--font-size-xs);
   font-weight:    var(--font-weight-bold);
-  color:          rgba(255, 255, 255, 0.8);
+  color:          var(--color-table-head-text);
   text-transform: uppercase;
   letter-spacing: var(--letter-spacing-wide);
-  border-bottom:  1px solid rgba(255, 255, 255, 0.05);
+  border-bottom:  1px solid var(--color-border);
   white-space:    nowrap;
-  background:     rgba(99, 102, 241, 0.08);
+  background:     var(--color-table-head-bg);
 }
 
 .th.sortable {
@@ -33,29 +33,29 @@
   gap:         var(--space-1);
 }
 
-.th.sortable:hover { color: #fff; }
+.th.sortable:hover { color: var(--color-text-primary); }
 
 .th.right, .td.right { text-align: right; }
 .th.center, .td.center { text-align: center; }
 
-/* ── Body ── */
+/* Body */
 .tr {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid var(--color-table-row-border);
   transition:    background var(--transition-fast);
 }
 
 .tr:last-child { border-bottom: none; }
 
-.tr:hover { background: rgba(99, 102, 241, 0.06); }
+.tr:hover { background: var(--color-table-row-hover); }
 
 .td {
   padding:        var(--space-3) var(--space-4);
-  color:          rgba(255, 255, 255, 0.8);
+  color:          var(--color-table-cell-text);
   white-space:    nowrap;
   vertical-align: middle;
 }
 
-/* ── Empty / Loading ── */
+/* Empty / Loading */
 .emptyRow td,
 .loadingRow td {
   text-align: center;
@@ -64,11 +64,11 @@
   font-size:  var(--font-size-md);
 }
 
-/* ── Skeleton shimmer ── */
+/* Skeleton shimmer */
 .skeleton {
   height:        14px;
   border-radius: var(--radius-sm);
-  background:    linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(99,102,241,0.08) 50%, rgba(255,255,255,0.04) 75%);
+  background:    linear-gradient(90deg, var(--color-bg-subtle) 25%, var(--color-table-head-bg) 50%, var(--color-bg-subtle) 75%);
   background-size: 200% 100%;
   animation:     shimmer 1.5s infinite;
 }

@@ -2,8 +2,8 @@
   width:            var(--sidebar-width);
   height:           100vh;
   background:       var(--sidebar-bg);
-  backdrop-filter:  blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter:  var(--sidebar-blur);
+  -webkit-backdrop-filter: var(--sidebar-blur);
   border-right:     1px solid var(--sidebar-border);
   display:          flex;
   flex-direction:   column;
@@ -25,8 +25,8 @@
   display:        flex;
   align-items:    center;
   gap:            var(--space-3);
-  background:     linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(168, 85, 247, 0.1) 100%);
-  border-bottom:  1px solid rgba(255, 255, 255, 0.05);
+  background:     var(--sidebar-brand-bg);
+  border-bottom:  1px solid var(--sidebar-border);
   flex-shrink:    0;
   min-height:     var(--header-height);
   overflow:       hidden;
@@ -36,13 +36,13 @@
   width:         48px;
   height:        48px;
   border-radius: 14px;
-  background:    linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
+  background:    var(--color-brand-gradient);
   display:       flex;
   align-items:   center;
   justify-content:center;
   flex-shrink:   0;
-  box-shadow:    0 8px 32px rgba(99, 102, 241, 0.4);
-  color:         #fff;
+  box-shadow:    0 8px 32px var(--color-brand-gradient-shadow);
+  color:         var(--color-text-on-primary);
 }
 
 .brandText {
@@ -53,7 +53,7 @@
 .brandName {
   font-size:   var(--font-size-md);
   font-weight: var(--font-weight-bold);
-  background:  linear-gradient(135deg, #6366f1, #a855f7, #ec4899);
+  background:  var(--color-brand-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -158,8 +158,8 @@
 .navBadge {
   flex-shrink:   0;
   padding:       3px 8px;
-  background:    linear-gradient(135deg, #f43f5e, #ec4899);
-  color:         #fff;
+  background:    var(--color-danger-text);
+  color:         var(--color-text-on-primary);
   border-radius: 6px;
   font-size:     var(--font-size-2xs);
   font-weight:   var(--font-weight-bold);
@@ -181,8 +181,8 @@
   gap:           var(--space-3);
   padding:       var(--space-2) var(--space-3);
   border-radius: 12px;
-  background:    rgba(255, 255, 255, 0.05);
-  border:        1px solid rgba(255, 255, 255, 0.1);
+  background:    var(--sidebar-glass-bg);
+  border:        1px solid var(--sidebar-glass-border);
   overflow:      hidden;
 }
 
@@ -190,13 +190,13 @@
   width:         40px;
   height:        40px;
   border-radius: 10px;
-  background:    linear-gradient(135deg, #6366f1, #a855f7);
+  background:    var(--color-brand-gradient);
   display:       flex;
   align-items:   center;
   justify-content:center;
   font-weight:   var(--font-weight-bold);
   font-size:     var(--font-size-sm);
-  color:         #fff;
+  color:         var(--color-text-on-primary);
   flex-shrink:   0;
 }
 
@@ -205,7 +205,7 @@
 .userName {
   font-size:   var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
-  color:       rgba(255, 255, 255, 0.9);
+  color:       var(--sidebar-text-hover);
   white-space: nowrap;
   overflow:    hidden;
   text-overflow:ellipsis;
@@ -214,6 +214,35 @@
 .userRole {
   font-size: var(--font-size-xs);
   color:     var(--sidebar-label);
+}
+
+/* ── Collapse toggle ── */
+.collapseBtn {
+  position:       absolute;
+  right:          -12px;
+  top:            80px;
+  width:          24px;
+  height:         24px;
+  border-radius:  var(--radius-full);
+  background:     var(--sidebar-collapse-bg);
+  border:         1px solid var(--sidebar-collapse-border);
+  display:        flex;
+  align-items:    center;
+  justify-content:center;
+  cursor:         pointer;
+  color:          var(--sidebar-collapse-text);
+  box-shadow:     0 2px 8px var(--sidebar-collapse-shadow);
+  transition:     transform var(--transition-base), color var(--transition-fast);
+  z-index:        1;
+}
+
+.collapseBtn:hover {
+  color:      var(--color-text-on-primary);
+  background: var(--sidebar-collapse-hover-bg);
+}
+
+.sidebar.collapsed .collapseBtn {
+  transform: rotate(180deg);
 }
 
 /* ── Mobile: hide sidebar off-screen, slide in when open ── */
@@ -225,7 +254,6 @@
   .sidebar.mobileOpen {
     transform: translateX(0);
   }
-  /* Always show full sidebar on mobile (never collapsed icon-only mode) */
   .sidebar.collapsed {
     width: var(--sidebar-width);
     transform: translateX(-100%);
@@ -233,35 +261,5 @@
   .sidebar.collapsed.mobileOpen {
     transform: translateX(0);
   }
-  /* Hide desktop collapse toggle on mobile */
   .collapseBtn { display: none; }
-}
-
-/* ── Collapse toggle ── */
-.collapseBtn {
-  position:       absolute;
-  right:          -12px;
-  top:            80px;
-  width:          24px;
-  height:         24px;
-  border-radius:  var(--radius-full);
-  background:     rgba(26, 26, 62, 0.9);
-  border:         1px solid rgba(255, 255, 255, 0.15);
-  display:        flex;
-  align-items:    center;
-  justify-content:center;
-  cursor:         pointer;
-  color:          rgba(255, 255, 255, 0.7);
-  box-shadow:     0 2px 8px rgba(0, 0, 0, 0.4);
-  transition:     transform var(--transition-base), color var(--transition-fast);
-  z-index:        1;
-}
-
-.collapseBtn:hover {
-  color: #fff;
-  background: rgba(99, 102, 241, 0.3);
-}
-
-.sidebar.collapsed .collapseBtn {
-  transform: rotate(180deg);
 }
