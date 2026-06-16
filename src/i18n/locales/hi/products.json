@@ -1,0 +1,65 @@
+{
+  "title": "उत्पाद",
+  "description": "ग्लास उत्पाद सूची और मूल्य निर्धारण।",
+  "count_one": "{{count}} उत्पाद",
+  "count_other": "{{count}} उत्पाद",
+  "table": {
+    "product": "उत्पाद",
+    "vehicle": "वाहन",
+    "position": "स्थिति",
+    "priceInclGst": "मूल्य (GST सहित)",
+    "stock": "स्टॉक",
+    "status": "स्थिति",
+    "empty": "कोई उत्पाद नहीं मिला। अपना पहला उत्पाद जोड़ें।",
+    "aria": {
+      "edit": "उत्पाद संपादित करें",
+      "delete": "उत्पाद हटाएं"
+    }
+  },
+  "form": {
+    "title": {
+      "add": "उत्पाद जोड़ें",
+      "edit": "उत्पाद संपादित करें"
+    },
+    "name": "उत्पाद का नाम",
+    "sku": "SKU",
+    "glassPosition": "ग्लास स्थिति",
+    "vehicleMake": "वाहन निर्माता",
+    "vehicleModel": "वाहन मॉडल",
+    "vehicleYear": "वर्ष सीमा",
+    "price": "बिक्री मूल्य (₹)",
+    "costPrice": "लागत मूल्य (₹)",
+    "gstRate": "GST दर",
+    "stockQty": "स्टॉक मात्रा",
+    "lowStockThreshold": "कम स्टॉक सीमा",
+    "vendor": "विक्रेता (वैकल्पिक)",
+    "placeholders": {
+      "name": "जैसे: Maruti Swift आगे का विंडशील्ड",
+      "sku": "जैसे: MS-SW-FW-001",
+      "vehicleMake": "जैसे: Maruti Suzuki",
+      "vehicleModel": "जैसे: Swift",
+      "vehicleYear": "जैसे: 2018-2024"
+    },
+    "hints": {
+      "lowStockThreshold": "स्टॉक इस सीमा से कम होने पर सूचना"
+    },
+    "errors": {
+      "nameRequired": "उत्पाद का नाम आवश्यक है",
+      "vehicleMakeRequired": "वाहन निर्माता आवश्यक है",
+      "vehicleModelRequired": "वाहन मॉडल आवश्यक है",
+      "selectPosition": "ग्लास स्थिति चुनें",
+      "priceInvalid": "वैध मूल्य दर्ज करें",
+      "costPriceInvalid": "वैध लागत मूल्य दर्ज करें",
+      "stockNegative": "स्टॉक नकारात्मक नहीं हो सकता",
+      "thresholdMin": "सीमा कम से कम 1 होनी चाहिए"
+    }
+  },
+  "messages": {
+    "added": "उत्पाद जोड़ा गया",
+    "updated": "उत्पाद अपडेट किया गया",
+    "removed": "उत्पाद हटाया गया",
+    "saveFailed": "उत्पाद सहेजना विफल हुआ",
+    "removeFailed": "उत्पाद हटाना विफल हुआ",
+    "confirmDelete": "इस उत्पाद को हटाएं? इसे पूर्ववत नहीं किया जा सकता।"
+  }
+}

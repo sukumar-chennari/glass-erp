@@ -6,6 +6,7 @@ import { ToastProvider } from '@/components/ui/Toast';
 import { ThemeProvider } from '@/context/ThemeContext';
 import App            from './App';
 import '@/styles/globals.css';
+import '@/i18n';
 
 const root = document.getElementById('root');
 if (!root) throw new Error('#root element not found in index.html');

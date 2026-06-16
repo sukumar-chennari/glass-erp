@@ -1,0 +1,65 @@
+{
+  "title": "Customers",
+  "description": "Customer directory with vehicle and service history.",
+  "count_one": "{{count}} customer",
+  "count_other": "{{count}} customers",
+  "table": {
+    "customer": "Customer",
+    "phone": "Phone",
+    "city": "City",
+    "vehicles": "Vehicles",
+    "jobs": "Jobs",
+    "joined": "Joined",
+    "empty": "No customers yet. Add your first customer.",
+    "aria": {
+      "edit": "Edit customer",
+      "delete": "Delete customer"
+    }
+  },
+  "form": {
+    "title": {
+      "add": "Add Customer",
+      "edit": "Edit Customer"
+    },
+    "name": "Full Name",
+    "phone": "Phone",
+    "email": "Email",
+    "city": "City",
+    "address": "Address",
+    "vehicle": {
+      "sectionLabel": "Vehicle Details",
+      "make": "Make",
+      "model": "Model",
+      "year": "Year",
+      "color": "Color",
+      "registrationNo": "Registration Number"
+    },
+    "placeholders": {
+      "name": "e.g. Ravi Kumar",
+      "phone": "10-digit mobile",
+      "email": "customer@gmail.com",
+      "city": "e.g. New Delhi",
+      "address": "Street address (optional)",
+      "vehicleMake": "e.g. Honda",
+      "vehicleModel": "e.g. City",
+      "vehicleColor": "e.g. White",
+      "registrationNo": "e.g. DL 01 AB 1234"
+    },
+    "errors": {
+      "nameRequired": "Customer name is required",
+      "yearMin": "Enter year after 1990",
+      "yearMax": "Year cannot be in the future",
+      "regNoRequired": "Registration number is required",
+      "vehicleMakeRequired": "Vehicle make is required",
+      "vehicleModelRequired": "Vehicle model is required"
+    }
+  },
+  "messages": {
+    "added": "Customer added",
+    "updated": "Customer updated",
+    "removed": "Customer removed",
+    "saveFailed": "Failed to save customer",
+    "removeFailed": "Failed to remove customer",
+    "confirmDelete": "Remove this customer? This cannot be undone."
+  }
+}

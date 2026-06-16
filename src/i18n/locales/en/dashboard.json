@@ -1,0 +1,47 @@
+{
+  "title": "Dashboard",
+  "description": "Welcome back! Here’s your business at a glance — {{date}}.",
+  "error": {
+    "loadFailed": "Failed to load dashboard data. Please refresh."
+  },
+  "kpi": {
+    "revenue": "Revenue",
+    "activeJobs": "Active Jobs",
+    "pendingClaims": "Pending Claims",
+    "stockAlerts": "Stock Alerts"
+  },
+  "sections": {
+    "recentCustomers": "Recent Customers",
+    "pendingClaims": "Pending Claims",
+    "recentJobs": "Recent Job Cards"
+  },
+  "table": {
+    "customers": {
+      "customer": "Customer",
+      "vehicle": "Vehicle",
+      "regNo": "Reg. No.",
+      "jobs": "Jobs"
+    },
+    "claims": {
+      "claimNo": "Claim #",
+      "customer": "Customer",
+      "amount": "Amount",
+      "days": "Days",
+      "status": "Status"
+    },
+    "jobs": {
+      "jobNo": "Job #",
+      "customer": "Customer",
+      "vehicle": "Vehicle",
+      "glass": "Glass",
+      "date": "Date",
+      "status": "Status"
+    }
+  },
+  "empty": {
+    "customers": "No customers yet.",
+    "claims": "No pending claims.",
+    "jobs": "No recent jobs."
+  },
+  "viewAll": "View All"
+}

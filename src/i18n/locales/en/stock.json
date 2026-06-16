@@ -1,0 +1,33 @@
+{
+  "title": "Stock Management",
+  "description": "Monitor inventory levels and stock movements.",
+  "table": {
+    "product": "Product",
+    "sku": "SKU",
+    "qty": "Qty",
+    "minQty": "Min Qty",
+    "status": "Status",
+    "lastUpdated": "Last Updated",
+    "actions": "Actions",
+    "empty": "No stock entries found."
+  },
+  "adjust": {
+    "title": "Adjust Stock",
+    "hint": "Use positive numbers to add stock, negative to remove",
+    "currentStock": "Current stock: {{qty}} units",
+    "adjustment": "Adjustment",
+    "reason": "Reason",
+    "placeholders": {
+      "reason": "e.g. Damaged, Returned, Received shipment"
+    },
+    "validation": {
+      "nonZero": "Cannot adjust by 0",
+      "reason": "Enter a reason for the adjustment"
+    }
+  },
+  "messages": {
+    "adjusted": "Stock adjusted",
+    "adjustFailed": "Failed to adjust stock",
+    "confirmAdjust": "Adjust stock for this item?"
+  }
+}

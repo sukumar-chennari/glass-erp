@@ -1,0 +1,65 @@
+{
+  "title": "ग्राहक",
+  "description": "वाहन इतिहास के साथ ग्राहक निर्देशिका।",
+  "count_one": "{{count}} ग्राहक",
+  "count_other": "{{count}} ग्राहक",
+  "table": {
+    "customer": "ग्राहक",
+    "phone": "फ़ोन",
+    "city": "शहर",
+    "vehicles": "वाहन",
+    "jobs": "जॉब",
+    "joined": "जुड़े",
+    "empty": "कोई ग्राहक नहीं। अपना पहला ग्राहक जोड़ें।",
+    "aria": {
+      "edit": "ग्राहक संपादित करें",
+      "delete": "ग्राहक हटाएं"
+    }
+  },
+  "form": {
+    "title": {
+      "add": "ग्राहक जोड़ें",
+      "edit": "ग्राहक संपादित करें"
+    },
+    "name": "पूरा नाम",
+    "phone": "फ़ोन",
+    "email": "ईमेल",
+    "city": "शहर",
+    "address": "पता",
+    "vehicle": {
+      "sectionLabel": "वाहन विवरण",
+      "make": "निर्माता",
+      "model": "मॉडल",
+      "year": "वर्ष",
+      "color": "रंग",
+      "registrationNo": "पंजीकरण संख्या"
+    },
+    "placeholders": {
+      "name": "जैसे: Ravi Kumar",
+      "phone": "10-अंकीय मोबाइल",
+      "email": "customer@gmail.com",
+      "city": "जैसे: नई दिल्ली",
+      "address": "सड़क का पता (वैकल्पिक)",
+      "vehicleMake": "जैसे: Honda",
+      "vehicleModel": "जैसे: City",
+      "vehicleColor": "जैसे: सफेद",
+      "registrationNo": "जैसे: DL 01 AB 1234"
+    },
+    "errors": {
+      "nameRequired": "ग्राहक का नाम आवश्यक है",
+      "yearMin": "1990 के बाद का वर्ष दर्ज करें",
+      "yearMax": "वर्ष भविष्य में नहीं हो सकता",
+      "regNoRequired": "पंजीकरण संख्या आवश्यक है",
+      "vehicleMakeRequired": "वाहन निर्माता आवश्यक है",
+      "vehicleModelRequired": "वाहन मॉडल आवश्यक है"
+    }
+  },
+  "messages": {
+    "added": "ग्राहक जोड़ा गया",
+    "updated": "ग्राहक अपडेट किया गया",
+    "removed": "ग्राहक हटाया गया",
+    "saveFailed": "ग्राहक सहेजना विफल हुआ",
+    "removeFailed": "ग्राहक हटाना विफल हुआ",
+    "confirmDelete": "इस ग्राहक को हटाएं? इसे पूर्ववत नहीं किया जा सकता।"
+  }
+}

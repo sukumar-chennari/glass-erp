@@ -1,4 +1,5 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -8,25 +9,18 @@ import { Button } from '@/components/ui/Button';
 import type { Customer, CreateCustomerDto } from '@/types/models/customer';
 import styles from './CustomerModal.module.css';
 
-const customerSchema = z.object({
-  name:    z.string().min(2, 'Customer name is required'),
-  phone:   z.string().regex(/^[6-9]\d{9}$/, 'Enter a valid 10-digit mobile number'),
-  email:   z.string().email('Enter a valid email').optional().or(z.literal('')),
-  city:    z.string().optional(),
-  address: z.string().optional(),
-  // Vehicle fields
-  vehicleMake:  z.string().min(1, 'Vehicle make is required'),
-  vehicleModel: z.string().min(1, 'Vehicle model is required'),
-  vehicleYear:  z.coerce
-    .number()
-    .int()
-    .min(1990, 'Enter year after 1990')
-    .max(new Date().getFullYear() + 1, 'Year cannot be in the future'),
-  registrationNo: z.string().min(5, 'Registration number is required'),
-  vehicleColor:   z.string().optional(),
-});
-
-type CustomerFormData = z.infer<typeof customerSchema>;
+interface CustomerFormData {
+  name:           string;
+  phone:          string;
+  email?:         string;
+  city?:          string;
+  address?:       string;
+  vehicleMake:    string;
+  vehicleModel:   string;
+  vehicleYear:    number;
+  registrationNo: string;
+  vehicleColor?:  string;
+}
 
 interface CustomerModalProps {
   isOpen:       boolean;
@@ -43,7 +37,25 @@ export function CustomerModal({
   customer,
   isSubmitting,
 }: CustomerModalProps) {
+  const { t } = useTranslation(['customers', 'common']);
   const isEdit = !!customer;
+
+  const customerSchema = useMemo(() => z.object({
+    name:    z.string().min(2, t('form.errors.nameRequired')),
+    phone:   z.string().regex(/^[6-9]\d{9}$/, t('validation.phone')),
+    email:   z.string().email(t('validation.email')).optional().or(z.literal('')),
+    city:    z.string().optional(),
+    address: z.string().optional(),
+    vehicleMake:    z.string().min(1, t('form.errors.vehicleMakeRequired')),
+    vehicleModel:   z.string().min(1, t('form.errors.vehicleModelRequired')),
+    vehicleYear:    z.coerce
+      .number()
+      .int()
+      .min(1990, t('form.errors.yearMin'))
+      .max(new Date().getFullYear() + 1, t('form.errors.yearMax')),
+    registrationNo: z.string().min(5, t('form.errors.regNoRequired')),
+    vehicleColor:   z.string().optional(),
+  }), [t]);
 
   const {
     register,
@@ -105,15 +117,15 @@ export function CustomerModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={isEdit ? 'Edit Customer' : 'Add Customer'}
+      title={isEdit ? t('form.title.edit') : t('form.title.add')}
       maxWidth="640px"
       footer={
         <div className={styles.footer}>
           <Button variant="secondary" onClick={onClose} disabled={isSubmitting}>
-            Cancel
+            {t('actions.cancel')}
           </Button>
           <Button type="submit" form="customer-form" loading={isSubmitting}>
-            {isEdit ? 'Save Changes' : 'Add Customer'}
+            {isEdit ? t('actions.saveChanges') : t('form.title.add')}
           </Button>
         </div>
       }
@@ -126,15 +138,15 @@ export function CustomerModal({
       >
         <div className={styles.row}>
           <Input
-            label="Full Name"
-            placeholder="e.g. Ravi Kumar"
+            label={t('form.name')}
+            placeholder={t('form.placeholders.name')}
             error={errors.name?.message}
             required
             {...register('name')}
           />
           <Input
-            label="Phone"
-            placeholder="10-digit mobile"
+            label={t('form.phone')}
+            placeholder={t('form.placeholders.phone')}
             error={errors.phone?.message}
             required
             {...register('phone')}
@@ -143,42 +155,42 @@ export function CustomerModal({
 
         <div className={styles.row}>
           <Input
-            label="Email"
+            label={t('form.email')}
             type="email"
-            placeholder="customer@gmail.com"
+            placeholder={t('form.placeholders.email')}
             error={errors.email?.message}
             {...register('email')}
           />
           <Input
-            label="City"
-            placeholder="e.g. New Delhi"
+            label={t('form.city')}
+            placeholder={t('form.placeholders.city')}
             error={errors.city?.message}
             {...register('city')}
           />
         </div>
 
         <Input
-          label="Address"
-          placeholder="Street address (optional)"
+          label={t('form.address')}
+          placeholder={t('form.placeholders.address')}
           error={errors.address?.message}
           fullWidth
           {...register('address')}
         />
 
         <hr className={styles.divider} />
-        <div className={styles.sectionLabel}>Vehicle Details</div>
+        <div className={styles.sectionLabel}>{t('form.vehicle.sectionLabel')}</div>
 
         <div className={styles.row}>
           <Input
-            label="Make"
-            placeholder="e.g. Honda"
+            label={t('form.vehicle.make')}
+            placeholder={t('form.placeholders.vehicleMake')}
             error={errors.vehicleMake?.message}
             required
             {...register('vehicleMake')}
           />
           <Input
-            label="Model"
-            placeholder="e.g. City"
+            label={t('form.vehicle.model')}
+            placeholder={t('form.placeholders.vehicleModel')}
             error={errors.vehicleModel?.message}
             required
             {...register('vehicleModel')}
@@ -187,7 +199,7 @@ export function CustomerModal({
 
         <div className={styles.row}>
           <Input
-            label="Year"
+            label={t('form.vehicle.year')}
             type="number"
             placeholder={String(new Date().getFullYear())}
             error={errors.vehicleYear?.message}
@@ -195,16 +207,16 @@ export function CustomerModal({
             {...register('vehicleYear')}
           />
           <Input
-            label="Color"
-            placeholder="e.g. White"
+            label={t('form.vehicle.color')}
+            placeholder={t('form.placeholders.vehicleColor')}
             error={errors.vehicleColor?.message}
             {...register('vehicleColor')}
           />
         </div>
 
         <Input
-          label="Registration Number"
-          placeholder="e.g. DL 01 AB 1234"
+          label={t('form.vehicle.registrationNo')}
+          placeholder={t('form.placeholders.registrationNo')}
           error={errors.registrationNo?.message}
           fullWidth
           required

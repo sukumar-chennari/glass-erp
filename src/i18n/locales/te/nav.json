@@ -1,0 +1,66 @@
+{
+  "dashboard": "డాష్‌బోర్డ్",
+  "vendors": "సరఫరాదారులు",
+  "products": "ఉత్పత్తులు",
+  "purchaseOrders": "కొనుగోలు ఆర్డర్లు",
+  "customers": "కస్టమర్లు",
+  "technicians": "టెక్నీషియన్లు",
+  "jobs": "జాబ్ కార్డులు",
+  "stock": "స్టాక్ నిర్వహణ",
+  "invoices": "ఇన్వాయిస్‌లు",
+  "claims": "బీమా క్లెయిమ్‌లు",
+  "enquiry": "విచారణ",
+  "reports": "నివేదికలు",
+  "settings": "సెట్టింగ్‌లు",
+  "sections": {
+    "main": "మెను",
+    "management": "నిర్వహణ"
+  },
+  "sidebar": {
+    "brand": {
+      "name": "Glass ERP Pro",
+      "tagline": "ఆటోమొబైల్ గ్లాస్ ERP"
+    },
+    "user": {
+      "role": "అడ్మిన్"
+    },
+    "aria": {
+      "expand": "సైడ్‌బార్ విస్తరించు",
+      "collapse": "సైడ్‌బార్ కుదించు",
+      "nav": "ప్రధాన నావిగేషన్"
+    }
+  },
+  "header": {
+    "appFallback": "Glass ERP Pro",
+    "aria": {
+      "openNav": "నావిగేషన్ తెరవండి",
+      "messages": "సందేశాలు",
+      "notifications": "నోటిఫికేషన్లు",
+      "settings": "సెట్టింగ్‌లు",
+      "changeTheme": "థీమ్ మార్చు",
+      "changeLanguage": "భాష మార్చు"
+    }
+  },
+  "languageSwitcher": {
+    "label": "భాష",
+    "aria": {
+      "trigger": "భాష మార్చు",
+      "menu": "భాష ఎంపిక"
+    },
+    "languages": {
+      "en": "English",
+      "te": "తెలుగు",
+      "hi": "హిందీ"
+    }
+  },
+  "themeToggle": {
+    "aria": {
+      "trigger": "థీమ్ మార్చు",
+      "menu": "రూపాన్వేషణ"
+    },
+    "light": "లైట్",
+    "dark": "డార్క్",
+    "system": "సిస్టమ్",
+    "moreThemes": "మరిన్ని థీమ్‌లు"
+  }
+}

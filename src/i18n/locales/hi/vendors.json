@@ -1,0 +1,53 @@
+{
+  "title": "विक्रेता",
+  "description": "अपने ग्लास आपूर्तिकर्ताओं और खरीद भागीदारों का प्रबंधन करें।",
+  "count_one": "{{count}} विक्रेता",
+  "count_other": "{{count}} विक्रेता",
+  "table": {
+    "company": "कंपनी",
+    "contact": "संपर्क",
+    "phone": "फ़ोन",
+    "gst": "GST नंबर",
+    "city": "शहर",
+    "products": "आपूर्ति किए गए उत्पाद",
+    "status": "स्थिति",
+    "actions": "क्रियाएं",
+    "empty": "कोई विक्रेता नहीं मिला।"
+  },
+  "form": {
+    "title": {
+      "add": "विक्रेता जोड़ें",
+      "edit": "विक्रेता संपादित करें"
+    },
+    "companyName": "कंपनी का नाम",
+    "contactPerson": "संपर्क व्यक्ति",
+    "phone": "फ़ोन",
+    "email": "ईमेल",
+    "gstNumber": "GST नंबर",
+    "city": "शहर",
+    "state": "राज्य",
+    "address": "पता",
+    "productsSupplied": "आपूर्ति किए गए उत्पाद",
+    "productsHint": "अनेक उत्पादों को कॉमा से अलग करें",
+    "status": "स्थिति",
+    "placeholders": {
+      "companyName": "उदा. बजाज ग्लास सप्लाइज",
+      "contactPerson": "उदा. राजेश पटेल",
+      "phone": "10-अंकीय मोबाइल",
+      "email": "vendor@example.com",
+      "gstNumber": "उदा. 27AABCB1234A1Z5",
+      "city": "उदा. मुंबई",
+      "state": "उदा. महाराष्ट्र",
+      "address": "सड़क का पता (वैकल्पिक)",
+      "productsSupplied": "उदा. विंडशील्ड, साइड ग्लास, सनरूफ"
+    }
+  },
+  "messages": {
+    "added": "विक्रेता जोड़ा गया",
+    "updated": "विक्रेता अपडेट किया गया",
+    "removed": "विक्रेता हटाया गया",
+    "saveFailed": "विक्रेता को सहेजना विफल हुआ",
+    "removeFailed": "विक्रेता को हटाना विफल हुआ",
+    "confirmDelete": "इस विक्रेता को हटाएं? इसे पूर्ववत नहीं किया जा सकता।"
+  }
+}

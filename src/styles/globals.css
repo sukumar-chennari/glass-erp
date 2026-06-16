@@ -355,19 +355,21 @@ ul, ol { list-style: none; }
   --color-neutral-bg:     #f1f5f9;
   --color-neutral-border: #d1d5db;
 
-  /* Sidebar — dark navy so it contrasts the white content area */
-  --sidebar-bg:           #1e293b;
-  --sidebar-border:       rgba(255, 255, 255, 0.08);
-  --sidebar-text:         rgba(255, 255, 255, 0.55);
-  --sidebar-text-hover:   rgba(255, 255, 255, 0.9);
-  --sidebar-text-active:  #ffffff;
-  --sidebar-active-bg:    linear-gradient(135deg, rgba(99, 102, 241, 0.35), rgba(168, 85, 247, 0.2));
-  --sidebar-active-border:#818cf8;
-  --sidebar-icon:         rgba(255, 255, 255, 0.4);
-  --sidebar-label:        rgba(255, 255, 255, 0.3);
-  --sidebar-hover-bg:     rgba(99, 102, 241, 0.15);
-  --sidebar-brand-bg:     linear-gradient(135deg, rgba(99, 102, 241, 0.25) 0%, rgba(168, 85, 247, 0.15) 100%);
+  /* Sidebar — white with purple accents */
+  --sidebar-bg:           #ffffff;
+  --sidebar-border:       #e2e8f0;
+  --sidebar-text:         #475569;
+  --sidebar-text-hover:   #0f172a;
+  --sidebar-text-active:  #6366f1;
+  --sidebar-active-bg:    rgba(99, 102, 241, 0.09);
+  --sidebar-active-border:#6366f1;
+  --sidebar-icon:         #94a3b8;
+  --sidebar-label:        #94a3b8;
+  --sidebar-hover-bg:     rgba(99, 102, 241, 0.05);
+  --sidebar-brand-bg:     #f8fafc;
   --sidebar-blur:         none;
+  --sidebar-glass-bg:     rgba(99, 102, 241, 0.05);
+  --sidebar-glass-border: #e2e8f0;
 
   /* Header */
   --header-bg:     #ffffff;
@@ -468,9 +470,12 @@ ul, ol { list-style: none; }
   --color-skeleton-from: #f1f5f9;
   --color-skeleton-mid:  #e2e8f0;
 
-  /* Sidebar collapse (sidebar remains dark navy in light theme) */
-  --sidebar-collapse-bg:       rgba(0, 0, 0, 0.25);
-  --sidebar-collapse-hover-bg: rgba(99, 102, 241, 0.4);
+  /* Sidebar collapse — white pill sitting on the sidebar edge */
+  --sidebar-collapse-bg:       #ffffff;
+  --sidebar-collapse-border:   #e2e8f0;
+  --sidebar-collapse-text:     #64748b;
+  --sidebar-collapse-shadow:   rgba(0, 0, 0, 0.10);
+  --sidebar-collapse-hover-bg: rgba(99, 102, 241, 0.10);
 
   /* Button danger hover (more subtle on white bg) */
   --color-danger-hover-bg:     rgba(244, 63, 94, 0.12);
@@ -478,77 +483,186 @@ ul, ol { list-style: none; }
 }
 
 /* ============================================================
-   ORANGE THEME
+   ORANGE THEME — warm light (cream bg, dark-brown sidebar, orange brand)
    ============================================================ */
 [data-theme="orange"] {
-  --body-bg: linear-gradient(135deg, #150b00 0%, #2a1200 50%, #1a0800 100%);
+  --body-bg: #fffdf7;
 
-  /* Brand — warm orange */
-  --color-primary:        #f97316;
-  --color-primary-hover:  #ea580c;
-  --color-primary-active: #c2410c;
-  --color-primary-subtle: rgba(249, 115, 22, 0.2);
-  --color-primary-border: rgba(249, 115, 22, 0.4);
-  --color-accent:         #fb923c;
-  --color-accent-hover:   #f97316;
-  --color-accent-subtle:  rgba(251, 146, 60, 0.2);
+  /* Brand — warm saturated orange */
+  --color-primary:        #ea580c;
+  --color-primary-hover:  #c2410c;
+  --color-primary-active: #9a3412;
+  --color-primary-subtle: rgba(234, 88, 12, 0.1);
+  --color-primary-border: rgba(234, 88, 12, 0.3);
+  --color-accent:         #f97316;
+  --color-accent-hover:   #ea580c;
+  --color-accent-subtle:  rgba(249, 115, 22, 0.1);
 
-  /* Backgrounds (warm dark) */
-  --color-bg-page:          #150b00;
-  --color-bg-surface-hover: rgba(249, 115, 22, 0.06);
+  /* Backgrounds — warm light */
+  --color-bg-page:          #fffdf7;
+  --color-bg-surface:       #ffffff;
+  --color-bg-surface-hover: rgba(234, 88, 12, 0.04);
+  --color-bg-input:         #ffffff;
+  --color-bg-disabled:      #fef3ec;
+  --color-bg-subtle:        #fff8f0;
 
-  /* Borders & focus */
-  --color-border-focus: rgba(249, 115, 22, 0.6);
-  --color-border-input: rgba(255, 255, 255, 0.12);
+  /* Text — warm dark charcoal */
+  --color-text-primary:    #1c1410;
+  --color-text-secondary:  #44311e;
+  --color-text-muted:      #78574a;
+  --color-text-disabled:   #b4887a;
+  --color-text-on-primary: #ffffff;
+  --color-text-inverse:    #fffdf7;
+  --color-text-link:       #ea580c;
+  --color-text-link-hover: #c2410c;
 
-  /* Text links → orange */
-  --color-text-link:       #fb923c;
-  --color-text-link-hover: #fdba74;
+  /* Borders — warm-tinted */
+  --color-border:       #f0e2d4;
+  --color-border-strong:#dac6b4;
+  --color-border-focus: rgba(234, 88, 12, 0.5);
+  --color-border-input: #e8cbb8;
 
-  /* Sidebar — warm dark with orange accents */
-  --sidebar-active-bg:    linear-gradient(135deg, rgba(249, 115, 22, 0.3), rgba(234, 88, 12, 0.2));
-  --sidebar-active-border:#f97316;
-  --sidebar-hover-bg:     rgba(249, 115, 22, 0.15);
-  --sidebar-brand-bg:     linear-gradient(135deg, rgba(249, 115, 22, 0.2) 0%, rgba(234, 88, 12, 0.1) 100%);
+  /* Status — same hues, muted for warm light surfaces */
+  --color-success-bg: rgba(16, 185, 129, 0.10);
+  --color-warning-bg: rgba(245, 158, 11, 0.10);
+  --color-danger-bg:  rgba(244, 63, 94, 0.10);
+  --color-info-text:  #ea580c;
+  --color-info-bg:    rgba(234, 88, 12, 0.10);
+  --color-info-border:rgba(234, 88, 12, 0.3);
+  --color-neutral-text:   #78574a;
+  --color-neutral-bg:     #fff8f0;
+  --color-neutral-border: #f0e2d4;
 
-  /* Brand gradient → orange */
-  --color-brand-gradient:          linear-gradient(135deg, #f97316, #fb923c);
-  --color-brand-gradient-shadow:   rgba(249, 115, 22, 0.3);
-  --color-brand-gradient-shadow-h: rgba(249, 115, 22, 0.4);
+  /* Sidebar — warm cream with orange accents */
+  --sidebar-bg:           #fffdf7;
+  --sidebar-border:       #f0e2d4;
+  --sidebar-text:         #78574a;
+  --sidebar-text-hover:   #1c1410;
+  --sidebar-text-active:  #ea580c;
+  --sidebar-active-bg:    rgba(234, 88, 12, 0.09);
+  --sidebar-active-border:#ea580c;
+  --sidebar-icon:         #b4887a;
+  --sidebar-label:        #b4887a;
+  --sidebar-hover-bg:     rgba(234, 88, 12, 0.05);
+  --sidebar-brand-bg:     #fff8f0;
+  --sidebar-blur:         none;
+  --sidebar-glass-bg:     rgba(234, 88, 12, 0.05);
+  --sidebar-glass-border: #f0e2d4;
 
-  /* Info badge → orange tint */
-  --color-info-text:   #fb923c;
-  --color-info-bg:     rgba(249, 115, 22, 0.2);
-  --color-info-border: rgba(249, 115, 22, 0.3);
+  /* Header */
+  --header-bg:     #ffffff;
+  --header-border: #f0e2d4;
+  --header-blur:   none;
 
-  /* Table head → orange tint */
-  --color-table-head-bg: rgba(249, 115, 22, 0.08);
+  /* Shadows — warm-tinted */
+  --shadow-xs: 0 1px 2px rgba(100, 40, 10, 0.06);
+  --shadow-sm: 0 1px 4px rgba(100, 40, 10, 0.08);
+  --shadow-md: 0 2px 8px rgba(100, 40, 10, 0.10);
+  --shadow-lg: 0 4px 16px rgba(100, 40, 10, 0.12);
+  --shadow-xl: 0 8px 32px rgba(100, 40, 10, 0.16);
 
-  /* Surface hover */
-  --color-card-hover: rgba(249, 115, 22, 0.04);
+  /* Glass → Solid warm */
+  --color-glass-bg:            #ffffff;
+  --color-glass-bg-subtle:     #fff8f0;
+  --color-glass-border:        #f0e2d4;
+  --color-glass-border-subtle: #f5ece0;
+  --surface-blur:              none;
+
+  /* Brand gradient */
+  --color-brand-gradient:          linear-gradient(135deg, #f97316, #ea580c);
+  --color-brand-gradient-shadow:   rgba(249, 115, 22, 0.25);
+  --color-brand-gradient-shadow-h: rgba(249, 115, 22, 0.35);
+
+  /* Button */
+  --color-btn-secondary-bg:           #fff8f0;
+  --color-btn-secondary-text:         #44311e;
+  --color-btn-secondary-border:       #e8cbb8;
+  --color-btn-secondary-hover-bg:     #f0e2d4;
+  --color-btn-secondary-hover-border: #dac6b4;
+  --color-btn-secondary-hover-text:   #1c1410;
+  --color-btn-ghost-text:             #78574a;
+  --color-btn-ghost-hover-bg:         rgba(234, 88, 12, 0.08);
+  --color-btn-ghost-hover-text:       #1c1410;
+
+  /* Danger hover */
+  --color-danger-hover-bg:     rgba(244, 63, 94, 0.10);
+  --color-danger-hover-border: rgba(244, 63, 94, 0.30);
+
+  /* Cards */
+  --color-card-bg:     #ffffff;
+  --color-card-border: #f0e2d4;
+  --color-card-hover:  rgba(234, 88, 12, 0.03);
+
+  /* KPI */
+  --color-kpi-border:  #f0e2d4;
+  --color-kpi-icon-bg: rgba(234, 88, 12, 0.10);
+  --color-kpi-label:   #78574a;
+
+  /* Table */
+  --color-table-head-bg:    #fff8f0;
+  --color-table-head-text:  #44311e;
+  --color-table-row-border: #faeee4;
+  --color-table-row-hover:  rgba(234, 88, 12, 0.03);
+  --color-table-cell-text:  #44311e;
+
+  /* Icon button */
+  --color-icon-btn-bg:       #fff8f0;
+  --color-icon-btn-border:   #f0e2d4;
+  --color-icon-btn-text:     #78574a;
+  --color-icon-btn-hover-bg: rgba(234, 88, 12, 0.10);
+
+  /* Modal */
+  --color-modal-bg:            #ffffff;
+  --color-modal-border:        #f0e2d4;
+  --color-modal-header-border: #faeee4;
+  --modal-blur:                none;
+
+  /* Section card */
+  --color-section-card-bg:     #ffffff;
+  --color-section-card-border: #f0e2d4;
+  --section-blur:              none;
 
   /* Focus ring */
-  --color-focus-ring: rgba(249, 115, 22, 0.15);
+  --color-focus-ring: rgba(234, 88, 12, 0.12);
+
+  /* Overlay */
+  --overlay: rgba(28, 15, 5, 0.45);
+
+  /* Scrollbar */
+  --scrollbar-thumb:       rgba(100, 40, 10, 0.15);
+  --scrollbar-thumb-hover: rgba(100, 40, 10, 0.28);
 
   /* Select option */
-  --select-option-bg:   #2a1200;
-  --select-option-text: #ffffff;
+  --select-option-bg:   #ffffff;
+  --select-option-text: #1c1410;
 
   /* Tab / filter-pill tokens */
-  --color-tab-active-bg:     linear-gradient(135deg, rgba(249, 115, 22, 0.3), rgba(234, 88, 12, 0.2));
-  --color-tab-active-border: rgba(249, 115, 22, 0.5);
+  --color-tab-bg:            #fff8f0;
+  --color-tab-border:        #f0e2d4;
+  --color-tab-text:          #78574a;
+  --color-tab-hover-bg:      #faeee4;
+  --color-tab-hover-text:    #44311e;
+  --color-tab-active-bg:     linear-gradient(135deg, rgba(234, 88, 12, 0.12), rgba(249, 115, 22, 0.08));
+  --color-tab-active-border: rgba(234, 88, 12, 0.4);
+  --color-tab-active-text:   var(--color-primary);
+  --color-tab-count-bg:      rgba(234, 88, 12, 0.10);
+  --color-tab-count-active:  rgba(234, 88, 12, 0.18);
 
-  /* Skeleton shimmer tokens */
-  --color-skeleton-mid: rgba(249, 115, 22, 0.06);
+  /* Skeleton shimmer */
+  --color-skeleton-from: #fff8f0;
+  --color-skeleton-mid:  #f0e2d4;
 
-  /* Accent border → orange tint */
-  --color-accent-border: rgba(249, 115, 22, 0.3);
+  /* Accent border */
+  --color-accent-border: rgba(249, 115, 22, 0.25);
 
-  /* Sidebar collapse (warm dark sidebar) */
-  --sidebar-collapse-bg:       rgba(42, 18, 0, 0.9);
-  --sidebar-collapse-hover-bg: rgba(249, 115, 22, 0.3);
+  /* Sidebar collapse — warm cream pill on the sidebar edge */
+  --sidebar-collapse-bg:       #fffdf7;
+  --sidebar-collapse-border:   #f0e2d4;
+  --sidebar-collapse-text:     #78574a;
+  --sidebar-collapse-shadow:   rgba(100, 40, 10, 0.10);
+  --sidebar-collapse-hover-bg: rgba(234, 88, 12, 0.12);
 
-  /* Accent gradient end → warm red for orange theme */
+  /* Accent-2 */
   --color-accent-2: #ef4444;
 }
 

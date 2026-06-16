@@ -1,0 +1,34 @@
+{
+  "title": "पूछताछ",
+  "description": "ग्राहक पूछताछ दर्ज करें और जॉब कार्ड में बदलें।",
+  "steps": {
+    "details": "पूछताछ विवरण",
+    "estimate": "अनुमान",
+    "whatsapp": "WhatsApp के माध्यम से भेजें"
+  },
+  "form": {
+    "customerName": "ग्राहक का नाम",
+    "phone": "फ़ोन / WhatsApp",
+    "vehicleName": "वाहन का नाम",
+    "regNo": "पंजीकरण नं.",
+    "glassPosition": "ग्लास स्थिति",
+    "damageType": "क्षति का प्रकार",
+    "remarks": "टिप्पणियां",
+    "estimatedAmount": "अनुमानित राशि (₹)"
+  },
+  "whatsapp": {
+    "panelTitle": "WhatsApp पूछताछ लिंक",
+    "panelDescription": "ग्राहक को उनकी पूछताछ विवरण के साथ पूर्व-भरा WhatsApp संदेश भेजें।",
+    "sendButton": "WhatsApp के माध्यम से पूछताछ लिंक भेजें",
+    "setupTitle": "सेटअप निर्देश",
+    "setupStep1": "अपना WhatsApp Business ऐप खोलें",
+    "setupStep2": "पूर्व-भरे संदेश के साथ WhatsApp लॉन्च करने के लिए नीचे दिए गए लिंक पर टैप करें",
+    "setupStep3": "संदेश की समीक्षा करें और भेजें पर टैप करें",
+    "template": "नमस्ते {{name}}, अपने {{vehicle}} ({{regNo}}) के लिए ग्लास प्रतिस्थापन के बारे में पूछताछ करने के लिए धन्यवाद। ग्लास स्थिति: {{position}}। अनुमानित लागत: ₹{{amount}}। हम जल्द ही आपसे संपर्क करेंगे। — Glass ERP Pro"
+  },
+  "messages": {
+    "submitted": "पूछताछ जमा की गई",
+    "whatsappSent": "WhatsApp संदेश भेजा गया",
+    "submitFailed": "पूछताछ जमा करना विफल हुआ"
+  }
+}

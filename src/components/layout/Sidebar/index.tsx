@@ -1,13 +1,14 @@
 import { NavLink } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import * as LucideIcons from 'lucide-react';
 import { ChevronLeft, Diamond } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { toggleSidebar, closeMobileSidebar } from '@/store/slices/uiSlice';
-import { NAV_ITEMS, NAV_SECTION_LABELS, type NavItem } from '@/constants/nav';
-import { LABELS } from '@/constants/labels';
+import { NAV_ITEMS, type NavItem } from '@/constants/nav';
 import styles from './Sidebar.module.css';
 
 export function Sidebar() {
+  const { t } = useTranslation('nav');
   const dispatch    = useAppDispatch();
   const collapsed   = useAppSelector((s) => s.ui.sidebarCollapsed);
   const mobileOpen  = useAppSelector((s) => s.ui.sidebarMobileOpen);
@@ -23,8 +24,8 @@ export function Sidebar() {
         </div>
         {!collapsed && (
           <div className={styles.brandText}>
-            <div className={styles.brandName}>{LABELS.app.name}</div>
-            <div className={styles.brandTagline}>{LABELS.app.tagline}</div>
+            <div className={styles.brandName}>{t('sidebar.brand.name')}</div>
+            <div className={styles.brandTagline}>{t('sidebar.brand.tagline')}</div>
           </div>
         )}
       </div>
@@ -33,19 +34,21 @@ export function Sidebar() {
       <button
         className={styles.collapseBtn}
         onClick={() => dispatch(toggleSidebar())}
-        aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+        aria-label={collapsed ? t('sidebar.aria.expand') : t('sidebar.aria.collapse')}
       >
         <ChevronLeft size={12} />
       </button>
 
       {/* Navigation */}
-      <nav className={styles.navContent} aria-label="Main navigation">
+      <nav className={styles.navContent} aria-label={t('sidebar.aria.nav')}>
         {sections.map((section) => {
           const items = NAV_ITEMS.filter((n) => n.section === section);
           return (
             <div key={section}>
               {!collapsed && (
-                <div className={styles.sectionLabel}>{NAV_SECTION_LABELS[section]}</div>
+                <div className={styles.sectionLabel}>
+                  {t(`sections.${section}`)}
+                </div>
               )}
               <ul className={styles.navList}>
                 {items.map((item) => {
@@ -60,7 +63,7 @@ export function Sidebar() {
                         className={({ isActive }) =>
                           `${styles.navLink} ${isActive ? styles.active : ''}`
                         }
-                        title={collapsed ? item.label : undefined}
+                        title={collapsed ? t(item.id, item.label) : undefined}
                         onClick={() => dispatch(closeMobileSidebar())}
                       >
                         <span className={styles.navIcon}>
@@ -69,7 +72,9 @@ export function Sidebar() {
 
                         {!collapsed && (
                           <>
-                            <span className={styles.navLabel}>{item.label}</span>
+                            <span className={styles.navLabel}>
+                              {t(item.id, item.label)}
+                            </span>
                             {item.badgeKey && (
                               <NavBadge badgeKey={item.badgeKey} />
                             )}
@@ -92,7 +97,7 @@ export function Sidebar() {
           {!collapsed && (
             <div className={styles.userInfo}>
               <div className={styles.userName}>John Smith</div>
-              <div className={styles.userRole}>Admin</div>
+              <div className={styles.userRole}>{t('sidebar.user.role')}</div>
             </div>
           )}
         </div>

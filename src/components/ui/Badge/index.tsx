@@ -37,9 +37,11 @@ interface StatusBadgeProps {
   status:    string;
   statusMap: Record<string, { label: string; variant: BadgeVariant }>;
   size?:     BadgeSize;
+  getLabel?: (status: string) => string;
 }
 
-export function StatusBadge({ status, statusMap, size }: StatusBadgeProps) {
+export function StatusBadge({ status, statusMap, size, getLabel }: StatusBadgeProps) {
   const display = statusMap[status] ?? { label: status, variant: 'neutral' as BadgeVariant };
-  return <Badge label={display.label} variant={display.variant} size={size} />;
+  const label   = getLabel ? getLabel(status) : display.label;
+  return <Badge label={label} variant={display.variant} size={size} />;
 }

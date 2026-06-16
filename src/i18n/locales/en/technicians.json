@@ -1,0 +1,33 @@
+{
+  "title": "Technicians",
+  "description": "Manage your service technicians.",
+  "count_one": "{{count}} technician",
+  "count_other": "{{count}} technicians",
+  "table": {
+    "name": "Name",
+    "phone": "Phone",
+    "specialisation": "Specialisation",
+    "activeJobs": "Active Jobs",
+    "status": "Status",
+    "actions": "Actions",
+    "empty": "No technicians found."
+  },
+  "form": {
+    "title": {
+      "add": "Add Technician",
+      "edit": "Edit Technician"
+    },
+    "name": "Full Name",
+    "phone": "Phone",
+    "specialisation": "Specialisation",
+    "status": "Status"
+  },
+  "messages": {
+    "added": "Technician added",
+    "updated": "Technician updated",
+    "removed": "Technician removed",
+    "saveFailed": "Failed to save technician",
+    "removeFailed": "Failed to remove technician",
+    "confirmDelete": "Remove this technician? This cannot be undone."
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "title": "Settings",
+  "description": "Business configuration and system preferences.",
+  "sections": {
+    "user": "Logged-in User",
+    "business": "Business Information",
+    "notifications": "Notifications",
+    "appearance": "Appearance",
+    "system": "System"
+  },
+  "user": {
+    "readOnly": "Read-only"
+  },
+  "business": {
+    "name": "Business Name",
+    "phone": "Phone",
+    "email": "Email",
+    "gstNumber": "GST Number",
+    "defaultGstRate": "Default GST Rate",
+    "currency": "Currency",
+    "save": "Save Business Info",
+    "saved": "Business information saved",
+    "saveFailed": "Failed to save settings",
+    "currencyOptions": {
+      "inr": "₹ Indian Rupee (INR)",
+      "usd": "$ US Dollar (USD)"
+    }
+  },
+  "notifications": {
+    "newJob": {
+      "title": "New Job Notifications",
+      "description": "Receive alerts when a new job card is created"
+    },
+    "lowStock": {
+      "title": "Low Stock Alerts",
+      "description": "Get notified when stock falls below minimum levels"
+    },
+    "claimUpdate": {
+      "title": "Claim Status Updates",
+      "description": "Receive updates when insurance claim status changes"
+    },
+    "invoiceDue": {
+      "title": "Invoice Due Reminders",
+      "description": "Get reminded about upcoming and overdue invoices"
+    }
+  },
+  "appearance": {
+    "description": "Choose your preferred visual theme.",
+    "themes": {
+      "purple": "Purple",
+      "light": "Light",
+      "dark": "Dark",
+      "orange": "Orange",
+      "system": "System"
+    }
+  },
+  "system": {
+    "version": "App Version",
+    "apiMode": "API Mode",
+    "apiModeHint": "Toggle via VITE_USE_MOCK_API environment variable",
+    "mock": "Mock",
+    "live": "Live"
+  }
+}

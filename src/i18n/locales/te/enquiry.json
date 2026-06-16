@@ -1,0 +1,34 @@
+{
+  "title": "విచారణ",
+  "description": "కస్టమర్ విచారణలు నమోదు చేయండి మరియు జాబ్ కార్డులుగా మార్చండి.",
+  "steps": {
+    "details": "విచారణ వివరాలు",
+    "estimate": "అంచనా",
+    "whatsapp": "WhatsApp ద్వారా పంపు"
+  },
+  "form": {
+    "customerName": "కస్టమర్ పేరు",
+    "phone": "ఫోన్ / WhatsApp",
+    "vehicleName": "వాహనం పేరు",
+    "regNo": "రిజిస్ట్రేషన్ నం.",
+    "glassPosition": "గ్లాస్ స్థానం",
+    "damageType": "నష్టం రకం",
+    "remarks": "వ్యాఖ్యలు",
+    "estimatedAmount": "అంచనా మొత్తం (₹)"
+  },
+  "whatsapp": {
+    "panelTitle": "WhatsApp విచారణ లింక్",
+    "panelDescription": "కస్టమర్‌కు వారి విచారణ వివరాలతో ముందే నింపిన WhatsApp సందేశం పంపండి.",
+    "sendButton": "WhatsApp ద్వారా విచారణ లింక్ పంపు",
+    "setupTitle": "సెటప్ సూచనలు",
+    "setupStep1": "మీ WhatsApp Business యాప్ తెరవండి",
+    "setupStep2": "ముందే నింపిన సందేశంతో WhatsApp ప్రారంభించడానికి దిగువ లింక్‌ను నొక్కండి",
+    "setupStep3": "సందేశం సమీక్షించి పంపు నొక్కండి",
+    "template": "నమస్కారం {{name}}, మీ {{vehicle}} ({{regNo}}) వాహనానికి గ్లాస్ భర్తీ గురించి విచారించినందుకు ధన్యవాదాలు. గ్లాస్ స్థానం: {{position}}. అంచనా ఖర్చు: ₹{{amount}}. మేము త్వరలో మీను సంప్రదిస్తాము. — Glass ERP Pro"
+  },
+  "messages": {
+    "submitted": "విచారణ సమర్పించారు",
+    "whatsappSent": "WhatsApp సందేశం పంపారు",
+    "submitFailed": "విచారణ సమర్పించడం విఫలమైంది"
+  }
+}

@@ -57,7 +57,7 @@
   flex-shrink:   0;
 }
 
-.swatchSidebar { flex: 0 0 28%; }
+.swatchSidebar { flex: 0 0 28%; border-right: 1px solid rgba(0, 0, 0, 0.06); }
 .swatchBody    { flex: 1; display: flex; flex-direction: column; gap: 2px; padding: 6px; }
 .swatchHeader  { height: 10px; border-radius: var(--radius-sm); opacity: 0.7; }
 .swatchCard1   { flex: 1; border-radius: var(--radius-sm); opacity: 0.9; }

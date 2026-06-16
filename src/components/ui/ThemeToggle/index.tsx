@@ -1,14 +1,15 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { SunMoon, Sun, Moon, Monitor, Palette, Check, ChevronRight, type LucideIcon } from 'lucide-react';
 import { useTheme, type ThemeId } from '@/context/ThemeContext';
 import { ROUTES } from '@/constants/routes';
 import styles from './ThemeToggle.module.css';
 
-const QUICK_OPTIONS: { id: ThemeId; label: string; Icon: LucideIcon }[] = [
-  { id: 'light',  label: 'Light',  Icon: Sun     },
-  { id: 'dark',   label: 'Dark',   Icon: Moon    },
-  { id: 'system', label: 'System', Icon: Monitor },
+const QUICK_OPTIONS: { id: ThemeId; Icon: LucideIcon }[] = [
+  { id: 'light',  Icon: Sun     },
+  { id: 'dark',   Icon: Moon    },
+  { id: 'system', Icon: Monitor },
 ];
 
 const MENU_ITEM_SELECTOR = '[role="menuitem"],[role="menuitemradio"]';
@@ -17,17 +18,16 @@ export function ThemeToggle() {
   const [open, setOpen]  = useState(false);
   const { theme, setTheme } = useTheme();
   const navigate    = useNavigate();
+  const { t }       = useTranslation('nav');
   const wrapRef     = useRef<HTMLDivElement>(null);
   const triggerRef  = useRef<HTMLButtonElement>(null);
   const popoverRef  = useRef<HTMLDivElement>(null);
 
-  // Return focus to the trigger whenever the popover closes
   const close = useCallback(() => {
     setOpen(false);
     requestAnimationFrame(() => triggerRef.current?.focus());
   }, []);
 
-  // Click-outside and Escape handlers (only mounted while open)
   useEffect(() => {
     if (!open) return;
     const onMouseDown = (e: MouseEvent) => {
@@ -44,7 +44,6 @@ export function ThemeToggle() {
     };
   }, [open, close]);
 
-  // Auto-focus the active option (or first) when the popover opens
   useEffect(() => {
     if (!open || !popoverRef.current) return;
     const active = popoverRef.current.querySelector<HTMLElement>('[aria-checked="true"]');
@@ -52,7 +51,6 @@ export function ThemeToggle() {
     (active ?? first)?.focus();
   }, [open]);
 
-  // Arrow-key navigation within the popover (WAI-ARIA APG menu pattern)
   const handlePopoverKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
     e.preventDefault();
@@ -72,7 +70,7 @@ export function ThemeToggle() {
         ref={triggerRef}
         className={styles.trigger}
         onClick={() => setOpen(v => !v)}
-        aria-label="Change theme"
+        aria-label={t('themeToggle.aria.trigger')}
         aria-expanded={open}
         aria-haspopup="menu"
       >
@@ -84,10 +82,10 @@ export function ThemeToggle() {
           ref={popoverRef}
           className={styles.popover}
           role="menu"
-          aria-label="Appearance"
+          aria-label={t('themeToggle.aria.menu')}
           onKeyDown={handlePopoverKeyDown}
         >
-          {QUICK_OPTIONS.map(({ id, label, Icon }) => (
+          {QUICK_OPTIONS.map(({ id, Icon }) => (
             <button
               key={id}
               className={`${styles.option} ${theme === id ? styles.optionActive : ''}`}
@@ -97,7 +95,7 @@ export function ThemeToggle() {
               tabIndex={-1}
             >
               <Icon size={14} />
-              <span>{label}</span>
+              <span>{t(`themeToggle.${id}`)}</span>
               {theme === id && <Check size={12} className={styles.check} />}
             </button>
           ))}
@@ -111,7 +109,7 @@ export function ThemeToggle() {
             tabIndex={-1}
           >
             <Palette size={14} />
-            <span>More themes</span>
+            <span>{t('themeToggle.moreThemes')}</span>
             <ChevronRight size={12} className={styles.chevron} />
           </button>
         </div>

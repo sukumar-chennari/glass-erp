@@ -1,0 +1,30 @@
+{
+  "title": "Purchase Orders",
+  "description": "Raise and track purchase orders with vendors.",
+  "count_one": "{{count}} order",
+  "count_other": "{{count}} orders",
+  "table": {
+    "poNo": "PO No.",
+    "vendor": "Vendor",
+    "items": "Items",
+    "amount": "Amount",
+    "status": "Status",
+    "date": "Date",
+    "actions": "Actions",
+    "empty": "No purchase orders found."
+  },
+  "status": {
+    "draft": "Draft",
+    "sent": "Sent",
+    "received": "Received",
+    "cancelled": "Cancelled"
+  },
+  "messages": {
+    "added": "Purchase order created",
+    "updated": "Purchase order updated",
+    "removed": "Purchase order removed",
+    "saveFailed": "Failed to save purchase order",
+    "removeFailed": "Failed to remove purchase order",
+    "confirmDelete": "Delete this purchase order? This cannot be undone."
+  }
+}

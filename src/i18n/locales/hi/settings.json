@@ -1,0 +1,64 @@
+{
+  "title": "सेटिंग्स",
+  "description": "व्यावसायिक कॉन्फ़िगरेशन और सिस्टम प्राथमिकताएं।",
+  "sections": {
+    "user": "लॉग-इन उपयोगकर्ता",
+    "business": "व्यावसायिक जानकारी",
+    "notifications": "सूचनाएं",
+    "appearance": "दिखावट",
+    "system": "सिस्टम"
+  },
+  "user": {
+    "readOnly": "केवल पढ़ने योग्य"
+  },
+  "business": {
+    "name": "व्यवसाय का नाम",
+    "phone": "फ़ोन",
+    "email": "ईमेल",
+    "gstNumber": "GST नंबर",
+    "defaultGstRate": "डिफ़ॉल्ट GST दर",
+    "currency": "मुद्रा",
+    "save": "व्यावसायिक जानकारी सहेजें",
+    "saved": "व्यावसायिक जानकारी सहेजी गई",
+    "saveFailed": "सेटिंग्स सहेजना विफल हुआ",
+    "currencyOptions": {
+      "inr": "₹ भारतीय रुपया (INR)",
+      "usd": "$ अमेरिकी डॉलर (USD)"
+    }
+  },
+  "notifications": {
+    "newJob": {
+      "title": "नई जॉब सूचनाएं",
+      "description": "नया जॉब कार्ड बनने पर अलर्ट प्राप्त करें"
+    },
+    "lowStock": {
+      "title": "कम स्टॉक अलर्ट",
+      "description": "स्टॉक न्यूनतम स्तर से नीचे जाने पर सूचित हों"
+    },
+    "claimUpdate": {
+      "title": "दावा स्थिति अपडेट",
+      "description": "बीमा दावे की स्थिति बदलने पर अपडेट प्राप्त करें"
+    },
+    "invoiceDue": {
+      "title": "चालान देय अनुस्मारक",
+      "description": "आने वाले और अतिदेय चालानों के बारे में याद दिलाएं"
+    }
+  },
+  "appearance": {
+    "description": "अपनी पसंदीदा विजुअल थीम चुनें।",
+    "themes": {
+      "purple": "पर्पल",
+      "light": "लाइट",
+      "dark": "डार्क",
+      "orange": "ऑरेंज",
+      "system": "सिस्टम"
+    }
+  },
+  "system": {
+    "version": "ऐप संस्करण",
+    "apiMode": "API मोड",
+    "apiModeHint": "VITE_USE_MOCK_API पर्यावरण चर के माध्यम से टॉगल करें",
+    "mock": "मॉक",
+    "live": "लाइव"
+  }
+}

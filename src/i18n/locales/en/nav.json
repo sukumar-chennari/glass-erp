@@ -1,0 +1,66 @@
+{
+  "dashboard": "Dashboard",
+  "vendors": "Vendors",
+  "products": "Products",
+  "purchaseOrders": "Purchase Orders",
+  "customers": "Customers",
+  "technicians": "Technicians",
+  "jobs": "Job Cards",
+  "stock": "Stock Management",
+  "invoices": "Invoices",
+  "claims": "Insurance Claims",
+  "enquiry": "Enquiry",
+  "reports": "Reports",
+  "settings": "Settings",
+  "sections": {
+    "main": "Menu",
+    "management": "Management"
+  },
+  "sidebar": {
+    "brand": {
+      "name": "Glass ERP Pro",
+      "tagline": "Automobile Glass ERP"
+    },
+    "user": {
+      "role": "Admin"
+    },
+    "aria": {
+      "expand": "Expand sidebar",
+      "collapse": "Collapse sidebar",
+      "nav": "Main navigation"
+    }
+  },
+  "header": {
+    "appFallback": "Glass ERP Pro",
+    "aria": {
+      "openNav": "Open navigation",
+      "messages": "Messages",
+      "notifications": "Notifications",
+      "settings": "Settings",
+      "changeTheme": "Change theme",
+      "changeLanguage": "Change language"
+    }
+  },
+  "languageSwitcher": {
+    "label": "Language",
+    "aria": {
+      "trigger": "Change language",
+      "menu": "Language selection"
+    },
+    "languages": {
+      "en": "English",
+      "te": "తెలుగు",
+      "hi": "हिंदी"
+    }
+  },
+  "themeToggle": {
+    "aria": {
+      "trigger": "Change theme",
+      "menu": "Appearance"
+    },
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System",
+    "moreThemes": "More themes"
+  }
+}

@@ -1,0 +1,82 @@
+{
+  "title": "Job Cards",
+  "description": "Create jobs, assign technicians and track status.",
+  "count_one": "{{count}} job",
+  "count_other": "{{count}} jobs",
+  "table": {
+    "jobNo": "Job #",
+    "customer": "Customer",
+    "vehicle": "Vehicle",
+    "technician": "Technician",
+    "payment": "Payment",
+    "estimatedCost": "Est. Cost",
+    "scheduled": "Scheduled",
+    "status": "Status",
+    "empty": "No job cards yet. Create your first job.",
+    "aria": {
+      "edit": "Edit job",
+      "delete": "Delete job"
+    }
+  },
+  "form": {
+    "title": {
+      "add": "New Job Card",
+      "edit": "Edit {{jobNumber}}"
+    },
+    "customer": "Customer",
+    "vehicle": "Vehicle",
+    "registrationNo": "Registration Number",
+    "glassPosition": "Glass Position",
+    "damageType": "Damage Type",
+    "assignment": "Assignment & Payment",
+    "technician": "Technician",
+    "paymentType": "Payment Type",
+    "estimatedCost": "Estimated Cost (₹)",
+    "scheduledDate": "Scheduled Date",
+    "status": "Status",
+    "notes": "Notes (optional)",
+    "placeholders": {
+      "vehicle": "e.g. Honda City 2020",
+      "registrationNo": "e.g. DL 01 AB 1234",
+      "assignLater": "Assign later",
+      "notes": "Any additional instructions…"
+    },
+    "errors": {
+      "selectCustomer": "Select a customer",
+      "vehicleRequired": "Vehicle name required",
+      "regNoRequired": "Registration number required",
+      "selectPosition": "Select glass position",
+      "selectDamage": "Select damage type",
+      "selectPayment": "Select payment type",
+      "dateRequired": "Scheduled date required"
+    }
+  },
+  "status": {
+    "pending": "Pending",
+    "inProgress": "In Progress",
+    "completed": "Completed",
+    "cancelled": "Cancelled",
+    "onHold": "On Hold"
+  },
+  "damageTypes": {
+    "crack": "Crack",
+    "chipStoneImpact": "Chip / Stone Impact",
+    "completeShatter": "Complete Shatter",
+    "scratch": "Scratch",
+    "stressFracture": "Stress Fracture"
+  },
+  "paymentTypes": {
+    "cash": "Cash",
+    "insurance": "Insurance",
+    "card": "Card",
+    "upi": "UPI"
+  },
+  "messages": {
+    "added": "Job created",
+    "updated": "Job updated",
+    "removed": "Job deleted",
+    "saveFailed": "Failed to save job",
+    "removeFailed": "Failed to delete job",
+    "confirmDelete": "Delete this job card? This cannot be undone."
+  }
+}

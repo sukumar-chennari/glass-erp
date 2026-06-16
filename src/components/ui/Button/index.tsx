@@ -1,4 +1,5 @@
 import { forwardRef, type ButtonHTMLAttributes, type ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import styles from './Button.module.css';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'accent';
@@ -63,8 +64,9 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 Button.displayName = 'Button';
 
 function LoadingDots() {
+  const { t } = useTranslation('common');
   return (
-    <span aria-label="Loading" style={{ display: 'inline-flex', gap: 3, alignItems: 'center' }}>
+    <span aria-label={t('table.loading')} style={{ display: 'inline-flex', gap: 3, alignItems: 'center' }}>
       {[0, 1, 2].map((i) => (
         <span
           key={i}

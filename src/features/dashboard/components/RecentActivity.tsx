@@ -1,9 +1,11 @@
+import { useTranslation } from 'react-i18next';
 import { useNavigate }  from 'react-router-dom';
 import { SectionCard, SectionHeader } from '@/components/layout/PageShell';
 import { DataTable }    from '@/components/ui/DataTable';
 import { Button }       from '@/components/ui/Button';
 import { StatusBadge }  from '@/components/ui/Badge';
 import { JOB_STATUS_MAP, CLAIM_STATUS_MAP } from '@/constants/statuses';
+import { claimStatusKey, jobStatusKey } from '@/i18n/statusKeys';
 import { ROUTES }       from '@/constants/routes';
 import type {
   DashboardRecentCustomer,
@@ -20,31 +22,32 @@ interface RecentCustomersProps {
   isLoading: boolean;
 }
 
-const customerColumns: TableColumn<DashboardRecentCustomer>[] = [
-  {
-    key: 'name', header: 'Customer',
-    render: (r) => (
-      <>
-        <strong>{r.name}</strong>
-        <span className={styles.phone}>{r.phone}</span>
-      </>
-    ),
-  },
-  { key: 'vehicleName',    header: 'Vehicle'       },
-  { key: 'registrationNo', header: 'Reg. No.'      },
-  { key: 'totalJobs',      header: 'Jobs', align: 'center' as const },
-];
-
 export function RecentCustomers({ data, isLoading }: RecentCustomersProps) {
   const navigate = useNavigate();
+  const { t } = useTranslation('dashboard');
+
+  const customerColumns: TableColumn<DashboardRecentCustomer>[] = [
+    {
+      key: 'name', header: t('table.customers.customer'),
+      render: (r) => (
+        <>
+          <strong>{r.name}</strong>
+          <span className={styles.phone}>{r.phone}</span>
+        </>
+      ),
+    },
+    { key: 'vehicleName',    header: t('table.customers.vehicle') },
+    { key: 'registrationNo', header: t('table.customers.regNo')   },
+    { key: 'totalJobs',      header: t('table.customers.jobs'), align: 'center' as const },
+  ];
 
   return (
     <SectionCard>
       <SectionHeader
-        title="Recent Customers"
+        title={t('sections.recentCustomers')}
         actions={
           <Button variant="primary" size="sm" onClick={() => navigate(ROUTES.CUSTOMERS)}>
-            View All
+            {t('viewAll')}
           </Button>
         }
       />
@@ -52,7 +55,7 @@ export function RecentCustomers({ data, isLoading }: RecentCustomersProps) {
         columns={customerColumns}
         data={data}
         isLoading={isLoading}
-        emptyMessage="No customers yet."
+        emptyMessage={t('empty.customers')}
       />
     </SectionCard>
   );
@@ -65,37 +68,45 @@ interface PendingClaimsProps {
   isLoading: boolean;
 }
 
-const claimColumns: TableColumn<DashboardPendingClaim>[] = [
-  { key: 'claimNumber',   header: 'Claim #'  },
-  { key: 'customerName',  header: 'Customer' },
-  {
-    key: 'amount', header: 'Amount', align: 'right' as const,
-    render: (r) => `₹${r.amount.toLocaleString('en-IN')}`,
-  },
-  {
-    key: 'daysPending', header: 'Days', align: 'center' as const,
-    render: (r) => (
-      <span style={{ color: r.daysPending > 7 ? 'var(--color-danger-text)' : 'inherit', fontWeight: r.daysPending > 7 ? 700 : 400 }}>
-        {r.daysPending}d
-      </span>
-    ),
-  },
-  {
-    key: 'status', header: 'Status',
-    render: (r) => <StatusBadge status={r.status} statusMap={CLAIM_STATUS_MAP} size="sm" />,
-  },
-];
-
 export function PendingClaims({ data, isLoading }: PendingClaimsProps) {
   const navigate = useNavigate();
+  const { t } = useTranslation(['dashboard', 'claims']);
+
+  const claimColumns: TableColumn<DashboardPendingClaim>[] = [
+    { key: 'claimNumber',  header: t('table.claims.claimNo')  },
+    { key: 'customerName', header: t('table.claims.customer') },
+    {
+      key: 'amount', header: t('table.claims.amount'), align: 'right' as const,
+      render: (r) => `₹${r.amount.toLocaleString('en-IN')}`,
+    },
+    {
+      key: 'daysPending', header: t('table.claims.days'), align: 'center' as const,
+      render: (r) => (
+        <span style={{ color: r.daysPending > 7 ? 'var(--color-danger-text)' : 'inherit', fontWeight: r.daysPending > 7 ? 700 : 400 }}>
+          {r.daysPending}d
+        </span>
+      ),
+    },
+    {
+      key: 'status', header: t('table.claims.status'),
+      render: (r) => (
+        <StatusBadge
+          status={r.status}
+          statusMap={CLAIM_STATUS_MAP}
+          size="sm"
+          getLabel={(s) => t(`status.${claimStatusKey(s)}`, { ns: 'claims' })}
+        />
+      ),
+    },
+  ];
 
   return (
     <SectionCard>
       <SectionHeader
-        title="Pending Claims"
+        title={t('sections.pendingClaims')}
         actions={
           <Button variant="primary" size="sm" onClick={() => navigate(ROUTES.CLAIMS)}>
-            View All
+            {t('viewAll')}
           </Button>
         }
       />
@@ -103,7 +114,7 @@ export function PendingClaims({ data, isLoading }: PendingClaimsProps) {
         columns={claimColumns}
         data={data}
         isLoading={isLoading}
-        emptyMessage="No pending claims."
+        emptyMessage={t('empty.claims')}
       />
     </SectionCard>
   );
@@ -116,34 +127,42 @@ interface RecentJobsProps {
   isLoading: boolean;
 }
 
-const jobColumns: TableColumn<DashboardRecentJob>[] = [
-  { key: 'jobNumber',     header: 'Job #'    },
-  { key: 'customerName',  header: 'Customer' },
-  { key: 'vehicleName',   header: 'Vehicle'  },
-  { key: 'glassPosition', header: 'Glass'    },
-  {
-    key: 'scheduledDate', header: 'Date',
-    render: (r) =>
-      new Date(r.scheduledDate).toLocaleDateString('en-IN', {
-        day: '2-digit', month: 'short',
-      }),
-  },
-  {
-    key: 'status', header: 'Status',
-    render: (r) => <StatusBadge status={r.status} statusMap={JOB_STATUS_MAP} size="sm" />,
-  },
-];
-
 export function RecentJobs({ data, isLoading }: RecentJobsProps) {
   const navigate = useNavigate();
+  const { t } = useTranslation(['dashboard', 'jobs']);
+
+  const jobColumns: TableColumn<DashboardRecentJob>[] = [
+    { key: 'jobNumber',     header: t('table.jobs.jobNo')    },
+    { key: 'customerName',  header: t('table.jobs.customer') },
+    { key: 'vehicleName',   header: t('table.jobs.vehicle')  },
+    { key: 'glassPosition', header: t('table.jobs.glass')    },
+    {
+      key: 'scheduledDate', header: t('table.jobs.date'),
+      render: (r) =>
+        new Date(r.scheduledDate).toLocaleDateString('en-IN', {
+          day: '2-digit', month: 'short',
+        }),
+    },
+    {
+      key: 'status', header: t('table.jobs.status'),
+      render: (r) => (
+        <StatusBadge
+          status={r.status}
+          statusMap={JOB_STATUS_MAP}
+          size="sm"
+          getLabel={(s) => t(`status.${jobStatusKey(s)}`, { ns: 'jobs' })}
+        />
+      ),
+    },
+  ];
 
   return (
     <SectionCard>
       <SectionHeader
-        title="Recent Job Cards"
+        title={t('sections.recentJobs')}
         actions={
           <Button variant="primary" size="sm" onClick={() => navigate(ROUTES.JOBS)}>
-            View All
+            {t('viewAll')}
           </Button>
         }
       />
@@ -151,7 +170,7 @@ export function RecentJobs({ data, isLoading }: RecentJobsProps) {
         columns={jobColumns}
         data={data}
         isLoading={isLoading}
-        emptyMessage="No recent jobs."
+        emptyMessage={t('empty.jobs')}
       />
     </SectionCard>
   );

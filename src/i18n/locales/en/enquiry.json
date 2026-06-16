@@ -1,0 +1,34 @@
+{
+  "title": "Enquiry",
+  "description": "Log customer enquiries and convert to job cards.",
+  "steps": {
+    "details": "Enquiry Details",
+    "estimate": "Estimate",
+    "whatsapp": "Send via WhatsApp"
+  },
+  "form": {
+    "customerName": "Customer Name",
+    "phone": "Phone / WhatsApp",
+    "vehicleName": "Vehicle Name",
+    "regNo": "Registration No.",
+    "glassPosition": "Glass Position",
+    "damageType": "Damage Type",
+    "remarks": "Remarks",
+    "estimatedAmount": "Estimated Amount (₹)"
+  },
+  "whatsapp": {
+    "panelTitle": "WhatsApp Enquiry Link",
+    "panelDescription": "Send a pre-filled WhatsApp message to the customer with their enquiry details.",
+    "sendButton": "Send Enquiry Link via WhatsApp",
+    "setupTitle": "Setup Instructions",
+    "setupStep1": "Open your WhatsApp Business app",
+    "setupStep2": "Tap the link button below to launch WhatsApp with pre-filled message",
+    "setupStep3": "Review the message and tap Send",
+    "template": "Hello {{name}}, thank you for enquiring about glass replacement for your {{vehicle}} ({{regNo}}). Glass position: {{position}}. Estimated cost: ₹{{amount}}. We will contact you shortly. — Glass ERP Pro"
+  },
+  "messages": {
+    "submitted": "Enquiry submitted",
+    "whatsappSent": "WhatsApp message sent",
+    "submitFailed": "Failed to submit enquiry"
+  }
+}

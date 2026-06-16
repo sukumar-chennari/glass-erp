@@ -1,0 +1,47 @@
+{
+  "title": "डैशबोर्ड",
+  "description": "वापस स्वागत है! आपका व्यवसाय एक नज़र में — {{date}}.",
+  "error": {
+    "loadFailed": "डैशबोर्ड डेटा लोड विफल। कृपया ताज़ा करें।"
+  },
+  "kpi": {
+    "revenue": "राजस्व",
+    "activeJobs": "सक्रिय जॉब",
+    "pendingClaims": "लंबित दावे",
+    "stockAlerts": "स्टॉक अलर्ट"
+  },
+  "sections": {
+    "recentCustomers": "हाल के ग्राहक",
+    "pendingClaims": "लंबित दावे",
+    "recentJobs": "हाल के जॉब कार्ड"
+  },
+  "table": {
+    "customers": {
+      "customer": "ग्राहक",
+      "vehicle": "वाहन",
+      "regNo": "रजि. नं.",
+      "jobs": "जॉब"
+    },
+    "claims": {
+      "claimNo": "दावा #",
+      "customer": "ग्राहक",
+      "amount": "राशि",
+      "days": "दिन",
+      "status": "स्थिति"
+    },
+    "jobs": {
+      "jobNo": "जॉब #",
+      "customer": "ग्राहक",
+      "vehicle": "वाहन",
+      "glass": "ग्लास",
+      "date": "तिथि",
+      "status": "स्थिति"
+    }
+  },
+  "empty": {
+    "customers": "कोई ग्राहक नहीं।",
+    "claims": "कोई लंबित दावा नहीं।",
+    "jobs": "कोई हाल का जॉब नहीं।"
+  },
+  "viewAll": "सभी देखें"
+}

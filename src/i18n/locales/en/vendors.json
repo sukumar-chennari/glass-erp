@@ -1,0 +1,53 @@
+{
+  "title": "Vendors",
+  "description": "Manage your glass suppliers and procurement partners.",
+  "count_one": "{{count}} vendor",
+  "count_other": "{{count}} vendors",
+  "table": {
+    "company": "Company",
+    "contact": "Contact",
+    "phone": "Phone",
+    "gst": "GST Number",
+    "city": "City",
+    "products": "Products Supplied",
+    "status": "Status",
+    "actions": "Actions",
+    "empty": "No vendors found. Add your first supplier."
+  },
+  "form": {
+    "title": {
+      "add": "Add Vendor",
+      "edit": "Edit Vendor"
+    },
+    "companyName": "Company Name",
+    "contactPerson": "Contact Person",
+    "phone": "Phone",
+    "email": "Email",
+    "gstNumber": "GST Number",
+    "city": "City",
+    "state": "State",
+    "address": "Address",
+    "productsSupplied": "Products Supplied",
+    "productsHint": "Separate multiple products with commas",
+    "status": "Status",
+    "placeholders": {
+      "companyName": "e.g. Bajaj Glass Supplies",
+      "contactPerson": "e.g. Rajesh Patel",
+      "phone": "10-digit mobile",
+      "email": "vendor@example.com",
+      "gstNumber": "e.g. 27AABCB1234A1Z5",
+      "city": "e.g. Mumbai",
+      "state": "e.g. Maharashtra",
+      "address": "Street address (optional)",
+      "productsSupplied": "e.g. Windshields, Side Glass, Sunroof"
+    }
+  },
+  "messages": {
+    "added": "Vendor added",
+    "updated": "Vendor updated",
+    "removed": "Vendor removed",
+    "saveFailed": "Failed to save vendor",
+    "removeFailed": "Failed to remove vendor",
+    "confirmDelete": "Remove this vendor? This cannot be undone."
+  }
+}

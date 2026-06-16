@@ -1,0 +1,51 @@
+{
+  "title": "बीमा दावे",
+  "description": "बीमा दावा अनुमोदन जमा करें और ट्रैक करें।",
+  "count_one": "{{count}} दावा",
+  "count_other": "{{count}} दावे",
+  "status": {
+    "all": "सभी",
+    "submitted": "जमा किया",
+    "underReview": "समीक्षाधीन",
+    "surveyed": "सर्वेक्षण किया",
+    "approved": "स्वीकृत",
+    "partial": "आंशिक रूप से स्वीकृत",
+    "rejected": "अस्वीकृत"
+  },
+  "card": {
+    "submittedOn": "जमा किया:",
+    "customer": "ग्राहक",
+    "vehicle": "वाहन",
+    "glass": "ग्लास",
+    "insurer": "बीमाकर्ता",
+    "claimed": "दावा किया",
+    "approved": "स्वीकृत",
+    "customerPays": "ग्राहक भुगतान",
+    "pending": "लंबित",
+    "tbd": "निर्धारित होना",
+    "awaitingDecision": "निर्णय की प्रतीक्षा",
+    "covered": "{{pct}}% कवर किया",
+    "aria": {
+      "update": "दावा अपडेट करें",
+      "delete": "दावा हटाएं"
+    }
+  },
+  "form": {
+    "title": "दावा अपडेट करें",
+    "status": "स्थिति",
+    "approvedAmount": "स्वीकृत राशि (₹)",
+    "surveyorName": "सर्वेक्षक का नाम",
+    "remarks": "टिप्पणियां"
+  },
+  "empty": {
+    "title": "कोई दावा नहीं मिला",
+    "hint": "एक अलग फ़िल्टर आज़माएं या नया दावा जोड़ें।"
+  },
+  "messages": {
+    "updated": "दावा अपडेट किया गया",
+    "removed": "दावा हटाया गया",
+    "updateFailed": "दावा अपडेट करना विफल हुआ",
+    "removeFailed": "दावा हटाना विफल हुआ",
+    "confirmDelete": "इस दावे को हटाएं? इसे पूर्ववत नहीं किया जा सकता।"
+  }
+}

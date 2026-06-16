@@ -1,0 +1,82 @@
+{
+  "title": "జాబ్ కార్డులు",
+  "description": "జాబ్‌లు సృష్టించి, టెక్నీషియన్లను నిర్ణయించి స్థితిని ట్రాక్ చేయండి.",
+  "count_one": "{{count}} జాబ్",
+  "count_other": "{{count}} జాబ్‌లు",
+  "table": {
+    "jobNo": "జాబ్ #",
+    "customer": "కస్టమర్",
+    "vehicle": "వాహనం",
+    "technician": "టెక్నీషియన్",
+    "payment": "చెల్లింపు",
+    "estimatedCost": "అంచనా ధర",
+    "scheduled": "నిర్ణీత తేదీ",
+    "status": "స్థితి",
+    "empty": "జాబ్ కార్డులు లేవు. మీ మొదటి జాబ్‌ను సృష్టించండి.",
+    "aria": {
+      "edit": "జాబ్‌ను సవరించు",
+      "delete": "జాబ్‌ను తొలగించు"
+    }
+  },
+  "form": {
+    "title": {
+      "add": "కొత్త జాబ్ కార్డ్",
+      "edit": "{{jobNumber}} సవరించు"
+    },
+    "customer": "కస్టమర్",
+    "vehicle": "వాహనం",
+    "registrationNo": "రిజిస్ట్రేషన్ నంబర్",
+    "glassPosition": "గ్లాస్ స్థానం",
+    "damageType": "నష్టం రకం",
+    "assignment": "నిర్ణయించడం & చెల్లింపు",
+    "technician": "టెక్నీషియన్",
+    "paymentType": "చెల్లింపు రకం",
+    "estimatedCost": "అంచనా వ్యయం (₹)",
+    "scheduledDate": "నిర్ణీత తేదీ",
+    "status": "స్థితి",
+    "notes": "గమనికలు (ఐచ్ఛికం)",
+    "placeholders": {
+      "vehicle": "ఉదా: హోండా సిటీ 2020",
+      "registrationNo": "ఉదా: TS 01 AB 1234",
+      "assignLater": "తర్వాత నిర్ణయించు",
+      "notes": "అదనపు సూచనలు…"
+    },
+    "errors": {
+      "selectCustomer": "కస్టమర్ ఎంచుకోండి",
+      "vehicleRequired": "వాహన పేరు అవసరం",
+      "regNoRequired": "రిజిస్ట్రేషన్ నంబర్ అవసరం",
+      "selectPosition": "గ్లాస్ స్థానం ఎంచుకోండి",
+      "selectDamage": "నష్టం రకం ఎంచుకోండి",
+      "selectPayment": "చెల్లింపు రకం ఎంచుకోండి",
+      "dateRequired": "నిర్ణీత తేదీ అవసరం"
+    }
+  },
+  "status": {
+    "pending": "పెండింగ్",
+    "inProgress": "పురోగతిలో ఉంది",
+    "completed": "పూర్తయింది",
+    "cancelled": "రద్దు చేశారు",
+    "onHold": "హోల్డ్‌లో ఉంది"
+  },
+  "damageTypes": {
+    "crack": "పగుళ్లు",
+    "chipStoneImpact": "చిప్ / రాయి దెబ్బ",
+    "completeShatter": "పూర్తిగా పగిలింది",
+    "scratch": "గీత",
+    "stressFracture": "ఒత్తిడి పగుళ్లు"
+  },
+  "paymentTypes": {
+    "cash": "నగదు",
+    "insurance": "బీమా",
+    "card": "కార్డ్",
+    "upi": "UPI"
+  },
+  "messages": {
+    "added": "జాబ్ సృష్టించారు",
+    "updated": "జాబ్ నవీకరించారు",
+    "removed": "జాబ్ తొలగించారు",
+    "saveFailed": "జాబ్ సేవ్ చేయడం విఫలమైంది",
+    "removeFailed": "జాబ్ తొలగించడం విఫలమైంది",
+    "confirmDelete": "ఈ జాబ్ కార్డ్‌ను తొలగించాలా? ఇది రద్దు చేయలేరు."
+  }
+}

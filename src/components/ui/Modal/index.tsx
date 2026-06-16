@@ -1,5 +1,6 @@
 import { useEffect, type ReactNode } from 'react';
 import { X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import styles from './Modal.module.css';
 
 interface ModalProps {
@@ -21,6 +22,7 @@ export function Modal({
   maxWidth = '560px',
   closeOnOverlay = true,
 }: ModalProps) {
+  const { t } = useTranslation('common');
   // Close on Escape key
   useEffect(() => {
     if (!isOpen) return;
@@ -53,7 +55,7 @@ export function Modal({
       >
         <div className={styles.header}>
           <h2 className={styles.title}>{title}</h2>
-          <button className={styles.closeBtn} onClick={onClose} aria-label="Close">
+          <button className={styles.closeBtn} onClick={onClose} aria-label={t('actions.close')}>
             <X size={16} />
           </button>
         </div>

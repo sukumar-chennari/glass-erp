@@ -32,9 +32,9 @@ const PRESETS: Preset[] = [
   {
     id:    'light',
     label: 'Light',
-    desc:  'Clean white surfaces with dark navy sidebar',
+    desc:  'Clean white surfaces with purple sidebar accents',
     swatch: {
-      sidebar: '#1e293b',
+      sidebar: '#ffffff',
       header:  '#ffffff',
       body:    '#f1f5f9',
       card:    '#ffffff',
@@ -56,13 +56,13 @@ const PRESETS: Preset[] = [
   {
     id:    'orange',
     label: 'Orange',
-    desc:  'Warm dark theme with energetic orange accents',
+    desc:  'Warm light surfaces with bold orange brand accents',
     swatch: {
-      sidebar: '#2a1200',
-      header:  '#1a0800',
-      body:    '#150b00',
-      card:    'rgba(255,255,255,0.05)',
-      primary: '#f97316',
+      sidebar: '#fffdf7',
+      header:  '#ffffff',
+      body:    '#fffdf7',
+      card:    '#ffffff',
+      primary: '#ea580c',
     },
   },
   {
@@ -79,7 +79,7 @@ const PRESETS: Preset[] = [
   },
 ];
 
-const LIGHT_SURFACE_IDS: ReadonlySet<ThemeId> = new Set(['light', 'system']);
+const LIGHT_SURFACE_IDS: ReadonlySet<ThemeId> = new Set(['light', 'orange', 'system']);
 
 export function AppearanceSection() {
   const { theme, setTheme } = useTheme();

@@ -1,0 +1,51 @@
+{
+  "title": "Insurance Claims",
+  "description": "Submit and track insurance claim approvals.",
+  "count_one": "{{count}} claim",
+  "count_other": "{{count}} claims",
+  "status": {
+    "all": "All",
+    "submitted": "Submitted",
+    "underReview": "Under Review",
+    "surveyed": "Surveyed",
+    "approved": "Approved",
+    "partial": "Partial",
+    "rejected": "Rejected"
+  },
+  "card": {
+    "submittedOn": "Submitted:",
+    "customer": "Customer",
+    "vehicle": "Vehicle",
+    "glass": "Glass",
+    "insurer": "Insurer",
+    "claimed": "Claimed",
+    "approved": "Approved",
+    "customerPays": "Customer Pays",
+    "pending": "Pending",
+    "tbd": "TBD",
+    "awaitingDecision": "Awaiting decision",
+    "covered": "{{pct}}% covered",
+    "aria": {
+      "update": "Update claim",
+      "delete": "Delete claim"
+    }
+  },
+  "form": {
+    "title": "Update Claim",
+    "status": "Status",
+    "approvedAmount": "Approved Amount (₹)",
+    "surveyorName": "Surveyor Name",
+    "remarks": "Remarks"
+  },
+  "empty": {
+    "title": "No claims found",
+    "hint": "Try a different filter or add a new claim."
+  },
+  "messages": {
+    "updated": "Claim updated",
+    "removed": "Claim deleted",
+    "updateFailed": "Failed to update claim",
+    "removeFailed": "Failed to delete claim",
+    "confirmDelete": "Delete this claim? This cannot be undone."
+  }
+}

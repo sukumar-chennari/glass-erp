@@ -1,0 +1,66 @@
+{
+  "dashboard": "डैशबोर्ड",
+  "vendors": "विक्रेता",
+  "products": "उत्पाद",
+  "purchaseOrders": "खरीद आदेश",
+  "customers": "ग्राहक",
+  "technicians": "तकनीशियन",
+  "jobs": "जॉब कार्ड",
+  "stock": "स्टॉक प्रबंधन",
+  "invoices": "चालान",
+  "claims": "बीमा दावे",
+  "enquiry": "पूछताछ",
+  "reports": "रिपोर्ट",
+  "settings": "सेटिंग्स",
+  "sections": {
+    "main": "मेनू",
+    "management": "प्रबंधन"
+  },
+  "sidebar": {
+    "brand": {
+      "name": "Glass ERP Pro",
+      "tagline": "ऑटोमोबाइल ग्लास ERP"
+    },
+    "user": {
+      "role": "व्यवस्थापक"
+    },
+    "aria": {
+      "expand": "साइडबार विस्तार करें",
+      "collapse": "साइडबार संकुचित करें",
+      "nav": "मुख्य नेविगेशन"
+    }
+  },
+  "header": {
+    "appFallback": "Glass ERP Pro",
+    "aria": {
+      "openNav": "नेविगेशन खोलें",
+      "messages": "संदेश",
+      "notifications": "सूचनाएं",
+      "settings": "सेटिंग्स",
+      "changeTheme": "थीम बदलें",
+      "changeLanguage": "भाषा बदलें"
+    }
+  },
+  "languageSwitcher": {
+    "label": "भाषा",
+    "aria": {
+      "trigger": "भाषा बदलें",
+      "menu": "भाषा चयन"
+    },
+    "languages": {
+      "en": "English",
+      "te": "తెలుగు",
+      "hi": "हिंदी"
+    }
+  },
+  "themeToggle": {
+    "aria": {
+      "trigger": "थीम बदलें",
+      "menu": "दिखावट"
+    },
+    "light": "लाइट",
+    "dark": "डार्क",
+    "system": "सिस्टम",
+    "moreThemes": "अधिक थीम"
+  }
+}

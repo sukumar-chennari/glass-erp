@@ -118,7 +118,3 @@ export const NAV_ITEMS: NavItem[] = [
   },
 ];
 
-export const NAV_SECTION_LABELS: Record<NavItem['section'], string> = {
-  main:       'Menu',
-  management: 'Management',
-};

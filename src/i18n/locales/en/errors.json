@@ -1,0 +1,12 @@
+{
+  "boundary": {
+    "title": "Something went wrong",
+    "message": "An unexpected error occurred.",
+    "tryAgain": "Try again"
+  },
+  "notFound": {
+    "title": "Page Not Found",
+    "message": "The page you're looking for doesn't exist.",
+    "home": "Go to Dashboard"
+  }
+}

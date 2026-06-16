@@ -7,6 +7,7 @@ import {
   type ReactNode,
 } from 'react';
 import { CheckCircle, XCircle, Info } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import styles from './Toast.module.css';
 
 type ToastType = 'success' | 'error' | 'info';
@@ -37,9 +38,10 @@ const ICONS: Record<ToastType, ReactNode> = {
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<ToastItem[]>([]);
   const timers = useRef<Record<number, ReturnType<typeof setTimeout>>>({});
+  const { t } = useTranslation('common');
 
   const dismiss = useCallback((id: number) => {
-    setToasts((prev) => prev.filter((t) => t.id !== id));
+    setToasts((prev) => prev.filter((item) => item.id !== id));
     clearTimeout(timers.current[id]);
     delete timers.current[id];
   }, []);
@@ -62,12 +64,12 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   return (
     <ToastContext.Provider value={ctx}>
       {children}
-      <div className={styles.container} aria-live="polite" aria-label="Notifications">
-        {toasts.map((t) => (
-          <div key={t.id} className={`${styles.toast} ${styles[t.type]}`} role="alert">
-            <span className={styles.icon}>{ICONS[t.type]}</span>
-            <span className={styles.message}>{t.message}</span>
-            <button className={styles.close} onClick={() => dismiss(t.id)} aria-label="Dismiss">
+      <div className={styles.container} aria-live="polite" aria-label={t('aria.notifications')}>
+        {toasts.map((toast) => (
+          <div key={toast.id} className={`${styles.toast} ${styles[toast.type]}`} role="alert">
+            <span className={styles.icon}>{ICONS[toast.type]}</span>
+            <span className={styles.message}>{toast.message}</span>
+            <button className={styles.close} onClick={() => dismiss(toast.id)} aria-label={t('actions.close')}>
               ×
             </button>
           </div>

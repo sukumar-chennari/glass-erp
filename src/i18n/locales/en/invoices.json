@@ -1,0 +1,44 @@
+{
+  "title": "Invoices",
+  "description": "Generate and manage customer invoices.",
+  "count_one": "{{count}} invoice",
+  "count_other": "{{count}} invoices",
+  "table": {
+    "invoiceNo": "Invoice No.",
+    "customer": "Customer",
+    "amount": "Amount",
+    "status": "Status",
+    "date": "Date",
+    "dueDate": "Due Date",
+    "actions": "Actions",
+    "empty": "No invoices found."
+  },
+  "status": {
+    "draft": "Draft",
+    "sent": "Sent",
+    "paid": "Paid",
+    "overdue": "Overdue",
+    "void": "Void"
+  },
+  "form": {
+    "title": {
+      "add": "New Invoice",
+      "edit": "Edit Invoice"
+    },
+    "customer": "Customer",
+    "items": "Line Items",
+    "notes": "Notes",
+    "dueDate": "Due Date",
+    "discount": "Discount (%)",
+    "tax": "GST (%)"
+  },
+  "messages": {
+    "added": "Invoice created",
+    "updated": "Invoice updated",
+    "removed": "Invoice removed",
+    "markedPaid": "Invoice marked as paid",
+    "saveFailed": "Failed to save invoice",
+    "removeFailed": "Failed to remove invoice",
+    "confirmDelete": "Delete this invoice? This cannot be undone."
+  }
+}

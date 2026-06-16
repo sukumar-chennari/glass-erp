@@ -1,7 +1,6 @@
 import { forwardRef, type SelectHTMLAttributes } from 'react';
 import { ChevronDown } from 'lucide-react';
 import type { SelectOption } from '@/types/ui';
-import { LABELS } from '@/constants/labels';
 import styles from './Select.module.css';
 
 interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
@@ -38,7 +37,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
             {...rest}
           >
             {placeholder && (
-              <option value="">{placeholder ?? LABELS.form.selectPlaceholder}</option>
+              <option value="">{placeholder}</option>
             )}
             {options.map((opt) => (
               <option key={opt.value} value={opt.value} disabled={opt.disabled}>

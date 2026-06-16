@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Plus } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { PageShell, SectionCard } from '@/components/layout/PageShell';
 import { Button } from '@/components/ui/Button';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
@@ -16,6 +17,7 @@ import type { Vendor, CreateVendorDto, UpdateVendorDto } from '@/types/models/ve
 import styles from './VendorsPage.module.css';
 
 export function VendorsPage() {
+  const { t } = useTranslation(['vendors', 'common']);
   const { data: vendors = [], isLoading } = useGetVendorsQuery();
   const [createVendor, { isLoading: creating }] = useCreateVendorMutation();
   const [updateVendor, { isLoading: updating }] = useUpdateVendorMutation();
@@ -34,14 +36,14 @@ export function VendorsPage() {
     try {
       if (editingVendor) {
         await updateVendor({ id: editingVendor.id, ...data }).unwrap();
-        toast.success('Vendor updated');
+        toast.success(t('messages.updated'));
       } else {
         await createVendor(data as CreateVendorDto).unwrap();
-        toast.success('Vendor added');
+        toast.success(t('messages.added'));
       }
       closeModal();
     } catch {
-      toast.error('Failed to save vendor');
+      toast.error(t('messages.saveFailed'));
     }
   };
 
@@ -49,9 +51,9 @@ export function VendorsPage() {
     if (!deleteTarget) return;
     try {
       await deleteVendor(deleteTarget).unwrap();
-      toast.success('Vendor removed');
+      toast.success(t('messages.removed'));
     } catch {
-      toast.error('Failed to remove vendor');
+      toast.error(t('messages.removeFailed'));
     } finally {
       setDeleteTarget(null);
     }
@@ -59,18 +61,20 @@ export function VendorsPage() {
 
   return (
     <PageShell
-      heading="Vendors"
-      description="Manage your glass suppliers and procurement partners."
+      heading={t('title')}
+      description={t('description')}
       actions={
         <Button leftIcon={<Plus size={16} />} onClick={openAdd}>
-          Add Vendor
+          {t('form.title.add')}
         </Button>
       }
     >
       <SectionCard>
         <div className={styles.tableHeader}>
           <span className={styles.count}>
-            {isLoading ? 'Loading…' : `${vendors.length} vendor${vendors.length !== 1 ? 's' : ''}`}
+            {isLoading
+              ? t('table.loading')
+              : t('count', { count: vendors.length })}
           </span>
         </div>
 
@@ -92,7 +96,7 @@ export function VendorsPage() {
 
       <ConfirmDialog
         isOpen={!!deleteTarget}
-        message="Remove this vendor? This cannot be undone."
+        message={t('messages.confirmDelete')}
         isLoading={deleting}
         onConfirm={handleConfirmDelete}
         onCancel={() => setDeleteTarget(null)}

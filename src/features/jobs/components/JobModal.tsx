@@ -1,4 +1,5 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -7,6 +8,7 @@ import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
 import { Button } from '@/components/ui/Button';
 import { JOB_STATUS } from '@/constants/statuses';
+import { glassPositionKey, damageTypeKey, paymentTypeKey } from '@/i18n/statusKeys';
 import type { Job, CreateJobDto, DamageType, PaymentType } from '@/types/models/job';
 import type { GlassPosition } from '@/types/models/product';
 import type { SelectOption } from '@/types/ui';
@@ -24,38 +26,19 @@ const DAMAGE_TYPES: DamageType[] = [
 
 const PAYMENT_TYPES: PaymentType[] = ['Cash', 'Insurance', 'Card', 'UPI'];
 
-const STATUS_OPTIONS: SelectOption[] = [
-  { value: JOB_STATUS.PENDING,     label: 'Pending'     },
-  { value: JOB_STATUS.IN_PROGRESS, label: 'In Progress' },
-  { value: JOB_STATUS.COMPLETED,   label: 'Completed'   },
-  { value: JOB_STATUS.ON_HOLD,     label: 'On Hold'     },
-  { value: JOB_STATUS.CANCELLED,   label: 'Cancelled'   },
-];
-
-const jobSchema = z.object({
-  customerId:     z.string().min(1, 'Select a customer'),
-  vehicleName:    z.string().min(2, 'Vehicle name required'),
-  registrationNo: z.string().min(4, 'Registration number required'),
-  glassPosition:  z.enum(GLASS_POSITIONS as [GlassPosition, ...GlassPosition[]], {
-    errorMap: () => ({ message: 'Select glass position' }),
-  }),
-  damageType: z.enum(DAMAGE_TYPES as [DamageType, ...DamageType[]], {
-    errorMap: () => ({ message: 'Select damage type' }),
-  }),
-  technicianId:  z.string().optional(),
-  paymentType: z.enum(PAYMENT_TYPES as [PaymentType, ...PaymentType[]], {
-    errorMap: () => ({ message: 'Select payment type' }),
-  }),
-  estimatedCost: z.coerce.number().positive().optional().or(z.literal('')),
-  scheduledDate: z.string().min(1, 'Scheduled date required'),
-  notes:         z.string().optional(),
-  status: z.enum([
-    JOB_STATUS.PENDING, JOB_STATUS.IN_PROGRESS, JOB_STATUS.COMPLETED,
-    JOB_STATUS.ON_HOLD, JOB_STATUS.CANCELLED,
-  ]).optional(),
-});
-
-type JobFormData = z.infer<typeof jobSchema>;
+interface JobFormData {
+  customerId:     string;
+  vehicleName:    string;
+  registrationNo: string;
+  glassPosition:  GlassPosition;
+  damageType:     DamageType;
+  technicianId?:  string;
+  paymentType:    PaymentType;
+  estimatedCost?: number | '';
+  scheduledDate:  string;
+  notes?:         string;
+  status?: typeof JOB_STATUS[keyof typeof JOB_STATUS];
+}
 
 interface JobModalProps {
   isOpen:            boolean;
@@ -76,7 +59,54 @@ export function JobModal({
   customerOptions,
   technicianOptions,
 }: JobModalProps) {
+  const { t } = useTranslation(['jobs', 'common']);
   const isEdit = !!job;
+
+  const jobSchema = useMemo(() => z.object({
+    customerId:     z.string().min(1, t('form.errors.selectCustomer')),
+    vehicleName:    z.string().min(2, t('form.errors.vehicleRequired')),
+    registrationNo: z.string().min(4, t('form.errors.regNoRequired')),
+    glassPosition:  z.enum(GLASS_POSITIONS as [GlassPosition, ...GlassPosition[]], {
+      errorMap: () => ({ message: t('form.errors.selectPosition') }),
+    }),
+    damageType: z.enum(DAMAGE_TYPES as [DamageType, ...DamageType[]], {
+      errorMap: () => ({ message: t('form.errors.selectDamage') }),
+    }),
+    technicianId:  z.string().optional(),
+    paymentType: z.enum(PAYMENT_TYPES as [PaymentType, ...PaymentType[]], {
+      errorMap: () => ({ message: t('form.errors.selectPayment') }),
+    }),
+    estimatedCost: z.coerce.number().positive().optional().or(z.literal('')),
+    scheduledDate: z.string().min(1, t('form.errors.dateRequired')),
+    notes:         z.string().optional(),
+    status: z.enum([
+      JOB_STATUS.PENDING, JOB_STATUS.IN_PROGRESS, JOB_STATUS.COMPLETED,
+      JOB_STATUS.ON_HOLD, JOB_STATUS.CANCELLED,
+    ]).optional(),
+  }), [t]);
+
+  const glassPositionOptions: SelectOption[] = GLASS_POSITIONS.map((p) => ({
+    value: p,
+    label: t(`glassPositions.${glassPositionKey(p)}`),
+  }));
+
+  const damageTypeOptions: SelectOption[] = DAMAGE_TYPES.map((d) => ({
+    value: d,
+    label: t(`damageTypes.${damageTypeKey(d)}`),
+  }));
+
+  const paymentTypeOptions: SelectOption[] = PAYMENT_TYPES.map((p) => ({
+    value: p,
+    label: t(`paymentTypes.${paymentTypeKey(p)}`),
+  }));
+
+  const statusOptions: SelectOption[] = [
+    { value: JOB_STATUS.PENDING,     label: t('status.pending')     },
+    { value: JOB_STATUS.IN_PROGRESS, label: t('status.inProgress')  },
+    { value: JOB_STATUS.COMPLETED,   label: t('status.completed')   },
+    { value: JOB_STATUS.ON_HOLD,     label: t('status.onHold')      },
+    { value: JOB_STATUS.CANCELLED,   label: t('status.cancelled')   },
+  ];
 
   const {
     register,
@@ -128,15 +158,15 @@ export function JobModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={isEdit ? `Edit ${job.jobNumber}` : 'New Job Card'}
+      title={isEdit ? t('form.title.edit', { jobNumber: job.jobNumber }) : t('form.title.add')}
       maxWidth="680px"
       footer={
         <div className={styles.footer}>
           <Button variant="secondary" onClick={onClose} disabled={isSubmitting}>
-            Cancel
+            {t('actions.cancel')}
           </Button>
           <Button type="submit" form="job-form" loading={isSubmitting}>
-            {isEdit ? 'Save Changes' : 'Create Job'}
+            {isEdit ? t('actions.saveChanges') : t('form.title.add')}
           </Button>
         </div>
       }
@@ -148,9 +178,9 @@ export function JobModal({
         noValidate
       >
         <Select
-          label="Customer"
+          label={t('form.customer')}
           options={customerOptions}
-          placeholder="Select customer"
+          placeholder={t('placeholders.select')}
           error={errors.customerId?.message}
           fullWidth
           required
@@ -159,15 +189,15 @@ export function JobModal({
 
         <div className={styles.row}>
           <Input
-            label="Vehicle"
-            placeholder="e.g. Honda City 2020"
+            label={t('form.vehicle')}
+            placeholder={t('form.placeholders.vehicle')}
             error={errors.vehicleName?.message}
             required
             {...register('vehicleName')}
           />
           <Input
-            label="Registration Number"
-            placeholder="e.g. DL 01 AB 1234"
+            label={t('form.registrationNo')}
+            placeholder={t('form.placeholders.registrationNo')}
             error={errors.registrationNo?.message}
             required
             {...register('registrationNo')}
@@ -176,17 +206,17 @@ export function JobModal({
 
         <div className={styles.row}>
           <Select
-            label="Glass Position"
-            options={GLASS_POSITIONS.map((p) => ({ value: p, label: p }))}
-            placeholder="Select position"
+            label={t('form.glassPosition')}
+            options={glassPositionOptions}
+            placeholder={t('placeholders.select')}
             error={errors.glassPosition?.message}
             required
             {...register('glassPosition')}
           />
           <Select
-            label="Damage Type"
-            options={DAMAGE_TYPES.map((d) => ({ value: d, label: d }))}
-            placeholder="Select damage type"
+            label={t('form.damageType')}
+            options={damageTypeOptions}
+            placeholder={t('placeholders.select')}
             error={errors.damageType?.message}
             required
             {...register('damageType')}
@@ -194,26 +224,26 @@ export function JobModal({
         </div>
 
         <hr className={styles.divider} />
-        <div className={styles.sectionLabel}>Assignment & Payment</div>
+        <div className={styles.sectionLabel}>{t('form.assignment')}</div>
 
         <div className={styles.row3}>
           <Select
-            label="Technician"
+            label={t('form.technician')}
             options={technicianOptions}
-            placeholder="Assign later"
+            placeholder={t('form.placeholders.assignLater')}
             error={errors.technicianId?.message}
             {...register('technicianId')}
           />
           <Select
-            label="Payment Type"
-            options={PAYMENT_TYPES.map((p) => ({ value: p, label: p }))}
-            placeholder="Select type"
+            label={t('form.paymentType')}
+            options={paymentTypeOptions}
+            placeholder={t('placeholders.select')}
             error={errors.paymentType?.message}
             required
             {...register('paymentType')}
           />
           <Input
-            label="Estimated Cost (₹)"
+            label={t('form.estimatedCost')}
             type="number"
             placeholder="0"
             error={errors.estimatedCost?.message}
@@ -223,7 +253,7 @@ export function JobModal({
 
         <div className={styles.row}>
           <Input
-            label="Scheduled Date"
+            label={t('form.scheduledDate')}
             type="date"
             error={errors.scheduledDate?.message}
             required
@@ -231,8 +261,8 @@ export function JobModal({
           />
           {isEdit && (
             <Select
-              label="Status"
-              options={STATUS_OPTIONS}
+              label={t('form.status')}
+              options={statusOptions}
               error={errors.status?.message}
               {...register('status')}
             />
@@ -240,8 +270,8 @@ export function JobModal({
         </div>
 
         <Input
-          label="Notes (optional)"
-          placeholder="Any additional instructions…"
+          label={t('form.notes')}
+          placeholder={t('form.placeholders.notes')}
           error={errors.notes?.message}
           fullWidth
           {...register('notes')}

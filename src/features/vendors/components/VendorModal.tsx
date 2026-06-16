@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { useTranslation } from 'react-i18next';
 import { Modal } from '@/components/ui/Modal';
 import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
@@ -55,6 +56,7 @@ export function VendorModal({
   vendor,
   isSubmitting,
 }: VendorModalProps) {
+  const { t } = useTranslation(['vendors', 'common']);
   const isEdit = !!vendor;
 
   const {
@@ -108,19 +110,19 @@ export function VendorModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={isEdit ? 'Edit Vendor' : 'Add Vendor'}
+      title={isEdit ? t('form.title.edit') : t('form.title.add')}
       maxWidth="640px"
       footer={
         <div className={styles.footer}>
           <Button variant="secondary" onClick={onClose} disabled={isSubmitting}>
-            Cancel
+            {t('actions.cancel')}
           </Button>
           <Button
             type="submit"
             form="vendor-form"
             loading={isSubmitting}
           >
-            {isEdit ? 'Save Changes' : 'Add Vendor'}
+            {isEdit ? t('actions.saveChanges') : t('form.title.add')}
           </Button>
         </div>
       }
@@ -132,8 +134,8 @@ export function VendorModal({
         noValidate
       >
         <Input
-          label="Company Name"
-          placeholder="e.g. Bajaj Glass Supplies"
+          label={t('form.companyName')}
+          placeholder={t('form.placeholders.companyName')}
           error={errors.companyName?.message}
           fullWidth
           required
@@ -142,15 +144,15 @@ export function VendorModal({
 
         <div className={styles.row}>
           <Input
-            label="Contact Person"
-            placeholder="e.g. Rajesh Patel"
+            label={t('form.contactPerson')}
+            placeholder={t('form.placeholders.contactPerson')}
             error={errors.contactPerson?.message}
             required
             {...register('contactPerson')}
           />
           <Input
-            label="Phone"
-            placeholder="10-digit mobile"
+            label={t('form.phone')}
+            placeholder={t('form.placeholders.phone')}
             error={errors.phone?.message}
             required
             {...register('phone')}
@@ -159,15 +161,15 @@ export function VendorModal({
 
         <div className={styles.row}>
           <Input
-            label="Email"
+            label={t('form.email')}
             type="email"
-            placeholder="vendor@example.com"
+            placeholder={t('form.placeholders.email')}
             error={errors.email?.message}
             {...register('email')}
           />
           <Input
-            label="GST Number"
-            placeholder="e.g. 27AABCB1234A1Z5"
+            label={t('form.gstNumber')}
+            placeholder={t('form.placeholders.gstNumber')}
             error={errors.gstNumber?.message}
             required
             {...register('gstNumber')}
@@ -176,32 +178,32 @@ export function VendorModal({
 
         <div className={styles.row}>
           <Input
-            label="City"
-            placeholder="e.g. Mumbai"
+            label={t('form.city')}
+            placeholder={t('form.placeholders.city')}
             error={errors.city?.message}
             required
             {...register('city')}
           />
           <Input
-            label="State"
-            placeholder="e.g. Maharashtra"
+            label={t('form.state')}
+            placeholder={t('form.placeholders.state')}
             error={errors.state?.message}
             {...register('state')}
           />
         </div>
 
         <Input
-          label="Address"
-          placeholder="Street address (optional)"
+          label={t('form.address')}
+          placeholder={t('form.placeholders.address')}
           error={errors.address?.message}
           fullWidth
           {...register('address')}
         />
 
         <Input
-          label="Products Supplied"
-          placeholder="e.g. Windshields, Side Glass, Sunroof"
-          hint="Separate multiple products with commas"
+          label={t('form.productsSupplied')}
+          placeholder={t('form.placeholders.productsSupplied')}
+          hint={t('form.productsHint')}
           error={errors.productsSupplied?.message}
           fullWidth
           {...register('productsSupplied')}
@@ -209,7 +211,7 @@ export function VendorModal({
 
         {isEdit && (
           <Select
-            label="Status"
+            label={t('form.status')}
             options={STATUS_OPTIONS}
             error={errors.status?.message}
             fullWidth

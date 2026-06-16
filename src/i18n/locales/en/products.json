@@ -1,0 +1,65 @@
+{
+  "title": "Products",
+  "description": "Glass product inventory and pricing.",
+  "count_one": "{{count}} product",
+  "count_other": "{{count}} products",
+  "table": {
+    "product": "Product",
+    "vehicle": "Vehicle",
+    "position": "Position",
+    "priceInclGst": "Price (incl. GST)",
+    "stock": "Stock",
+    "status": "Status",
+    "empty": "No products found. Add your first glass product.",
+    "aria": {
+      "edit": "Edit product",
+      "delete": "Delete product"
+    }
+  },
+  "form": {
+    "title": {
+      "add": "Add Product",
+      "edit": "Edit Product"
+    },
+    "name": "Product Name",
+    "sku": "SKU",
+    "glassPosition": "Glass Position",
+    "vehicleMake": "Vehicle Make",
+    "vehicleModel": "Vehicle Model",
+    "vehicleYear": "Year Range",
+    "price": "Selling Price (₹)",
+    "costPrice": "Cost Price (₹)",
+    "gstRate": "GST Rate",
+    "stockQty": "Stock Qty",
+    "lowStockThreshold": "Low Stock Threshold",
+    "vendor": "Vendor (optional)",
+    "placeholders": {
+      "name": "e.g. Maruti Suzuki Swift Front Windshield",
+      "sku": "e.g. MS-SW-FW-001",
+      "vehicleMake": "e.g. Maruti Suzuki",
+      "vehicleModel": "e.g. Swift",
+      "vehicleYear": "e.g. 2018-2024"
+    },
+    "hints": {
+      "lowStockThreshold": "Alert when stock falls below this"
+    },
+    "errors": {
+      "nameRequired": "Product name is required",
+      "vehicleMakeRequired": "Vehicle make is required",
+      "vehicleModelRequired": "Vehicle model is required",
+      "selectPosition": "Select a glass position",
+      "priceInvalid": "Enter a valid price",
+      "costPriceInvalid": "Enter a valid cost price",
+      "stockNegative": "Stock cannot be negative",
+      "thresholdMin": "Threshold must be at least 1"
+    }
+  },
+  "messages": {
+    "added": "Product added",
+    "updated": "Product updated",
+    "removed": "Product removed",
+    "saveFailed": "Failed to save product",
+    "removeFailed": "Failed to remove product",
+    "confirmDelete": "Remove this product? This cannot be undone."
+  }
+}

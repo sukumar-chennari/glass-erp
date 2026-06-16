@@ -1,4 +1,5 @@
 import { AlertTriangle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/Button';
 import styles from './ConfirmDialog.module.css';
@@ -15,26 +16,28 @@ interface ConfirmDialogProps {
 
 export function ConfirmDialog({
   isOpen,
-  title        = 'Confirm Delete',
+  title,
   message,
-  confirmLabel = 'Delete',
+  confirmLabel,
   isLoading,
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) {
+  const { t } = useTranslation('common');
+
   return (
     <Modal
       isOpen={isOpen}
       onClose={onCancel}
-      title={title}
+      title={title ?? t('confirmDelete.title')}
       maxWidth="400px"
       footer={
         <div className={styles.footer}>
           <Button variant="secondary" onClick={onCancel} disabled={isLoading}>
-            Cancel
+            {t('actions.cancel')}
           </Button>
           <Button variant="danger" onClick={onConfirm} loading={isLoading}>
-            {confirmLabel}
+            {confirmLabel ?? t('actions.delete')}
           </Button>
         </div>
       }

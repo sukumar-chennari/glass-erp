@@ -1,0 +1,32 @@
+{
+  "title": "रिपोर्ट",
+  "description": "विश्लेषण और व्यावसायिक अंतर्दृष्टि।",
+  "sections": {
+    "keyMetrics": "मुख्य मेट्रिक्स",
+    "topCustomers": "जॉब के आधार पर शीर्ष ग्राहक",
+    "glassByPosition": "ग्लास स्थिति के अनुसार जॉब",
+    "monthlyRevenue": "मासिक राजस्व प्रवृत्ति"
+  },
+  "metrics": {
+    "totalRevenue": "कुल राजस्व (भुगतान किया)",
+    "totalJobs": "कुल जॉब",
+    "completionRate": "पूर्णता दर",
+    "avgJobValue": "औसत जॉब मूल्य",
+    "paidInvoices_one": "{{count}} भुगतान किया चालान",
+    "paidInvoices_other": "{{count}} भुगतान किए चालान",
+    "completedJobs_one": "{{count}} पूर्ण जॉब",
+    "completedJobs_other": "{{count}} पूर्ण जॉब",
+    "fromTotal": "{{count}} कुल जॉब से"
+  },
+  "table": {
+    "customer": "ग्राहक",
+    "jobs": "जॉब",
+    "revenue": "राजस्व",
+    "position": "स्थिति",
+    "count": "संख्या"
+  },
+  "empty": {
+    "noData": "कोई डेटा उपलब्ध नहीं।"
+  },
+  "chartComingSoon": "चार्ट एकीकरण जल्द आ रहा है"
+}

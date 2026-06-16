@@ -1,0 +1,93 @@
+{
+  "actions": {
+    "add": "+ Add",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "view": "View",
+    "export": "Export",
+    "create": "Create",
+    "update": "Update",
+    "submit": "Submit",
+    "back": "Back",
+    "next": "Next",
+    "confirm": "Confirm",
+    "close": "Close",
+    "search": "Search",
+    "filter": "Filter",
+    "reset": "Reset",
+    "refresh": "Refresh",
+    "print": "Print",
+    "downloadPdf": "Download PDF",
+    "shareWhatsApp": "Share on WhatsApp",
+    "markPaid": "Mark as Paid",
+    "saveChanges": "Save Changes",
+    "addItem": "Add Item",
+    "applyAdjustment": "Apply Adjustment",
+    "viewAll": "View All"
+  },
+  "table": {
+    "noData": "No records found.",
+    "loading": "Loading…"
+  },
+  "pagination": {
+    "rowsPerPage": "Rows per page",
+    "of": "of",
+    "showing": "Showing",
+    "results": "results"
+  },
+  "validation": {
+    "required": "This field is required.",
+    "phone": "Enter a valid 10-digit mobile number.",
+    "gst": "Enter a valid GST number (15 characters).",
+    "email": "Enter a valid email address.",
+    "amount": "Enter a valid positive amount.",
+    "date": "Enter a valid date.",
+    "url": "Please enter a valid URL starting with https://",
+    "whatsapp": "Enter a valid 10-digit WhatsApp number."
+  },
+  "placeholders": {
+    "select": "— Select —",
+    "search": "Search…"
+  },
+  "confirmDelete": {
+    "title": "Confirm Delete",
+    "message": "Are you sure? This action cannot be undone."
+  },
+  "status": {
+    "active": "Active",
+    "onHold": "On Hold",
+    "inactive": "Inactive",
+    "inStock": "In Stock",
+    "lowStock": "Low Stock",
+    "outOfStock": "Out of Stock",
+    "training": "Training",
+    "onLeave": "On Leave"
+  },
+  "kpi": {
+    "vsYesterday": "vs yesterday",
+    "vsLastMonth": "vs last month",
+    "thisMonth": "This month",
+    "today": "Today"
+  },
+  "comingSoon": "Coming Soon",
+  "underConstruction": "This module is under development.",
+  "emptyState": {
+    "title": "No data",
+    "message": "Nothing to display here yet."
+  },
+  "aria": {
+    "notifications": "Notifications"
+  },
+  "glassPositions": {
+    "frontWindshield":      "Front Windshield",
+    "rearWindshield":       "Rear Windshield",
+    "driverSideWindow":     "Driver Side Window",
+    "passengerSideWindow":  "Passenger Side Window",
+    "rearLeftWindow":       "Rear Left Window",
+    "rearRightWindow":      "Rear Right Window",
+    "sunroofGlass":         "Sunroof Glass",
+    "quarterGlass":         "Quarter Glass"
+  }
+}

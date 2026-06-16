@@ -1,5 +1,5 @@
+import { useTranslation } from 'react-i18next';
 import type { TableColumn } from '@/types/ui';
-import { LABELS } from '@/constants/labels';
 import styles from './DataTable.module.css';
 
 interface DataTableProps<T extends { id: string }> {
@@ -14,9 +14,11 @@ export function DataTable<T extends { id: string }>({
   columns,
   data,
   isLoading    = false,
-  emptyMessage = LABELS.table.noData,
+  emptyMessage,
   onRowClick,
 }: DataTableProps<T>) {
+  const { t } = useTranslation('common');
+  const noDataMsg = emptyMessage ?? t('table.noData');
   const SKELETON_ROWS = 5;
 
   return (
@@ -52,7 +54,7 @@ export function DataTable<T extends { id: string }>({
             ))
           ) : data.length === 0 ? (
             <tr className={styles.emptyRow}>
-              <td colSpan={columns.length}>{emptyMessage}</td>
+              <td colSpan={columns.length}>{noDataMsg}</td>
             </tr>
           ) : (
             data.map((row) => (

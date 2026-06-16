@@ -1,0 +1,32 @@
+{
+  "title": "నివేదికలు",
+  "description": "విశ్లేషణ మరియు వ్యాపార అంతర్దృష్టులు.",
+  "sections": {
+    "keyMetrics": "ముఖ్య గణాంకాలు",
+    "topCustomers": "జాబ్‌ల ఆధారంగా అగ్ర కస్టమర్లు",
+    "glassByPosition": "గ్లాస్ స్థానం ప్రకారం జాబ్‌లు",
+    "monthlyRevenue": "నెలవారీ ఆదాయ ధోరణి"
+  },
+  "metrics": {
+    "totalRevenue": "మొత్తం ఆదాయం (చెల్లించింది)",
+    "totalJobs": "మొత్తం జాబ్‌లు",
+    "completionRate": "పూర్తి రేటు",
+    "avgJobValue": "సగటు జాబ్ విలువ",
+    "paidInvoices_one": "{{count}} చెల్లించిన ఇన్వాయిస్",
+    "paidInvoices_other": "{{count}} చెల్లించిన ఇన్వాయిస్‌లు",
+    "completedJobs_one": "{{count}} పూర్తయిన జాబ్",
+    "completedJobs_other": "{{count}} పూర్తయిన జాబ్‌లు",
+    "fromTotal": "{{count}} మొత్తం జాబ్‌ల నుండి"
+  },
+  "table": {
+    "customer": "కస్టమర్",
+    "jobs": "జాబ్‌లు",
+    "revenue": "ఆదాయం",
+    "position": "స్థానం",
+    "count": "లెక్క"
+  },
+  "empty": {
+    "noData": "డేటా అందుబాటులో లేదు."
+  },
+  "chartComingSoon": "చార్ట్ ఇంటిగ్రేషన్ త్వరలో వస్తోంది"
+}

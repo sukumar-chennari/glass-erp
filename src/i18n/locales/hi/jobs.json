@@ -1,0 +1,82 @@
+{
+  "title": "जॉब कार्ड",
+  "description": "जॉब बनाएं, तकनीशियन असाइन करें और स्थिति ट्रैक करें।",
+  "count_one": "{{count}} जॉब",
+  "count_other": "{{count}} जॉब",
+  "table": {
+    "jobNo": "जॉब #",
+    "customer": "ग्राहक",
+    "vehicle": "वाहन",
+    "technician": "तकनीशियन",
+    "payment": "भुगतान",
+    "estimatedCost": "अनुमानित लागत",
+    "scheduled": "निर्धारित तिथि",
+    "status": "स्थिति",
+    "empty": "कोई जॉब कार्ड नहीं। अपना पहला जॉब बनाएं।",
+    "aria": {
+      "edit": "जॉब संपादित करें",
+      "delete": "जॉब हटाएं"
+    }
+  },
+  "form": {
+    "title": {
+      "add": "नया जॉब कार्ड",
+      "edit": "{{jobNumber}} संपादित करें"
+    },
+    "customer": "ग्राहक",
+    "vehicle": "वाहन",
+    "registrationNo": "पंजीकरण संख्या",
+    "glassPosition": "ग्लास स्थिति",
+    "damageType": "क्षति का प्रकार",
+    "assignment": "असाइनमेंट और भुगतान",
+    "technician": "तकनीशियन",
+    "paymentType": "भुगतान प्रकार",
+    "estimatedCost": "अनुमानित लागत (₹)",
+    "scheduledDate": "निर्धारित तिथि",
+    "status": "स्थिति",
+    "notes": "नोट्स (वैकल्पिक)",
+    "placeholders": {
+      "vehicle": "जैसे: Honda City 2020",
+      "registrationNo": "जैसे: DL 01 AB 1234",
+      "assignLater": "बाद में असाइन करें",
+      "notes": "अतिरिक्त निर्देश…"
+    },
+    "errors": {
+      "selectCustomer": "ग्राहक चुनें",
+      "vehicleRequired": "वाहन का नाम आवश्यक है",
+      "regNoRequired": "पंजीकरण संख्या आवश्यक है",
+      "selectPosition": "ग्लास स्थिति चुनें",
+      "selectDamage": "क्षति का प्रकार चुनें",
+      "selectPayment": "भुगतान प्रकार चुनें",
+      "dateRequired": "निर्धारित तिथि आवश्यक है"
+    }
+  },
+  "status": {
+    "pending": "लंबित",
+    "inProgress": "प्रगति में",
+    "completed": "पूर्ण",
+    "cancelled": "रद्द",
+    "onHold": "होल्ड पर"
+  },
+  "damageTypes": {
+    "crack": "दरार",
+    "chipStoneImpact": "चिप / पत्थर का प्रभाव",
+    "completeShatter": "पूरी तरह टूटा",
+    "scratch": "खरोंच",
+    "stressFracture": "तनाव दरार"
+  },
+  "paymentTypes": {
+    "cash": "नकद",
+    "insurance": "बीमा",
+    "card": "कार्ड",
+    "upi": "UPI"
+  },
+  "messages": {
+    "added": "जॉब बनाया गया",
+    "updated": "जॉब अपडेट किया गया",
+    "removed": "जॉब हटाया गया",
+    "saveFailed": "जॉब सहेजना विफल हुआ",
+    "removeFailed": "जॉब हटाना विफल हुआ",
+    "confirmDelete": "इस जॉब कार्ड को हटाएं? इसे पूर्ववत नहीं किया जा सकता।"
+  }
+}

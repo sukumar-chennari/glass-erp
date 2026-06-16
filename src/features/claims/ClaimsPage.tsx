@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { PageShell } from '@/components/layout/PageShell';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { useToast } from '@/components/ui/Toast';
@@ -12,17 +13,18 @@ import {
 import type { Claim } from '@/types/models/claim';
 import styles from './ClaimsPage.module.css';
 
-const FILTER_TABS = [
-  { key: 'all',          label: 'All' },
-  { key: 'Submitted',    label: 'Submitted' },
-  { key: 'Under Review', label: 'Under Review' },
-  { key: 'Surveyed',     label: 'Surveyed' },
-  { key: 'Approved',     label: 'Approved' },
-  { key: 'Partial',      label: 'Partial' },
-  { key: 'Rejected',     label: 'Rejected' },
+const STATUS_FILTER_KEYS = [
+  { key: 'all',          i18nKey: 'status.all'         },
+  { key: 'Submitted',    i18nKey: 'status.submitted'   },
+  { key: 'Under Review', i18nKey: 'status.underReview' },
+  { key: 'Surveyed',     i18nKey: 'status.surveyed'    },
+  { key: 'Approved',     i18nKey: 'status.approved'    },
+  { key: 'Partial',      i18nKey: 'status.partial'     },
+  { key: 'Rejected',     i18nKey: 'status.rejected'    },
 ];
 
 export function ClaimsPage() {
+  const { t } = useTranslation(['claims', 'common']);
   const { data: claims = [], isLoading } = useGetClaimsQuery();
   const [updateClaim, { isLoading: updating }] = useUpdateClaimMutation();
   const [deleteClaim, { isLoading: deleting }] = useDeleteClaimMutation();
@@ -45,10 +47,10 @@ export function ClaimsPage() {
     if (!editingClaim) return;
     try {
       await updateClaim({ id: editingClaim.id, ...dto }).unwrap();
-      toast.success('Claim updated');
+      toast.success(t('messages.updated'));
       closeModal();
     } catch {
-      toast.error('Failed to update claim');
+      toast.error(t('messages.updateFailed'));
     }
   };
 
@@ -56,9 +58,9 @@ export function ClaimsPage() {
     if (!deleteTarget) return;
     try {
       await deleteClaim(deleteTarget).unwrap();
-      toast.success('Claim deleted');
+      toast.success(t('messages.removed'));
     } catch {
-      toast.error('Failed to delete claim');
+      toast.error(t('messages.removeFailed'));
     } finally {
       setDeleteTarget(null);
     }
@@ -70,12 +72,12 @@ export function ClaimsPage() {
 
   return (
     <PageShell
-      heading="Insurance Claims"
-      description="Submit and track insurance claim approvals."
+      heading={t('title')}
+      description={t('description')}
     >
       {/* Filter tabs */}
       <div className={styles.filters}>
-        {FILTER_TABS.map(tab => {
+        {STATUS_FILTER_KEYS.map(tab => {
           const count = tab.key === 'all'
             ? claims.length
             : claims.filter(c => c.status === tab.key).length;
@@ -85,7 +87,7 @@ export function ClaimsPage() {
               className={`${styles.filterTab} ${activeFilter === tab.key ? styles.filterTabActive : ''}`}
               onClick={() => setActiveFilter(tab.key)}
             >
-              {tab.label}
+              {t(tab.i18nKey)}
               {count > 0 && (
                 <span className={styles.filterCount}>{count}</span>
               )}
@@ -103,8 +105,8 @@ export function ClaimsPage() {
         </div>
       ) : filtered.length === 0 ? (
         <div className={styles.empty}>
-          <p className={styles.emptyTitle}>No claims found</p>
-          <p className={styles.emptyHint}>Try a different filter or add a new claim.</p>
+          <p className={styles.emptyTitle}>{t('empty.title')}</p>
+          <p className={styles.emptyHint}>{t('empty.hint')}</p>
         </div>
       ) : (
         <div className={styles.cardGrid}>
@@ -129,7 +131,7 @@ export function ClaimsPage() {
 
       <ConfirmDialog
         isOpen={!!deleteTarget}
-        message="Delete this claim? This cannot be undone."
+        message={t('messages.confirmDelete')}
         isLoading={deleting}
         onConfirm={handleConfirmDelete}
         onCancel={() => setDeleteTarget(null)}

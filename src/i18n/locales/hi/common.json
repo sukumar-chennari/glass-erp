@@ -1,0 +1,93 @@
+{
+  "actions": {
+    "add": "+ जोड़ें",
+    "save": "सहेजें",
+    "cancel": "रद्द करें",
+    "delete": "हटाएं",
+    "edit": "संपादित करें",
+    "view": "देखें",
+    "export": "निर्यात",
+    "create": "बनाएं",
+    "update": "अपडेट करें",
+    "submit": "जमा करें",
+    "back": "वापस",
+    "next": "अगला",
+    "confirm": "पुष्टि करें",
+    "close": "बंद करें",
+    "search": "खोजें",
+    "filter": "फ़िल्टर",
+    "reset": "रीसेट",
+    "refresh": "ताज़ा करें",
+    "print": "प्रिंट",
+    "downloadPdf": "PDF डाउनलोड करें",
+    "shareWhatsApp": "WhatsApp पर साझा करें",
+    "markPaid": "भुगतान किया हुआ चिह्नित करें",
+    "saveChanges": "परिवर्तन सहेजें",
+    "addItem": "आइटम जोड़ें",
+    "applyAdjustment": "समायोजन लागू करें",
+    "viewAll": "सभी देखें"
+  },
+  "table": {
+    "noData": "कोई रिकॉर्ड नहीं मिला।",
+    "loading": "लोड हो रहा है…"
+  },
+  "pagination": {
+    "rowsPerPage": "प्रति पृष्ठ पंक्तियाँ",
+    "of": "में से",
+    "showing": "दिखाया जा रहा है",
+    "results": "परिणाम"
+  },
+  "validation": {
+    "required": "यह फ़ील्ड आवश्यक है।",
+    "phone": "एक वैध 10-अंकीय मोबाइल नंबर दर्ज करें।",
+    "gst": "एक वैध GST नंबर (15 अक्षर) दर्ज करें।",
+    "email": "एक वैध ईमेल पता दर्ज करें।",
+    "amount": "एक वैध धनात्मक राशि दर्ज करें।",
+    "date": "एक वैध तिथि दर्ज करें।",
+    "url": "कृपया https:// से शुरू होने वाला वैध URL दर्ज करें।",
+    "whatsapp": "एक वैध 10-अंकीय WhatsApp नंबर दर्ज करें।"
+  },
+  "placeholders": {
+    "select": "— चुनें —",
+    "search": "खोजें…"
+  },
+  "confirmDelete": {
+    "title": "हटाने की पुष्टि करें",
+    "message": "क्या आप सुनिश्चित हैं? इस क्रिया को पूर्ववत नहीं किया जा सकता।"
+  },
+  "status": {
+    "active": "सक्रिय",
+    "onHold": "होल्ड पर",
+    "inactive": "निष्क्रिय",
+    "inStock": "स्टॉक में",
+    "lowStock": "कम स्टॉक",
+    "outOfStock": "स्टॉक समाप्त",
+    "training": "प्रशिक्षण में",
+    "onLeave": "छुट्टी पर"
+  },
+  "kpi": {
+    "vsYesterday": "कल की तुलना में",
+    "vsLastMonth": "पिछले महीने की तुलना में",
+    "thisMonth": "इस महीने",
+    "today": "आज"
+  },
+  "comingSoon": "जल्द आ रहा है",
+  "underConstruction": "यह मॉड्यूल विकास में है।",
+  "emptyState": {
+    "title": "कोई डेटा नहीं",
+    "message": "यहाँ दिखाने के लिए कुछ नहीं है।"
+  },
+  "aria": {
+    "notifications": "सूचनाएं"
+  },
+  "glassPositions": {
+    "frontWindshield":      "आगे की विंडशील्ड",
+    "rearWindshield":       "पीछे की विंडशील्ड",
+    "driverSideWindow":     "ड्राइवर साइड विंडो",
+    "passengerSideWindow":  "पैसेंजर साइड विंडो",
+    "rearLeftWindow":       "पीछे बाईं विंडो",
+    "rearRightWindow":      "पीछे दाईं विंडो",
+    "sunroofGlass":         "सनरूफ ग्लास",
+    "quarterGlass":         "क्वार्टर ग्लास"
+  }
+}

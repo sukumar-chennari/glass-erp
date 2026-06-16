@@ -1,0 +1,32 @@
+{
+  "title": "Reports",
+  "description": "Analytics and business insights.",
+  "sections": {
+    "keyMetrics": "Key Metrics",
+    "topCustomers": "Top Customers by Jobs",
+    "glassByPosition": "Jobs by Glass Position",
+    "monthlyRevenue": "Monthly Revenue Trend"
+  },
+  "metrics": {
+    "totalRevenue": "Total Revenue (Paid)",
+    "totalJobs": "Total Jobs",
+    "completionRate": "Completion Rate",
+    "avgJobValue": "Avg. Job Value",
+    "paidInvoices_one": "{{count}} paid invoice",
+    "paidInvoices_other": "{{count}} paid invoices",
+    "completedJobs_one": "{{count}} completed job",
+    "completedJobs_other": "{{count}} completed jobs",
+    "fromTotal": "from {{count}} total jobs"
+  },
+  "table": {
+    "customer": "Customer",
+    "jobs": "Jobs",
+    "revenue": "Revenue",
+    "position": "Position",
+    "count": "Count"
+  },
+  "empty": {
+    "noData": "No data available."
+  },
+  "chartComingSoon": "Chart integration coming soon"
+}

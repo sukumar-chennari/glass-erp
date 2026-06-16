@@ -1,4 +1,5 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -6,6 +7,7 @@ import { Modal } from '@/components/ui/Modal';
 import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
 import { Button } from '@/components/ui/Button';
+import { glassPositionKey } from '@/i18n/statusKeys';
 import type { Product, CreateProductDto, GlassPosition } from '@/types/models/product';
 import type { SelectOption } from '@/types/ui';
 import styles from './ProductModal.module.css';
@@ -21,27 +23,6 @@ const GLASS_POSITIONS: GlassPosition[] = [
   'Quarter Glass',
 ];
 
-const POSITION_OPTIONS: SelectOption[] = GLASS_POSITIONS.map((p) => ({ value: p, label: p }));
-
-const productSchema = z.object({
-  name:              z.string().min(3, 'Product name is required'),
-  sku:               z.string().optional(),
-  vehicleMake:       z.string().min(1, 'Vehicle make is required'),
-  vehicleModel:      z.string().min(1, 'Vehicle model is required'),
-  vehicleYear:       z.string().optional(),
-  glassPosition:     z.enum(GLASS_POSITIONS as [GlassPosition, ...GlassPosition[]], {
-    errorMap: () => ({ message: 'Select a glass position' }),
-  }),
-  price:             z.coerce.number().positive('Enter a valid price'),
-  costPrice:         z.coerce.number().positive('Enter a valid cost price').optional().or(z.literal('')),
-  gstRate:           z.coerce.number().min(0).max(100),
-  stockQty:          z.coerce.number().int().min(0, 'Stock cannot be negative'),
-  lowStockThreshold: z.coerce.number().int().min(1, 'Threshold must be at least 1'),
-  vendorId:          z.string().optional(),
-});
-
-type ProductFormData = z.infer<typeof productSchema>;
-
 const GST_OPTIONS: SelectOption[] = [
   { value: '5',  label: '5%'  },
   { value: '12', label: '12%' },
@@ -49,12 +30,27 @@ const GST_OPTIONS: SelectOption[] = [
   { value: '28', label: '28%' },
 ];
 
+interface ProductFormData {
+  name: string;
+  sku?: string;
+  vehicleMake: string;
+  vehicleModel: string;
+  vehicleYear?: string;
+  glassPosition: GlassPosition;
+  price: number;
+  costPrice?: number | '';
+  gstRate: number;
+  stockQty: number;
+  lowStockThreshold: number;
+  vendorId?: string;
+}
+
 interface ProductModalProps {
-  isOpen:       boolean;
-  onClose:      () => void;
-  onSubmit:     (data: CreateProductDto) => Promise<void>;
-  product?:     Product | null;
-  isSubmitting: boolean;
+  isOpen:        boolean;
+  onClose:       () => void;
+  onSubmit:      (data: CreateProductDto) => Promise<void>;
+  product?:      Product | null;
+  isSubmitting:  boolean;
   vendorOptions: SelectOption[];
 }
 
@@ -66,7 +62,30 @@ export function ProductModal({
   isSubmitting,
   vendorOptions,
 }: ProductModalProps) {
+  const { t } = useTranslation(['products', 'common']);
   const isEdit = !!product;
+
+  const productSchema = useMemo(() => z.object({
+    name:              z.string().min(3, t('form.errors.nameRequired')),
+    sku:               z.string().optional(),
+    vehicleMake:       z.string().min(1, t('form.errors.vehicleMakeRequired')),
+    vehicleModel:      z.string().min(1, t('form.errors.vehicleModelRequired')),
+    vehicleYear:       z.string().optional(),
+    glassPosition:     z.enum(GLASS_POSITIONS as [GlassPosition, ...GlassPosition[]], {
+      errorMap: () => ({ message: t('form.errors.selectPosition') }),
+    }),
+    price:             z.coerce.number().positive(t('form.errors.priceInvalid')),
+    costPrice:         z.coerce.number().positive(t('form.errors.costPriceInvalid')).optional().or(z.literal('')),
+    gstRate:           z.coerce.number().min(0).max(100),
+    stockQty:          z.coerce.number().int().min(0, t('form.errors.stockNegative')),
+    lowStockThreshold: z.coerce.number().int().min(1, t('form.errors.thresholdMin')),
+    vendorId:          z.string().optional(),
+  }), [t]);
+
+  const positionOptions: SelectOption[] = GLASS_POSITIONS.map((p) => ({
+    value: p,
+    label: t(`glassPositions.${glassPositionKey(p)}`),
+  }));
 
   const {
     register,
@@ -128,15 +147,15 @@ export function ProductModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={isEdit ? 'Edit Product' : 'Add Product'}
+      title={isEdit ? t('form.title.edit') : t('form.title.add')}
       maxWidth="680px"
       footer={
         <div className={styles.footer}>
           <Button variant="secondary" onClick={onClose} disabled={isSubmitting}>
-            Cancel
+            {t('actions.cancel')}
           </Button>
           <Button type="submit" form="product-form" loading={isSubmitting}>
-            {isEdit ? 'Save Changes' : 'Add Product'}
+            {isEdit ? t('actions.saveChanges') : t('form.title.add')}
           </Button>
         </div>
       }
@@ -148,8 +167,8 @@ export function ProductModal({
         noValidate
       >
         <Input
-          label="Product Name"
-          placeholder="e.g. Maruti Suzuki Swift Front Windshield"
+          label={t('form.name')}
+          placeholder={t('form.placeholders.name')}
           error={errors.name?.message}
           fullWidth
           required
@@ -158,15 +177,15 @@ export function ProductModal({
 
         <div className={styles.row}>
           <Input
-            label="SKU"
-            placeholder="e.g. MS-SW-FW-001"
+            label={t('form.sku')}
+            placeholder={t('form.placeholders.sku')}
             error={errors.sku?.message}
             {...register('sku')}
           />
           <Select
-            label="Glass Position"
-            options={POSITION_OPTIONS}
-            placeholder="Select position"
+            label={t('form.glassPosition')}
+            options={positionOptions}
+            placeholder={t('placeholders.select')}
             error={errors.glassPosition?.message}
             required
             {...register('glassPosition')}
@@ -175,22 +194,22 @@ export function ProductModal({
 
         <div className={styles.row3}>
           <Input
-            label="Vehicle Make"
-            placeholder="e.g. Maruti Suzuki"
+            label={t('form.vehicleMake')}
+            placeholder={t('form.placeholders.vehicleMake')}
             error={errors.vehicleMake?.message}
             required
             {...register('vehicleMake')}
           />
           <Input
-            label="Vehicle Model"
-            placeholder="e.g. Swift"
+            label={t('form.vehicleModel')}
+            placeholder={t('form.placeholders.vehicleModel')}
             error={errors.vehicleModel?.message}
             required
             {...register('vehicleModel')}
           />
           <Input
-            label="Year Range"
-            placeholder="e.g. 2018-2024"
+            label={t('form.vehicleYear')}
+            placeholder={t('form.placeholders.vehicleYear')}
             error={errors.vehicleYear?.message}
             {...register('vehicleYear')}
           />
@@ -198,7 +217,7 @@ export function ProductModal({
 
         <div className={styles.row3}>
           <Input
-            label="Selling Price (₹)"
+            label={t('form.price')}
             type="number"
             placeholder="0"
             error={errors.price?.message}
@@ -206,14 +225,14 @@ export function ProductModal({
             {...register('price')}
           />
           <Input
-            label="Cost Price (₹)"
+            label={t('form.costPrice')}
             type="number"
             placeholder="0"
             error={errors.costPrice?.message}
             {...register('costPrice')}
           />
           <Select
-            label="GST Rate"
+            label={t('form.gstRate')}
             options={GST_OPTIONS}
             error={errors.gstRate?.message}
             required
@@ -223,7 +242,7 @@ export function ProductModal({
 
         <div className={styles.row3}>
           <Input
-            label="Stock Qty"
+            label={t('form.stockQty')}
             type="number"
             placeholder="0"
             error={errors.stockQty?.message}
@@ -231,18 +250,18 @@ export function ProductModal({
             {...register('stockQty')}
           />
           <Input
-            label="Low Stock Threshold"
+            label={t('form.lowStockThreshold')}
             type="number"
             placeholder="3"
-            hint="Alert when stock falls below this"
+            hint={t('form.hints.lowStockThreshold')}
             error={errors.lowStockThreshold?.message}
             required
             {...register('lowStockThreshold')}
           />
           <Select
-            label="Vendor (optional)"
+            label={t('form.vendor')}
             options={vendorOptions}
-            placeholder="Select vendor"
+            placeholder={t('placeholders.select')}
             error={errors.vendorId?.message}
             {...register('vendorId')}
           />
