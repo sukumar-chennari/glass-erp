@@ -1,34 +1,31 @@
 {
-  "title": "విచారణ",
-  "description": "కస్టమర్ విచారణలు నమోదు చేయండి మరియు జాబ్ కార్డులుగా మార్చండి.",
-  "steps": {
-    "details": "విచారణ వివరాలు",
-    "estimate": "అంచనా",
-    "whatsapp": "WhatsApp ద్వారా పంపు"
+  "title": "విచారణ ఫారమ్ పంపు",
+  "description": "విచారణ ఫారమ్ లింక్‌తో WhatsApp సందేశం పంపండి. కస్టమర్లు దానిపై నొక్కి వారి వివరాలు నింపి సమర్పిస్తారు.",
+  "send": {
+    "panelTitle": "📱 కస్టమర్‌కు పంపు",
+    "phoneLabel": "కస్టమర్ WhatsApp నంబర్ *",
+    "sendButton": "WhatsApp ద్వారా విచారణ లింక్ పంపు",
+    "savedUrlLabel": "సేవ్ అయిన ఫారమ్ URL",
+    "savedUrlEmpty": "సెట్ కాలేదు — సెటప్ దశలు చూడండి →"
   },
-  "form": {
-    "customerName": "కస్టమర్ పేరు",
-    "phone": "ఫోన్ / WhatsApp",
-    "vehicleName": "వాహనం పేరు",
-    "regNo": "రిజిస్ట్రేషన్ నం.",
-    "glassPosition": "గ్లాస్ స్థానం",
-    "damageType": "నష్టం రకం",
-    "remarks": "వ్యాఖ్యలు",
-    "estimatedAmount": "అంచనా మొత్తం (₹)"
+  "setup": {
+    "panelTitle": "🔧 ఒక్కసారి సెటప్",
+    "description": "<1>glass-enquiry-form.html</1> ఫైల్‌ను ఒక్కసారి ఆన్‌లైన్‌లో హోస్ట్ చేయండి — 30 సెకన్లు పడుతుంది, ఎప్పటికీ ఉచితం.",
+    "step1Title": "దశ 1 — Netlify కి అప్‌లోడ్ చేయండి (ఉచితం)",
+    "step1Desc": "మీ బ్రౌజర్‌లో <1>app.netlify.com/drop</1> తెరిచి <2>glass-enquiry-form.html</2> ఫైల్‌ను పేజీపై డ్రాగ్ & డ్రాప్ చేయండి. Netlify వెంటనే URL ఇస్తుంది.",
+    "step2Title": "దశ 2 — URL ఇక్కడ సేవ్ చేయండి",
+    "urlPlaceholder": "https://your-site.netlify.app/glass-enquiry-form.html",
+    "save": "సేవ్",
+    "note": "✓ ఒక్కసారి సేవ్ చేయండి — ప్రతి కస్టమర్‌కు అదే లింక్ స్వయంచాలకంగా వెళ్ళుతుంది."
   },
   "whatsapp": {
-    "panelTitle": "WhatsApp విచారణ లింక్",
-    "panelDescription": "కస్టమర్‌కు వారి విచారణ వివరాలతో ముందే నింపిన WhatsApp సందేశం పంపండి.",
-    "sendButton": "WhatsApp ద్వారా విచారణ లింక్ పంపు",
-    "setupTitle": "సెటప్ సూచనలు",
-    "setupStep1": "మీ WhatsApp Business యాప్ తెరవండి",
-    "setupStep2": "ముందే నింపిన సందేశంతో WhatsApp ప్రారంభించడానికి దిగువ లింక్‌ను నొక్కండి",
-    "setupStep3": "సందేశం సమీక్షించి పంపు నొక్కండి",
-    "template": "నమస్కారం {{name}}, మీ {{vehicle}} ({{regNo}}) వాహనానికి గ్లాస్ భర్తీ గురించి విచారించినందుకు ధన్యవాదాలు. గ్లాస్ స్థానం: {{position}}. అంచనా ఖర్చు: ₹{{amount}}. మేము త్వరలో మీను సంప్రదిస్తాము. — Glass ERP Pro"
+    "message": "నమస్కారం! 👋\n\nదయచేసి మా *Glass Service Enquiry Form* నింపండి, మేము మీకు వేగంగా సహాయం చేస్తాం:\n\n🔗 {{url}}\n\n_లింక్‌పై నొక్కి, మీ వాహనం & గ్లాస్ వివరాలు నింపి సమర్పించండి. ఒక్క నిమిషంలో అవుతుంది!_ 🪟\n\n— *Glass ERP Pro*"
   },
   "messages": {
-    "submitted": "విచారణ సమర్పించారు",
-    "whatsappSent": "WhatsApp సందేశం పంపారు",
-    "submitFailed": "విచారణ సమర్పించడం విఫలమైంది"
+    "invalidPhone": "సరైన 10-అంకెల WhatsApp నంబర్ నమోదు చేయండి.",
+    "noUrl": "ఇంకా ఫారమ్ URL సేవ్ కాలేదు. మొదట కుడివైపు సెటప్ దశలు పూర్తి చేయండి.",
+    "invalidUrl": "https:// తో ప్రారంభించే సరైన URL నమోదు చేయండి",
+    "urlSaved": "✓ ఫారమ్ URL సేవ్ అయింది! ఇప్పుడు కస్టమర్లకు పంపవచ్చు.",
+    "whatsappOpened": "✓ WhatsApp తెరిచారు! +91 {{phone}} కి ఫారమ్ లింక్ పంపుతున్నారు"
   }
 }

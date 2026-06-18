@@ -1,4 +1,5 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -8,28 +9,16 @@ import { Select } from '@/components/ui/Select';
 import { Button } from '@/components/ui/Button';
 import { formatINR } from '@/services/mockUtils';
 import { INVOICE_STATUS } from '@/constants/statuses';
+import type { InvoiceStatus } from '@/constants/statuses';
 import type { Invoice, UpdateInvoiceDto } from '@/types/models/invoice';
 import type { SelectOption } from '@/types/ui';
 import styles from './InvoiceStatusModal.module.css';
 
-const schema = z.object({
-  status:   z.enum([
-    INVOICE_STATUS.DRAFT, INVOICE_STATUS.SENT, INVOICE_STATUS.PAID,
-    INVOICE_STATUS.OVERDUE, INVOICE_STATUS.VOID,
-  ]),
-  paidDate: z.string().optional(),
-  notes:    z.string().optional(),
-});
-
-type FormData = z.infer<typeof schema>;
-
-const STATUS_OPTIONS: SelectOption[] = [
-  { value: INVOICE_STATUS.DRAFT,   label: 'Draft'   },
-  { value: INVOICE_STATUS.SENT,    label: 'Sent'    },
-  { value: INVOICE_STATUS.PAID,    label: 'Paid'    },
-  { value: INVOICE_STATUS.OVERDUE, label: 'Overdue' },
-  { value: INVOICE_STATUS.VOID,    label: 'Void'    },
-];
+interface FormData {
+  status:   InvoiceStatus;
+  paidDate?: string;
+  notes?:   string;
+}
 
 interface InvoiceStatusModalProps {
   isOpen:       boolean;
@@ -46,6 +35,25 @@ export function InvoiceStatusModal({
   invoice,
   isSubmitting,
 }: InvoiceStatusModalProps) {
+  const { t } = useTranslation(['invoices', 'common']);
+
+  const schema = useMemo(() => z.object({
+    status: z.enum([
+      INVOICE_STATUS.DRAFT, INVOICE_STATUS.SENT, INVOICE_STATUS.PAID,
+      INVOICE_STATUS.OVERDUE, INVOICE_STATUS.VOID,
+    ]),
+    paidDate: z.string().optional(),
+    notes:    z.string().optional(),
+  }), []);
+
+  const statusOptions = useMemo<SelectOption[]>(() => [
+    { value: INVOICE_STATUS.DRAFT,   label: t('status.draft')   },
+    { value: INVOICE_STATUS.SENT,    label: t('status.sent')    },
+    { value: INVOICE_STATUS.PAID,    label: t('status.paid')    },
+    { value: INVOICE_STATUS.OVERDUE, label: t('status.overdue') },
+    { value: INVOICE_STATUS.VOID,    label: t('status.void')    },
+  ], [t]);
+
   const {
     register,
     handleSubmit,
@@ -75,15 +83,15 @@ export function InvoiceStatusModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Update Invoice"
+      title={t('statusModal.title')}
       maxWidth="440px"
       footer={
         <div className={styles.footer}>
           <Button variant="secondary" onClick={onClose} disabled={isSubmitting}>
-            Cancel
+            {t('actions.cancel', { ns: 'common' })}
           </Button>
           <Button type="submit" form="invoice-status-form" loading={isSubmitting}>
-            Save Changes
+            {t('actions.saveChanges', { ns: 'common' })}
           </Button>
         </div>
       }
@@ -97,23 +105,23 @@ export function InvoiceStatusModal({
         {invoice && (
           <div className={styles.infoBox}>
             <div className={styles.infoRow}>
-              <span className={styles.infoLabel}>Invoice</span>
+              <span className={styles.infoLabel}>{t('statusModal.info.invoice')}</span>
               <span className={styles.infoValue}>{invoice.invoiceNumber}</span>
             </div>
             <div className={styles.infoRow}>
-              <span className={styles.infoLabel}>Customer</span>
+              <span className={styles.infoLabel}>{t('statusModal.info.customer')}</span>
               <span className={styles.infoValue}>{invoice.customerName}</span>
             </div>
             <div className={styles.infoRow}>
-              <span className={styles.infoLabel}>Total</span>
+              <span className={styles.infoLabel}>{t('statusModal.info.total')}</span>
               <span className={styles.infoValue}>{formatINR(invoice.totalAmount)}</span>
             </div>
           </div>
         )}
 
         <Select
-          label="Status"
-          options={STATUS_OPTIONS}
+          label={t('statusModal.form.status')}
+          options={statusOptions}
           error={errors.status?.message}
           fullWidth
           required
@@ -122,7 +130,7 @@ export function InvoiceStatusModal({
 
         {watchedStatus === INVOICE_STATUS.PAID && (
           <Input
-            label="Payment Date"
+            label={t('statusModal.form.paymentDate')}
             type="date"
             error={errors.paidDate?.message}
             fullWidth
@@ -131,8 +139,8 @@ export function InvoiceStatusModal({
         )}
 
         <Input
-          label="Notes (optional)"
-          placeholder="Any additional notes…"
+          label={t('statusModal.form.notes')}
+          placeholder={t('statusModal.form.notesPlaceholder')}
           error={errors.notes?.message}
           fullWidth
           {...register('notes')}

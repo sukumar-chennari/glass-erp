@@ -1,4 +1,5 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -8,12 +9,10 @@ import { Button } from '@/components/ui/Button';
 import type { StockEntry, AdjustStockDto } from '@/types/models/stock';
 import styles from './AdjustStockModal.module.css';
 
-const schema = z.object({
-  adjustment: z.coerce.number().int().refine((n) => n !== 0, 'Cannot adjust by 0'),
-  reason:     z.string().min(3, 'Enter a reason for the adjustment'),
-});
-
-type FormData = z.infer<typeof schema>;
+interface FormData {
+  adjustment: number;
+  reason:     string;
+}
 
 interface AdjustStockModalProps {
   isOpen:       boolean;
@@ -30,6 +29,13 @@ export function AdjustStockModal({
   entry,
   isSubmitting,
 }: AdjustStockModalProps) {
+  const { t } = useTranslation(['stock', 'common']);
+
+  const schema = useMemo(() => z.object({
+    adjustment: z.coerce.number().int().refine((n) => n !== 0, t('adjust.validation.nonZero')),
+    reason:     z.string().min(3, t('adjust.validation.reason')),
+  }), [t]);
+
   const {
     register,
     handleSubmit,
@@ -50,15 +56,15 @@ export function AdjustStockModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Adjust Stock"
+      title={t('adjust.title')}
       maxWidth="440px"
       footer={
         <div className={styles.footer}>
           <Button variant="secondary" onClick={onClose} disabled={isSubmitting}>
-            Cancel
+            {t('actions.cancel', { ns: 'common' })}
           </Button>
           <Button type="submit" form="adjust-stock-form" loading={isSubmitting}>
-            Apply Adjustment
+            {t('actions.applyAdjustment', { ns: 'common' })}
           </Button>
         </div>
       }
@@ -72,15 +78,17 @@ export function AdjustStockModal({
         {entry && (
           <div className={styles.productInfo}>
             <div className={styles.productName}>{entry.productName}</div>
-            <div className={styles.currentQty}>Current stock: {entry.currentQty} units</div>
+            <div className={styles.currentQty}>
+              {t('adjust.currentStock', { qty: entry.currentQty })}
+            </div>
           </div>
         )}
 
         <Input
-          label="Adjustment"
+          label={t('adjust.adjustment')}
           type="number"
-          placeholder="e.g. +5 or -2"
-          hint="Use positive numbers to add stock, negative to remove"
+          placeholder={t('adjust.placeholders.adjustment')}
+          hint={t('adjust.hint')}
           error={errors.adjustment?.message}
           fullWidth
           required
@@ -88,8 +96,8 @@ export function AdjustStockModal({
         />
 
         <Input
-          label="Reason"
-          placeholder="e.g. Received from PO-2025-001, Damaged unit removed"
+          label={t('adjust.reason')}
+          placeholder={t('adjust.placeholders.reason')}
           error={errors.reason?.message}
           fullWidth
           required

@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useTheme, type ThemeId } from '@/context/ThemeContext';
 import styles from './AppearanceSection.module.css';
 
@@ -10,72 +11,30 @@ interface Swatch {
 }
 
 interface Preset {
-  id:    ThemeId;
-  label: string;
-  desc:  string;
+  id:     ThemeId;
   swatch: Swatch;
 }
 
 const PRESETS: Preset[] = [
   {
-    id:    'purple',
-    label: 'Purple',
-    desc:  'Dark glassmorphic with deep indigo & violet',
-    swatch: {
-      sidebar: '#1a1a3e',
-      header:  '#0f1b3c',
-      body:    '#0a0e27',
-      card:    'rgba(255,255,255,0.05)',
-      primary: '#6366f1',
-    },
+    id: 'purple',
+    swatch: { sidebar: '#1a1a3e', header: '#0f1b3c', body: '#0a0e27', card: 'rgba(255,255,255,0.05)', primary: '#6366f1' },
   },
   {
-    id:    'light',
-    label: 'Light',
-    desc:  'Clean white surfaces with purple sidebar accents',
-    swatch: {
-      sidebar: '#ffffff',
-      header:  '#ffffff',
-      body:    '#f1f5f9',
-      card:    '#ffffff',
-      primary: '#6366f1',
-    },
+    id: 'light',
+    swatch: { sidebar: '#ffffff', header: '#ffffff', body: '#f1f5f9', card: '#ffffff', primary: '#6366f1' },
   },
   {
-    id:    'dark',
-    label: 'Dark',
-    desc:  'Neutral dark slate with softer indigo accents',
-    swatch: {
-      sidebar: '#1e293b',
-      header:  '#0f172a',
-      body:    '#0f172a',
-      card:    'rgba(255,255,255,0.05)',
-      primary: '#818cf8',
-    },
+    id: 'dark',
+    swatch: { sidebar: '#1e293b', header: '#0f172a', body: '#0f172a', card: 'rgba(255,255,255,0.05)', primary: '#818cf8' },
   },
   {
-    id:    'orange',
-    label: 'Orange',
-    desc:  'Warm light surfaces with bold orange brand accents',
-    swatch: {
-      sidebar: '#fffdf7',
-      header:  '#ffffff',
-      body:    '#fffdf7',
-      card:    '#ffffff',
-      primary: '#ea580c',
-    },
+    id: 'orange',
+    swatch: { sidebar: '#fffdf7', header: '#ffffff', body: '#fffdf7', card: '#ffffff', primary: '#ea580c' },
   },
   {
-    id:    'system',
-    label: 'System',
-    desc:  'Follows your device light / dark mode preference',
-    swatch: {
-      sidebar: '#1e293b',
-      header:  '#ffffff',
-      body:    'linear-gradient(135deg, #f1f5f9 50%, #0f172a 50%)',
-      card:    '#ffffff',
-      primary: '#6366f1',
-    },
+    id: 'system',
+    swatch: { sidebar: '#1e293b', header: '#ffffff', body: 'linear-gradient(135deg, #f1f5f9 50%, #0f172a 50%)', card: '#ffffff', primary: '#6366f1' },
   },
 ];
 
@@ -83,6 +42,7 @@ const LIGHT_SURFACE_IDS: ReadonlySet<ThemeId> = new Set(['light', 'orange', 'sys
 
 export function AppearanceSection() {
   const { theme, setTheme } = useTheme();
+  const { t } = useTranslation('settings');
 
   return (
     <div className={styles.presetGrid}>
@@ -91,6 +51,7 @@ export function AppearanceSection() {
         const cardBorder  = LIGHT_SURFACE_IDS.has(p.id)
           ? '1px solid #e2e8f0'
           : '1px solid rgba(255,255,255,0.08)';
+        const label = t(`appearance.themes.${p.id}`);
 
         return (
           <button
@@ -99,11 +60,10 @@ export function AppearanceSection() {
             className={`${styles.preset} ${isActive ? styles.active : ''}`}
             onClick={() => setTheme(p.id)}
             aria-pressed={isActive}
-            aria-label={`Select ${p.label} theme`}
+            aria-label={t('appearance.aria', { label })}
           >
             {isActive && <span className={styles.activeBadge}>✓</span>}
 
-            {/* Visual swatch */}
             <div className={styles.swatches}>
               <div
                 className={styles.swatchSidebar}
@@ -128,16 +88,15 @@ export function AppearanceSection() {
               </div>
             </div>
 
-            {/* Primary color dot + label */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <div
                 className={styles.swatchPrimary}
                 style={{ background: p.swatch.primary }}
               />
-              <span className={styles.presetLabel}>{p.label}</span>
+              <span className={styles.presetLabel}>{label}</span>
             </div>
 
-            <p className={styles.presetDesc}>{p.desc}</p>
+            <p className={styles.presetDesc}>{t(`appearance.descs.${p.id}`)}</p>
           </button>
         );
       })}

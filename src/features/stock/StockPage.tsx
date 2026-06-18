@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { AlertTriangle } from 'lucide-react';
 import { PageShell, SectionCard } from '@/components/layout/PageShell';
 import { useToast } from '@/components/ui/Toast';
@@ -13,6 +14,7 @@ export function StockPage() {
   const { data: entries = [], isLoading } = useGetStockQuery();
   const [adjustStock, { isLoading: adjusting }] = useAdjustStockMutation();
   const toast = useToast();
+  const { t } = useTranslation(['stock', 'common']);
 
   const [modalOpen, setModalOpen]     = useState(false);
   const [adjustEntry, setAdjustEntry] = useState<StockEntry | null>(null);
@@ -27,28 +29,28 @@ export function StockPage() {
   const handleAdjust = async (dto: AdjustStockDto) => {
     try {
       await adjustStock(dto).unwrap();
-      toast.success('Stock adjusted');
+      toast.success(t('messages.adjusted'));
       closeModal();
     } catch {
-      toast.error('Failed to adjust stock');
+      toast.error(t('messages.adjustFailed'));
     }
   };
 
   return (
     <PageShell
-      heading="Stock Management"
-      description="Live inventory view with quick adjustments."
+      heading={t('title')}
+      description={t('description')}
     >
       <SectionCard>
         <div className={styles.tableHeader}>
           <div className={styles.headerLeft}>
             <span className={styles.count}>
-              {isLoading ? 'Loading…' : `${entries.length} SKU${entries.length !== 1 ? 's' : ''}`}
+              {isLoading ? t('table.loading') : t('count', { count: entries.length })}
             </span>
             {!isLoading && alertCount > 0 && (
               <span className={styles.alertBadge}>
                 <AlertTriangle size={12} />
-                {alertCount} low / out of stock
+                {t('alert', { count: alertCount })}
               </span>
             )}
           </div>

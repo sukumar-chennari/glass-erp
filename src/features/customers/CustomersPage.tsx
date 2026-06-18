@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { UserPlus } from 'lucide-react';
 import { PageShell, SectionCard } from '@/components/layout/PageShell';
 import { Button } from '@/components/ui/Button';
@@ -21,6 +22,7 @@ export function CustomersPage() {
   const [updateCustomer, { isLoading: updating }] = useUpdateCustomerMutation();
   const [deleteCustomer, { isLoading: deleting }] = useDeleteCustomerMutation();
   const toast = useToast();
+  const { t } = useTranslation(['customers', 'common']);
 
   const [modalOpen, setModalOpen]             = useState(false);
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
@@ -34,14 +36,14 @@ export function CustomersPage() {
     try {
       if (editingCustomer) {
         await updateCustomer({ id: editingCustomer.id, ...data }).unwrap();
-        toast.success('Customer updated');
+        toast.success(t('messages.updated'));
       } else {
         await createCustomer(data).unwrap();
-        toast.success('Customer added');
+        toast.success(t('messages.added'));
       }
       closeModal();
     } catch {
-      toast.error('Failed to save customer');
+      toast.error(t('messages.saveFailed'));
     }
   };
 
@@ -49,9 +51,9 @@ export function CustomersPage() {
     if (!deleteTarget) return;
     try {
       await deleteCustomer(deleteTarget).unwrap();
-      toast.success('Customer removed');
+      toast.success(t('messages.removed'));
     } catch {
-      toast.error('Failed to remove customer');
+      toast.error(t('messages.removeFailed'));
     } finally {
       setDeleteTarget(null);
     }
@@ -59,20 +61,18 @@ export function CustomersPage() {
 
   return (
     <PageShell
-      heading="Customers"
-      description="Customer directory with vehicle and service history."
+      heading={t('title')}
+      description={t('description')}
       actions={
         <Button leftIcon={<UserPlus size={16} />} onClick={openAdd}>
-          Add Customer
+          {t('form.title.add')}
         </Button>
       }
     >
       <SectionCard>
         <div className={styles.tableHeader}>
           <span className={styles.count}>
-            {isLoading
-              ? 'Loading…'
-              : `${customers.length} customer${customers.length !== 1 ? 's' : ''}`}
+            {isLoading ? t('table.loading') : t('count', { count: customers.length })}
           </span>
         </div>
 
@@ -94,7 +94,7 @@ export function CustomersPage() {
 
       <ConfirmDialog
         isOpen={!!deleteTarget}
-        message="Remove this customer? This cannot be undone."
+        message={t('messages.confirmDelete')}
         isLoading={deleting}
         onConfirm={handleConfirmDelete}
         onCancel={() => setDeleteTarget(null)}

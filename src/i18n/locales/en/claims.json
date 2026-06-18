@@ -30,12 +30,45 @@
       "delete": "Delete claim"
     }
   },
+  "table": {
+    "claimNo": "Claim #",
+    "customer": "Customer",
+    "insurer": "Insurer",
+    "glass": "Glass",
+    "amount": "Amount",
+    "daysPending": "Days Pending",
+    "status": "Status",
+    "claimedLine": "Claimed: {{amount}}",
+    "approvedLine": "Approved: {{amount}}",
+    "balanceLine": "Balance: {{amount}}",
+    "daysUnit": "{{count}}d",
+    "loading": "Loading…",
+    "empty": "No insurance claims yet.",
+    "aria": {
+      "edit": "Edit claim",
+      "delete": "Delete claim"
+    }
+  },
   "form": {
     "title": "Update Claim",
     "status": "Status",
     "approvedAmount": "Approved Amount (₹)",
     "surveyorName": "Surveyor Name",
-    "remarks": "Remarks"
+    "remarks": "Remarks",
+    "approvedHint": "Leave 0 if not yet approved",
+    "placeholders": {
+      "surveyorName": "e.g. Ramesh Nair",
+      "remarks": "Notes on claim status or survey findings…"
+    },
+    "info": {
+      "claimNo": "Claim #",
+      "customer": "Customer",
+      "insurer": "Insurer",
+      "claimedAmount": "Claimed Amount"
+    },
+    "errors": {
+      "exceedsClaimed": "Cannot exceed claimed amount ({{amount}})"
+    }
   },
   "empty": {
     "title": "No claims found",

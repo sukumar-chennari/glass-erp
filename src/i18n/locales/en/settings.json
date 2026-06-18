@@ -28,37 +28,45 @@
   },
   "notifications": {
     "newJob": {
-      "title": "New Job Notifications",
-      "description": "Receive alerts when a new job card is created"
+      "title": "Email Notifications",
+      "description": "Receive email alerts for new jobs and status changes"
     },
     "lowStock": {
       "title": "Low Stock Alerts",
-      "description": "Get notified when stock falls below minimum levels"
+      "description": "Alert when any product stock falls below the threshold"
     },
     "claimUpdate": {
-      "title": "Claim Status Updates",
-      "description": "Receive updates when insurance claim status changes"
+      "title": "Claim Follow-up Reminders",
+      "description": "Daily reminder for claims pending more than 7 days"
     },
     "invoiceDue": {
-      "title": "Invoice Due Reminders",
-      "description": "Get reminded about upcoming and overdue invoices"
+      "title": "Invoice Due Date Alerts",
+      "description": "Alert 3 days before an invoice becomes overdue"
     }
   },
   "appearance": {
-    "description": "Choose your preferred visual theme.",
+    "description": "Choose a colour theme. Your selection is saved automatically and persists across sessions.",
     "themes": {
       "purple": "Purple",
       "light": "Light",
       "dark": "Dark",
       "orange": "Orange",
       "system": "System"
-    }
+    },
+    "descs": {
+      "purple": "Dark glassmorphic with deep indigo & violet",
+      "light": "Clean white surfaces with purple sidebar accents",
+      "dark": "Neutral dark slate with softer indigo accents",
+      "orange": "Warm light surfaces with bold orange brand accents",
+      "system": "Follows your device light / dark mode preference"
+    },
+    "aria": "Select {{label}} theme"
   },
   "system": {
     "version": "App Version",
     "apiMode": "API Mode",
     "apiModeHint": "Toggle via VITE_USE_MOCK_API environment variable",
-    "mock": "Mock",
-    "live": "Live"
+    "mock": "Mock (Development)",
+    "live": "Live (Production)"
   }
 }

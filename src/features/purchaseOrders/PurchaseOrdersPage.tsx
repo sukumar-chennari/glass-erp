@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { FilePlus } from 'lucide-react';
 import { PageShell, SectionCard } from '@/components/layout/PageShell';
 import { Button } from '@/components/ui/Button';
@@ -24,6 +25,7 @@ export function PurchaseOrdersPage() {
   const [updatePO, { isLoading: updating }] = useUpdatePurchaseOrderMutation();
   const [deletePO, { isLoading: deleting }] = useDeletePurchaseOrderMutation();
   const toast = useToast();
+  const { t } = useTranslation(['purchaseOrders', 'common']);
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editingPO, setEditingPO] = useState<PurchaseOrder | null>(null);
@@ -42,14 +44,14 @@ export function PurchaseOrdersPage() {
     try {
       if (editingPO) {
         await updatePO({ id: editingPO.id, ...data }).unwrap();
-        toast.success('Purchase order updated');
+        toast.success(t('messages.updated'));
       } else {
         await createPO(data as CreatePurchaseOrderDto).unwrap();
-        toast.success('Purchase order created');
+        toast.success(t('messages.created'));
       }
       closeModal();
     } catch {
-      toast.error('Failed to save purchase order');
+      toast.error(t('messages.saveFailed'));
     }
   };
 
@@ -57,9 +59,9 @@ export function PurchaseOrdersPage() {
     if (!deleteTarget) return;
     try {
       await deletePO(deleteTarget).unwrap();
-      toast.success('Purchase order deleted');
+      toast.success(t('messages.deleted'));
     } catch {
-      toast.error('Failed to delete purchase order');
+      toast.error(t('messages.deleteFailed'));
     } finally {
       setDeleteTarget(null);
     }
@@ -67,18 +69,18 @@ export function PurchaseOrdersPage() {
 
   return (
     <PageShell
-      heading="Purchase Orders"
-      description="Track vendor orders and delivery status."
+      heading={t('title')}
+      description={t('description')}
       actions={
         <Button leftIcon={<FilePlus size={16} />} onClick={openAdd}>
-          New Order
+          {t('actions.newOrder')}
         </Button>
       }
     >
       <SectionCard>
         <div className={styles.tableHeader}>
           <span className={styles.count}>
-            {isLoading ? 'Loading…' : `${orders.length} order${orders.length !== 1 ? 's' : ''}`}
+            {isLoading ? t('table.loading') : t('count', { count: orders.length })}
           </span>
         </div>
 
@@ -101,7 +103,7 @@ export function PurchaseOrdersPage() {
 
       <ConfirmDialog
         isOpen={!!deleteTarget}
-        message="Delete this purchase order? This cannot be undone."
+        message={t('messages.confirmDelete')}
         isLoading={deleting}
         onConfirm={handleConfirmDelete}
         onCancel={() => setDeleteTarget(null)}

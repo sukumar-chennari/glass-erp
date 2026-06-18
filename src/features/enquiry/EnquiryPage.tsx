@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import { PageShell, SectionCard } from '@/components/layout/PageShell';
 import { Button } from '@/components/ui/Button';
 import { MessageCircle } from 'lucide-react';
@@ -9,6 +10,7 @@ const LS_KEY = 'glass_erp_enquiry_url';
 type AlertState = { msg: string; type: 'success' | 'error' } | null;
 
 export function EnquiryPage() {
+  const { t } = useTranslation(['enquiry', 'common']);
   const [phone,       setPhone]       = useState('');
   const [urlInput,    setUrlInput]    = useState('');
   const [savedUrl,    setSavedUrl]    = useState('');
@@ -33,43 +35,41 @@ export function EnquiryPage() {
   function saveUrl() {
     const url = urlInput.trim();
     if (!url || !url.startsWith('http')) {
-      showSetup('Please enter a valid URL starting with https://', 'error');
+      showSetup(t('messages.invalidUrl'), 'error');
       return;
     }
     localStorage.setItem(LS_KEY, url);
     setSavedUrl(url);
-    showSetup('✓ Form URL saved! You can now send it to customers.', 'success');
+    showSetup(t('messages.urlSaved'), 'success');
   }
 
   function sendLink() {
     const digits = phone.replace(/\D/g, '');
     if (!digits || digits.length !== 10) {
-      showSend('Enter a valid 10-digit WhatsApp number.', 'error');
+      showSend(t('messages.invalidPhone'), 'error');
       return;
     }
     if (!savedUrl) {
-      showSend('No form URL saved yet. Complete the setup steps on the right first.', 'error');
+      showSend(t('messages.noUrl'), 'error');
       return;
     }
-    const msg =
-      `Hello! 👋\n\nPlease fill in our *Glass Service Enquiry Form* so we can assist you quickly:\n\n🔗 ${savedUrl}\n\n` +
-      `_Tap the link, fill in your vehicle & glass details and submit. It takes less than a minute!_ 🪟\n\n— *Glass ERP Pro*`;
+    const msg = t('whatsapp.message', { url: savedUrl });
     window.open(`https://wa.me/91${digits}?text=${encodeURIComponent(msg)}`, '_blank');
     setPhone('');
     const fmt = digits.replace(/(\d{5})(\d{5})/, '$1 $2');
-    showSend(`✓ WhatsApp opened! Sending form link to +91 ${fmt}`, 'success');
+    showSend(t('messages.whatsappOpened', { phone: fmt }), 'success');
   }
 
   return (
     <PageShell
-      heading="Send Enquiry Form"
-      description="Send a WhatsApp message with a link to the enquiry form. Customers tap it, fill their details, and submit."
+      heading={t('title')}
+      description={t('description')}
     >
       <div className={styles.panels}>
 
         {/* ── Send Panel ── */}
         <SectionCard className={styles.sendPanel}>
-          <div className={styles.panelTitle}>📱 Send to Customer</div>
+          <div className={styles.panelTitle}>{t('send.panelTitle')}</div>
 
           {sendAlert && (
             <div className={`${styles.alert} ${sendAlert.type === 'error' ? styles.alertError : styles.alertSuccess}`}>
@@ -78,7 +78,7 @@ export function EnquiryPage() {
           )}
 
           <div className={styles.formGroup}>
-            <label className={styles.label}>Customer WhatsApp Number *</label>
+            <label className={styles.label}>{t('send.phoneLabel')}</label>
             <div className={styles.phoneRow}>
               <span className={styles.prefix}>🇮🇳 +91</span>
               <input
@@ -95,37 +95,41 @@ export function EnquiryPage() {
 
           <button className={styles.waBtn} onClick={sendLink}>
             <MessageCircle size={20} />
-            Send Enquiry Link via WhatsApp
+            {t('send.sendButton')}
           </button>
 
           <div className={styles.savedUrlBox}>
-            <div className={styles.savedUrlLabel}>Saved Form URL</div>
+            <div className={styles.savedUrlLabel}>{t('send.savedUrlLabel')}</div>
             {savedUrl
               ? <div className={styles.savedUrlText}>{savedUrl}</div>
-              : <div className={styles.savedUrlEmpty}>Not set — see setup steps →</div>
+              : <div className={styles.savedUrlEmpty}>{t('send.savedUrlEmpty')}</div>
             }
           </div>
         </SectionCard>
 
         {/* ── Setup Panel ── */}
         <SectionCard className={styles.setupPanel}>
-          <div className={styles.panelTitle}>🔧 One-Time Setup</div>
+          <div className={styles.panelTitle}>{t('setup.panelTitle')}</div>
 
           <p className={styles.setupDesc}>
-            Host the <strong>glass-enquiry-form.html</strong> file online once — takes 30 seconds, free forever.
+            <Trans i18nKey="setup.description" ns="enquiry">
+              Host the <strong>glass-enquiry-form.html</strong> file online once — takes 30 seconds, free forever.
+            </Trans>
           </p>
 
           <div className={styles.steps}>
             <div className={styles.step}>
-              <div className={styles.stepTitle}>Step 1 — Upload to Netlify (free)</div>
+              <div className={styles.stepTitle}>{t('setup.step1Title')}</div>
               <div className={styles.stepDesc}>
-                Open <strong>app.netlify.com/drop</strong> in your browser and drag &amp; drop the{' '}
-                <strong>glass-enquiry-form.html</strong> file onto the page. Netlify gives you a URL instantly.
+                <Trans i18nKey="setup.step1Desc" ns="enquiry">
+                  Open <strong>app.netlify.com/drop</strong> in your browser and drag &amp; drop the{' '}
+                  <strong>glass-enquiry-form.html</strong> file onto the page. Netlify gives you a URL instantly.
+                </Trans>
               </div>
             </div>
 
             <div className={styles.step}>
-              <div className={styles.stepTitle}>Step 2 — Save the URL here</div>
+              <div className={styles.stepTitle}>{t('setup.step2Title')}</div>
               {setupAlert && (
                 <div className={`${styles.alert} ${setupAlert.type === 'error' ? styles.alertError : styles.alertSuccess}`}>
                   {setupAlert.msg}
@@ -135,19 +139,17 @@ export function EnquiryPage() {
                 <input
                   type="url"
                   className={styles.urlInput}
-                  placeholder="https://your-site.netlify.app/glass-enquiry-form.html"
+                  placeholder={t('setup.urlPlaceholder')}
                   value={urlInput}
                   onChange={(e) => setUrlInput(e.target.value)}
                   onKeyDown={(e) => { if (e.key === 'Enter') saveUrl(); }}
                 />
-                <Button variant="primary" size="sm" onClick={saveUrl}>Save</Button>
+                <Button variant="primary" size="sm" onClick={saveUrl}>{t('setup.save')}</Button>
               </div>
             </div>
           </div>
 
-          <div className={styles.setupNote}>
-            ✓ Save once — every customer gets the same link automatically.
-          </div>
+          <div className={styles.setupNote}>{t('setup.note')}</div>
         </SectionCard>
 
       </div>

@@ -1,4 +1,5 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useForm, useFieldArray, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -9,45 +10,32 @@ import { Select } from '@/components/ui/Select';
 import { Button } from '@/components/ui/Button';
 import { formatINR } from '@/services/mockUtils';
 import { PO_STATUS } from '@/constants/statuses';
+import { poStatusKey } from '@/i18n/statusKeys';
 import type { PurchaseOrder, CreatePurchaseOrderDto, UpdatePurchaseOrderDto } from '@/types/models/purchaseOrder';
 import type { SelectOption } from '@/types/ui';
 import styles from './POModal.module.css';
 
-const itemSchema = z.object({
-  productName: z.string().min(1, 'Product name required'),
-  quantity:    z.coerce.number().int().min(1, 'Min 1'),
-  unitPrice:   z.coerce.number().positive('Enter price'),
-});
+interface POItemData {
+  productName: string;
+  quantity:    number;
+  unitPrice:   number;
+}
 
-const poSchema = z.object({
-  vendorId:              z.string().min(1, 'Select a vendor'),
-  items:                 z.array(itemSchema).min(1, 'Add at least one item'),
-  expectedDeliveryDate:  z.string().optional(),
-  notes:                 z.string().optional(),
-  status: z.enum([
-    PO_STATUS.DRAFT, PO_STATUS.SENT, PO_STATUS.ACCEPTED,
-    PO_STATUS.IN_TRANSIT, PO_STATUS.RECEIVED, PO_STATUS.CANCELLED,
-  ]).optional(),
-});
-
-type POFormData = z.infer<typeof poSchema>;
-
-const STATUS_OPTIONS: SelectOption[] = [
-  { value: PO_STATUS.DRAFT,      label: 'Draft'      },
-  { value: PO_STATUS.SENT,       label: 'Sent'       },
-  { value: PO_STATUS.ACCEPTED,   label: 'Accepted'   },
-  { value: PO_STATUS.IN_TRANSIT, label: 'In Transit' },
-  { value: PO_STATUS.RECEIVED,   label: 'Received'   },
-  { value: PO_STATUS.CANCELLED,  label: 'Cancelled'  },
-];
+interface POFormData {
+  vendorId:             string;
+  items:                POItemData[];
+  expectedDeliveryDate?: string;
+  notes?:               string;
+  status?:              string;
+}
 
 interface POModalProps {
-  isOpen:         boolean;
-  onClose:        () => void;
-  onSubmit:       (data: CreatePurchaseOrderDto | UpdatePurchaseOrderDto) => Promise<void>;
-  order?:         PurchaseOrder | null;
-  isSubmitting:   boolean;
-  vendorOptions:  SelectOption[];
+  isOpen:        boolean;
+  onClose:       () => void;
+  onSubmit:      (data: CreatePurchaseOrderDto | UpdatePurchaseOrderDto) => Promise<void>;
+  order?:        PurchaseOrder | null;
+  isSubmitting:  boolean;
+  vendorOptions: SelectOption[];
 }
 
 export function POModal({
@@ -58,7 +46,34 @@ export function POModal({
   isSubmitting,
   vendorOptions,
 }: POModalProps) {
+  const { t } = useTranslation(['purchaseOrders', 'common']);
   const isEdit = !!order;
+
+  const itemSchema = useMemo(() => z.object({
+    productName: z.string().min(1, t('form.errors.productRequired')),
+    quantity:    z.coerce.number().int().min(1, t('form.errors.minQty')),
+    unitPrice:   z.coerce.number().positive(t('form.errors.enterPrice')),
+  }), [t]);
+
+  const poSchema = useMemo(() => z.object({
+    vendorId:             z.string().min(1, t('form.errors.selectVendor')),
+    items:                z.array(itemSchema).min(1, t('form.errors.addItem')),
+    expectedDeliveryDate: z.string().optional(),
+    notes:                z.string().optional(),
+    status: z.enum([
+      PO_STATUS.DRAFT, PO_STATUS.SENT, PO_STATUS.ACCEPTED,
+      PO_STATUS.IN_TRANSIT, PO_STATUS.RECEIVED, PO_STATUS.CANCELLED,
+    ]).optional(),
+  }), [t, itemSchema]);
+
+  const statusOptions = useMemo<SelectOption[]>(() => [
+    { value: PO_STATUS.DRAFT,      label: t(`status.${poStatusKey(PO_STATUS.DRAFT)}`)      },
+    { value: PO_STATUS.SENT,       label: t(`status.${poStatusKey(PO_STATUS.SENT)}`)       },
+    { value: PO_STATUS.ACCEPTED,   label: t(`status.${poStatusKey(PO_STATUS.ACCEPTED)}`)   },
+    { value: PO_STATUS.IN_TRANSIT, label: t(`status.${poStatusKey(PO_STATUS.IN_TRANSIT)}`) },
+    { value: PO_STATUS.RECEIVED,   label: t(`status.${poStatusKey(PO_STATUS.RECEIVED)}`)   },
+    { value: PO_STATUS.CANCELLED,  label: t(`status.${poStatusKey(PO_STATUS.CANCELLED)}`)  },
+  ], [t]);
 
   const {
     register,
@@ -119,15 +134,15 @@ export function POModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={isEdit ? `Edit ${order.poNumber}` : 'New Purchase Order'}
+      title={isEdit ? t('form.title.edit', { poNumber: order.poNumber }) : t('form.title.add')}
       maxWidth="700px"
       footer={
         <div className={styles.footer}>
           <Button variant="secondary" onClick={onClose} disabled={isSubmitting}>
-            Cancel
+            {t('actions.cancel', { ns: 'common' })}
           </Button>
           <Button type="submit" form="po-form" loading={isSubmitting}>
-            {isEdit ? 'Save Changes' : 'Create Order'}
+            {isEdit ? t('actions.saveChanges', { ns: 'common' }) : t('form.buttons.create')}
           </Button>
         </div>
       }
@@ -140,15 +155,15 @@ export function POModal({
       >
         <div className={styles.row}>
           <Select
-            label="Vendor"
+            label={t('form.vendor')}
             options={vendorOptions}
-            placeholder="Select vendor"
+            placeholder={t('form.vendorPlaceholder')}
             error={errors.vendorId?.message}
             required
             {...register('vendorId')}
           />
           <Input
-            label="Expected Delivery"
+            label={t('form.expectedDelivery')}
             type="date"
             error={errors.expectedDeliveryDate?.message}
             {...register('expectedDeliveryDate')}
@@ -156,25 +171,25 @@ export function POModal({
         </div>
 
         <hr className={styles.divider} />
-        <div className={styles.sectionLabel}>Line Items</div>
+        <div className={styles.sectionLabel}>{t('form.lineItems')}</div>
 
         {fields.map((field, index) => (
           <div key={field.id} className={styles.itemRow}>
             <Input
-              label={index === 0 ? 'Product / Description' : undefined}
-              placeholder="e.g. Swift Front Windshield"
+              label={index === 0 ? t('form.product') : undefined}
+              placeholder={t('form.productPlaceholder')}
               error={errors.items?.[index]?.productName?.message}
               {...register(`items.${index}.productName`)}
             />
             <Input
-              label={index === 0 ? 'Qty' : undefined}
+              label={index === 0 ? t('form.qty') : undefined}
               type="number"
               placeholder="1"
               error={errors.items?.[index]?.quantity?.message}
               {...register(`items.${index}.quantity`)}
             />
             <Input
-              label={index === 0 ? 'Unit Price (₹)' : undefined}
+              label={index === 0 ? t('form.unitPrice') : undefined}
               type="number"
               placeholder="0"
               error={errors.items?.[index]?.unitPrice?.message}
@@ -184,7 +199,7 @@ export function POModal({
               variant="ghost"
               size="sm"
               iconOnly
-              aria-label="Remove item"
+              aria-label={t('form.aria.removeItem')}
               className={styles.removeBtn}
               onClick={() => fields.length > 1 && remove(index)}
               disabled={fields.length <= 1}
@@ -203,34 +218,34 @@ export function POModal({
           type="button"
           onClick={() => append({ productName: '', quantity: 1, unitPrice: 0 })}
         >
-          Add Item
+          {t('actions.addItem', { ns: 'common' })}
         </Button>
 
         <div className={styles.totalsBox}>
           <div className={styles.totalRow}>
-            <span>Subtotal</span>
+            <span>{t('form.totals.subtotal')}</span>
             <span>{formatINR(subtotal)}</span>
           </div>
           <div className={styles.totalRow}>
-            <span>GST (18%)</span>
+            <span>{t('form.totals.gst')}</span>
             <span>{formatINR(gstAmount)}</span>
           </div>
           <div className={styles.totalRowBold}>
-            <span>Total</span>
+            <span>{t('form.totals.total')}</span>
             <span>{formatINR(totalAmount)}</span>
           </div>
         </div>
 
         <div className={styles.row}>
           <Input
-            label="Notes (optional)"
-            placeholder="Any special instructions…"
+            label={t('form.notes')}
+            placeholder={t('form.notesPlaceholder')}
             {...register('notes')}
           />
           {isEdit && (
             <Select
-              label="Status"
-              options={STATUS_OPTIONS}
+              label={t('form.statusLabel')}
+              options={statusOptions}
               error={errors.status?.message}
               {...register('status')}
             />

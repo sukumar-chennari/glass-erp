@@ -1,8 +1,10 @@
+import { useTranslation } from 'react-i18next';
 import { Pencil, Trash2 } from 'lucide-react';
 import { DataTable } from '@/components/ui/DataTable';
 import { Button } from '@/components/ui/Button';
 import { StatusBadge } from '@/components/ui/Badge';
 import { CLAIM_STATUS_MAP } from '@/constants/statuses';
+import { claimStatusKey } from '@/i18n/statusKeys';
 import { formatINR } from '@/services/mockUtils';
 import type { TableColumn } from '@/types/ui';
 import type { Claim } from '@/types/models/claim';
@@ -16,10 +18,12 @@ interface ClaimTableProps {
 }
 
 export function ClaimTable({ claims, isLoading, onEdit, onDelete }: ClaimTableProps) {
+  const { t } = useTranslation(['claims', 'common']);
+
   const columns: TableColumn<Claim>[] = [
     {
       key: 'claimNumber',
-      header: 'Claim #',
+      header: t('table.claimNo'),
       width: '155px',
       render: (c) => (
         <div>
@@ -34,7 +38,7 @@ export function ClaimTable({ claims, isLoading, onEdit, onDelete }: ClaimTablePr
     },
     {
       key: 'customerName',
-      header: 'Customer',
+      header: t('table.customer'),
       render: (c) => (
         <div className={styles.nameCell}>
           <span className={styles.customerName}>{c.customerName ?? '—'}</span>
@@ -44,33 +48,33 @@ export function ClaimTable({ claims, isLoading, onEdit, onDelete }: ClaimTablePr
     },
     {
       key: 'insurer',
-      header: 'Insurer',
+      header: t('table.insurer'),
     },
     {
       key: 'glassPosition',
-      header: 'Glass',
+      header: t('table.glass'),
       width: '150px',
     },
     {
       key: 'claimedAmount',
-      header: 'Amount',
+      header: t('table.amount'),
       align: 'right',
       width: '140px',
       render: (c) => (
         <div className={styles.amountCell}>
-          <span className={styles.claimedAmount}>Claimed: {formatINR(c.claimedAmount)}</span>
+          <span className={styles.claimedAmount}>{t('table.claimedLine', { amount: formatINR(c.claimedAmount) })}</span>
           {c.approvedAmount > 0 && (
-            <span className={styles.approvedAmount}>Approved: {formatINR(c.approvedAmount)}</span>
+            <span className={styles.approvedAmount}>{t('table.approvedLine', { amount: formatINR(c.approvedAmount) })}</span>
           )}
           {c.customerBalance > 0 && (
-            <span className={styles.balance}>Balance: {formatINR(c.customerBalance)}</span>
+            <span className={styles.balance}>{t('table.balanceLine', { amount: formatINR(c.customerBalance) })}</span>
           )}
         </div>
       ),
     },
     {
       key: 'submittedAt',
-      header: 'Days Pending',
+      header: t('table.daysPending'),
       align: 'center',
       width: '110px',
       render: (c) => {
@@ -79,16 +83,22 @@ export function ClaimTable({ claims, isLoading, onEdit, onDelete }: ClaimTablePr
         );
         return (
           <span className={`${styles.days} ${days > 7 ? styles.daysAlert : ''}`}>
-            {days}d
+            {t('table.daysUnit', { count: days })}
           </span>
         );
       },
     },
     {
       key: 'status',
-      header: 'Status',
+      header: t('table.status'),
       width: '120px',
-      render: (c) => <StatusBadge status={c.status} statusMap={CLAIM_STATUS_MAP} />,
+      render: (c) => (
+        <StatusBadge
+          status={c.status}
+          statusMap={CLAIM_STATUS_MAP}
+          getLabel={(s) => t(`status.${claimStatusKey(s)}`, { defaultValue: s })}
+        />
+      ),
     },
     {
       key: 'id',
@@ -101,7 +111,7 @@ export function ClaimTable({ claims, isLoading, onEdit, onDelete }: ClaimTablePr
             variant="ghost"
             size="sm"
             iconOnly
-            aria-label="Edit claim"
+            aria-label={t('table.aria.edit')}
             onClick={(e) => { e.stopPropagation(); onEdit(c); }}
           >
             <Pencil size={14} />
@@ -110,7 +120,7 @@ export function ClaimTable({ claims, isLoading, onEdit, onDelete }: ClaimTablePr
             variant="ghost"
             size="sm"
             iconOnly
-            aria-label="Delete claim"
+            aria-label={t('table.aria.delete')}
             onClick={(e) => { e.stopPropagation(); onDelete(c.id); }}
           >
             <Trash2 size={14} />
@@ -125,7 +135,7 @@ export function ClaimTable({ claims, isLoading, onEdit, onDelete }: ClaimTablePr
       columns={columns}
       data={claims}
       isLoading={isLoading}
-      emptyMessage="No insurance claims yet."
+      emptyMessage={t('table.empty')}
     />
   );
 }

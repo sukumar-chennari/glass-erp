@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -8,38 +8,23 @@ import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
 import { Button } from '@/components/ui/Button';
 import { VENDOR_STATUS } from '@/constants/statuses';
+import { vendorStatusKey } from '@/i18n/statusKeys';
 import type { Vendor, CreateVendorDto, UpdateVendorDto } from '@/types/models/vendor';
 import type { SelectOption } from '@/types/ui';
 import styles from './VendorModal.module.css';
 
-const vendorSchema = z.object({
-  companyName:   z.string().min(2, 'Company name is required'),
-  contactPerson: z.string().min(2, 'Contact person is required'),
-  phone:         z.string().regex(/^[6-9]\d{9}$/, 'Enter a valid 10-digit mobile number'),
-  email:         z.string().email('Enter a valid email address').optional().or(z.literal('')),
-  gstNumber:     z
-    .string()
-    .length(15, 'GST number must be 15 characters')
-    .regex(
-      /^\d{2}[A-Z]{5}\d{4}[A-Z][A-Z\d]Z[A-Z\d]$/,
-      'Enter a valid GST number (e.g. 27AABCB1234A1Z5)',
-    ),
-  city:             z.string().min(1, 'City is required'),
-  state:            z.string().optional(),
-  address:          z.string().optional(),
-  productsSupplied: z.string().optional(),
-  status:           z
-    .enum([VENDOR_STATUS.ACTIVE, VENDOR_STATUS.ON_HOLD, VENDOR_STATUS.INACTIVE])
-    .optional(),
-});
-
-type VendorFormData = z.infer<typeof vendorSchema>;
-
-const STATUS_OPTIONS: SelectOption[] = [
-  { value: VENDOR_STATUS.ACTIVE,   label: 'Active'   },
-  { value: VENDOR_STATUS.ON_HOLD,  label: 'On Hold'  },
-  { value: VENDOR_STATUS.INACTIVE, label: 'Inactive' },
-];
+interface VendorFormData {
+  companyName:      string;
+  contactPerson:    string;
+  phone:            string;
+  email?:           string;
+  gstNumber:        string;
+  city:             string;
+  state?:           string;
+  address?:         string;
+  productsSupplied?: string;
+  status?:          string;
+}
 
 interface VendorModalProps {
   isOpen:       boolean;
@@ -58,6 +43,33 @@ export function VendorModal({
 }: VendorModalProps) {
   const { t } = useTranslation(['vendors', 'common']);
   const isEdit = !!vendor;
+
+  const vendorSchema = useMemo(() => z.object({
+    companyName:   z.string().min(2, t('form.errors.companyRequired')),
+    contactPerson: z.string().min(2, t('form.errors.contactRequired')),
+    phone:         z.string().regex(/^[6-9]\d{9}$/, t('form.errors.phoneInvalid')),
+    email:         z.string().email(t('form.errors.emailInvalid')).optional().or(z.literal('')),
+    gstNumber:     z
+      .string()
+      .length(15, t('form.errors.gstLength'))
+      .regex(
+        /^\d{2}[A-Z]{5}\d{4}[A-Z][A-Z\d]Z[A-Z\d]$/,
+        t('form.errors.gstFormat'),
+      ),
+    city:             z.string().min(1, t('form.errors.cityRequired')),
+    state:            z.string().optional(),
+    address:          z.string().optional(),
+    productsSupplied: z.string().optional(),
+    status:           z
+      .enum([VENDOR_STATUS.ACTIVE, VENDOR_STATUS.ON_HOLD, VENDOR_STATUS.INACTIVE])
+      .optional(),
+  }), [t]);
+
+  const statusOptions = useMemo<SelectOption[]>(() => [
+    { value: VENDOR_STATUS.ACTIVE,   label: t(`status.${vendorStatusKey(VENDOR_STATUS.ACTIVE)}`)   },
+    { value: VENDOR_STATUS.ON_HOLD,  label: t(`status.${vendorStatusKey(VENDOR_STATUS.ON_HOLD)}`)  },
+    { value: VENDOR_STATUS.INACTIVE, label: t(`status.${vendorStatusKey(VENDOR_STATUS.INACTIVE)}`) },
+  ], [t]);
 
   const {
     register,
@@ -115,14 +127,14 @@ export function VendorModal({
       footer={
         <div className={styles.footer}>
           <Button variant="secondary" onClick={onClose} disabled={isSubmitting}>
-            {t('actions.cancel')}
+            {t('actions.cancel', { ns: 'common' })}
           </Button>
           <Button
             type="submit"
             form="vendor-form"
             loading={isSubmitting}
           >
-            {isEdit ? t('actions.saveChanges') : t('form.title.add')}
+            {isEdit ? t('actions.saveChanges', { ns: 'common' }) : t('form.title.add')}
           </Button>
         </div>
       }
@@ -212,7 +224,7 @@ export function VendorModal({
         {isEdit && (
           <Select
             label={t('form.status')}
-            options={STATUS_OPTIONS}
+            options={statusOptions}
             error={errors.status?.message}
             fullWidth
             {...register('status')}

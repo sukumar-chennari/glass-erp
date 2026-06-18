@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { BarChart3 } from 'lucide-react';
 import { PageShell, SectionCard, SectionHeader } from '@/components/layout/PageShell';
 import { useGetJobsQuery } from '@/features/jobs/services/jobsApi';
@@ -9,6 +10,7 @@ import { JOB_STATUS, INVOICE_STATUS, CLAIM_STATUS, VENDOR_STATUS } from '@/const
 import styles from './ReportsPage.module.css';
 
 export function ReportsPage() {
+  const { t } = useTranslation(['reports', 'common']);
   const { data: jobs = [] }     = useGetJobsQuery();
   const { data: invoices = [] } = useGetInvoicesQuery();
   const { data: claims = [] }   = useGetClaimsQuery();
@@ -17,9 +19,8 @@ export function ReportsPage() {
   // ── Computed metrics ──────────────────────────────────────────────
   const completedJobs  = jobs.filter((j) => j.status === JOB_STATUS.COMPLETED).length;
   const activeJobs     = jobs.filter((j) => j.status === JOB_STATUS.IN_PROGRESS).length;
-  const totalRevenue   = invoices
-    .filter((i) => i.status === INVOICE_STATUS.PAID)
-    .reduce((s, i) => s + i.totalAmount, 0);
+  const paidInvoiceList = invoices.filter((i) => i.status === INVOICE_STATUS.PAID);
+  const totalRevenue   = paidInvoiceList.reduce((s, i) => s + i.totalAmount, 0);
   const pendingInvoices = invoices.filter(
     (i) => i.status === INVOICE_STATUS.SENT || i.status === INVOICE_STATUS.OVERDUE,
   );
@@ -28,6 +29,7 @@ export function ReportsPage() {
   const totalApproved   = claims
     .filter((c) => c.status === CLAIM_STATUS.APPROVED || c.status === CLAIM_STATUS.PARTIAL)
     .reduce((s, c) => s + c.approvedAmount, 0);
+  const activeVendorCount = vendors.filter((v) => v.status === VENDOR_STATUS.ACTIVE).length;
 
   // ── Top customers by jobs ─────────────────────────────────────────
   const customerJobMap: Record<string, { name: string; count: number }> = {};
@@ -54,42 +56,42 @@ export function ReportsPage() {
 
   return (
     <PageShell
-      heading="Reports"
-      description="Summary of inventory, sales, vendor, and claim activity."
+      heading={t('title')}
+      description={t('description')}
     >
       {/* Key Metrics */}
       <SectionCard>
-        <SectionHeader title="Key Metrics" />
+        <SectionHeader title={t('sections.keyMetrics')} />
         <div className={styles.statGrid}>
           <div className={styles.statBox}>
-            <span className={styles.statLabel}>Total Revenue (Paid)</span>
+            <span className={styles.statLabel}>{t('metrics.totalRevenue')}</span>
             <span className={styles.statValue}>{formatINR(totalRevenue)}</span>
-            <span className={styles.statSub}>{invoices.filter((i) => i.status === INVOICE_STATUS.PAID).length} paid invoices</span>
+            <span className={styles.statSub}>{t('metrics.paidInvoices', { count: paidInvoiceList.length })}</span>
           </div>
           <div className={styles.statBox}>
-            <span className={styles.statLabel}>Pending Collections</span>
+            <span className={styles.statLabel}>{t('metrics.pendingCollections')}</span>
             <span className={styles.statValue}>{formatINR(pendingRevenue)}</span>
-            <span className={styles.statSub}>{pendingInvoices.length} unpaid invoices</span>
+            <span className={styles.statSub}>{t('metrics.unpaidInvoices', { count: pendingInvoices.length })}</span>
           </div>
           <div className={styles.statBox}>
-            <span className={styles.statLabel}>Jobs Completed</span>
+            <span className={styles.statLabel}>{t('metrics.jobsCompleted')}</span>
             <span className={styles.statValue}>{completedJobs}</span>
-            <span className={styles.statSub}>{activeJobs} currently active</span>
+            <span className={styles.statSub}>{t('metrics.activeJobs', { count: activeJobs })}</span>
           </div>
           <div className={styles.statBox}>
-            <span className={styles.statLabel}>Claims Approved</span>
+            <span className={styles.statLabel}>{t('metrics.claimsApproved')}</span>
             <span className={styles.statValue}>{approvedClaims}</span>
-            <span className={styles.statSub}>{formatINR(totalApproved)} total approved</span>
+            <span className={styles.statSub}>{t('metrics.totalApprovedAmount', { amount: formatINR(totalApproved) })}</span>
           </div>
           <div className={styles.statBox}>
-            <span className={styles.statLabel}>Total Vendors</span>
+            <span className={styles.statLabel}>{t('metrics.totalVendors')}</span>
             <span className={styles.statValue}>{vendors.length}</span>
-            <span className={styles.statSub}>{vendors.filter((v) => v.status === VENDOR_STATUS.ACTIVE).length} active</span>
+            <span className={styles.statSub}>{t('metrics.activeVendors', { count: activeVendorCount })}</span>
           </div>
           <div className={styles.statBox}>
-            <span className={styles.statLabel}>Total Jobs</span>
+            <span className={styles.statLabel}>{t('metrics.totalJobs')}</span>
             <span className={styles.statValue}>{jobs.length}</span>
-            <span className={styles.statSub}>All time</span>
+            <span className={styles.statSub}>{t('metrics.allTime')}</span>
           </div>
         </div>
       </SectionCard>
@@ -97,10 +99,10 @@ export function ReportsPage() {
       <div className={styles.grid}>
         {/* Top Customers */}
         <SectionCard>
-          <SectionHeader title="Top Customers by Jobs" />
+          <SectionHeader title={t('sections.topCustomers')} />
           <div className={styles.rankList}>
             {topCustomers.length === 0 ? (
-              <span className={styles.emptyNote}>No data</span>
+              <span className={styles.emptyNote}>{t('empty.noData')}</span>
             ) : (
               topCustomers.map((c, i) => (
                 <div key={c.name} className={styles.rankItem}>
@@ -121,10 +123,10 @@ export function ReportsPage() {
 
         {/* Jobs by Glass Position */}
         <SectionCard>
-          <SectionHeader title="Jobs by Glass Position" />
+          <SectionHeader title={t('sections.glassByPosition')} />
           <div className={styles.rankList}>
             {topPositions.length === 0 ? (
-              <span className={styles.emptyNote}>No data</span>
+              <span className={styles.emptyNote}>{t('empty.noData')}</span>
             ) : (
               topPositions.map(([position, count], i) => (
                 <div key={position} className={styles.rankItem}>
@@ -146,12 +148,12 @@ export function ReportsPage() {
 
       {/* Revenue chart placeholder */}
       <SectionCard>
-        <SectionHeader title="Monthly Revenue Trend" />
+        <SectionHeader title={t('sections.monthlyRevenue')} />
         <div className={styles.chartPlaceholder}>
           <BarChart3 size={48} className={styles.chartIcon} />
           <div>
-            <strong>Chart integration coming soon</strong>
-            <p>Connect a charting library (Recharts / Chart.js) to visualize monthly revenue, job completion rates, and claim trends.</p>
+            <strong>{t('chart.title')}</strong>
+            <p>{t('chart.desc')}</p>
           </div>
         </div>
       </SectionCard>

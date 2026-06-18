@@ -1,4 +1,5 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -8,30 +9,17 @@ import { Select } from '@/components/ui/Select';
 import { Button } from '@/components/ui/Button';
 import { formatINR } from '@/services/mockUtils';
 import { CLAIM_STATUS } from '@/constants/statuses';
+import { claimStatusKey } from '@/i18n/statusKeys';
 import type { Claim } from '@/types/models/claim';
 import type { SelectOption } from '@/types/ui';
 import styles from './ClaimUpdateModal.module.css';
 
-const schema = z.object({
-  status: z.enum([
-    CLAIM_STATUS.SUBMITTED, CLAIM_STATUS.UNDER_REVIEW, CLAIM_STATUS.SURVEYED,
-    CLAIM_STATUS.APPROVED, CLAIM_STATUS.PARTIAL, CLAIM_STATUS.REJECTED,
-  ]),
-  approvedAmount: z.coerce.number().min(0).optional().or(z.literal('')),
-  surveyorName:   z.string().optional(),
-  remarks:        z.string().optional(),
-});
-
-type FormData = z.infer<typeof schema>;
-
-const STATUS_OPTIONS: SelectOption[] = [
-  { value: CLAIM_STATUS.SUBMITTED,    label: 'Submitted'    },
-  { value: CLAIM_STATUS.UNDER_REVIEW, label: 'Under Review' },
-  { value: CLAIM_STATUS.SURVEYED,     label: 'Surveyed'     },
-  { value: CLAIM_STATUS.APPROVED,     label: 'Approved'     },
-  { value: CLAIM_STATUS.PARTIAL,      label: 'Partial'      },
-  { value: CLAIM_STATUS.REJECTED,     label: 'Rejected'     },
-];
+interface ClaimFormData {
+  status:         string;
+  approvedAmount: number | string;
+  surveyorName?:  string;
+  remarks?:       string;
+}
 
 interface ClaimUpdateModalProps {
   isOpen:       boolean;
@@ -48,13 +36,34 @@ export function ClaimUpdateModal({
   claim,
   isSubmitting,
 }: ClaimUpdateModalProps) {
+  const { t } = useTranslation(['claims', 'common']);
+
+  const schema = useMemo(() => z.object({
+    status: z.enum([
+      CLAIM_STATUS.SUBMITTED, CLAIM_STATUS.UNDER_REVIEW, CLAIM_STATUS.SURVEYED,
+      CLAIM_STATUS.APPROVED, CLAIM_STATUS.PARTIAL, CLAIM_STATUS.REJECTED,
+    ]),
+    approvedAmount: z.coerce.number().min(0).optional().or(z.literal('')),
+    surveyorName:   z.string().optional(),
+    remarks:        z.string().optional(),
+  }), []);
+
+  const statusOptions = useMemo<SelectOption[]>(() => [
+    { value: CLAIM_STATUS.SUBMITTED,    label: t(`status.${claimStatusKey(CLAIM_STATUS.SUBMITTED)}`)    },
+    { value: CLAIM_STATUS.UNDER_REVIEW, label: t(`status.${claimStatusKey(CLAIM_STATUS.UNDER_REVIEW)}`) },
+    { value: CLAIM_STATUS.SURVEYED,     label: t(`status.${claimStatusKey(CLAIM_STATUS.SURVEYED)}`)     },
+    { value: CLAIM_STATUS.APPROVED,     label: t(`status.${claimStatusKey(CLAIM_STATUS.APPROVED)}`)     },
+    { value: CLAIM_STATUS.PARTIAL,      label: t(`status.${claimStatusKey(CLAIM_STATUS.PARTIAL)}`)      },
+    { value: CLAIM_STATUS.REJECTED,     label: t(`status.${claimStatusKey(CLAIM_STATUS.REJECTED)}`)     },
+  ], [t]);
+
   const {
     register,
     handleSubmit,
     reset,
     setError,
     formState: { errors },
-  } = useForm<FormData>({ resolver: zodResolver(schema) });
+  } = useForm<ClaimFormData>({ resolver: zodResolver(schema) });
 
   useEffect(() => {
     if (isOpen && claim) {
@@ -67,16 +76,16 @@ export function ClaimUpdateModal({
     }
   }, [isOpen, claim, reset]);
 
-  const handleFormSubmit = async (data: FormData) => {
+  const handleFormSubmit = async (data: ClaimFormData) => {
     const amount = data.approvedAmount ? Number(data.approvedAmount) : 0;
     if (claim && amount > claim.claimedAmount) {
       setError('approvedAmount', {
-        message: `Cannot exceed claimed amount (${formatINR(claim.claimedAmount)})`,
+        message: t('form.errors.exceedsClaimed', { amount: formatINR(claim.claimedAmount) }),
       });
       return;
     }
     await onSubmit({
-      status:         data.status,
+      status:         data.status as Claim['status'],
       approvedAmount: amount > 0 ? amount : undefined,
       surveyorName:   data.surveyorName || undefined,
       remarks:        data.remarks || undefined,
@@ -87,15 +96,15 @@ export function ClaimUpdateModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Update Claim"
+      title={t('form.title')}
       maxWidth="500px"
       footer={
         <div className={styles.footer}>
           <Button variant="secondary" onClick={onClose} disabled={isSubmitting}>
-            Cancel
+            {t('actions.cancel', { ns: 'common' })}
           </Button>
           <Button type="submit" form="claim-update-form" loading={isSubmitting}>
-            Save Changes
+            {t('actions.saveChanges', { ns: 'common' })}
           </Button>
         </div>
       }
@@ -109,19 +118,19 @@ export function ClaimUpdateModal({
         {claim && (
           <div className={styles.infoBox}>
             <div className={styles.infoRow}>
-              <span className={styles.infoLabel}>Claim #</span>
+              <span className={styles.infoLabel}>{t('form.info.claimNo')}</span>
               <span className={styles.infoValue}>{claim.claimNumber}</span>
             </div>
             <div className={styles.infoRow}>
-              <span className={styles.infoLabel}>Customer</span>
+              <span className={styles.infoLabel}>{t('form.info.customer')}</span>
               <span className={styles.infoValue}>{claim.customerName}</span>
             </div>
             <div className={styles.infoRow}>
-              <span className={styles.infoLabel}>Insurer</span>
+              <span className={styles.infoLabel}>{t('form.info.insurer')}</span>
               <span className={styles.infoValue}>{claim.insurer}</span>
             </div>
             <div className={styles.infoRow}>
-              <span className={styles.infoLabel}>Claimed Amount</span>
+              <span className={styles.infoLabel}>{t('form.info.claimedAmount')}</span>
               <span className={styles.infoValue}>{formatINR(claim.claimedAmount)}</span>
             </div>
           </div>
@@ -129,33 +138,33 @@ export function ClaimUpdateModal({
 
         <div className={styles.row}>
           <Select
-            label="Status"
-            options={STATUS_OPTIONS}
+            label={t('form.status')}
+            options={statusOptions}
             error={errors.status?.message}
             required
             {...register('status')}
           />
           <Input
-            label="Approved Amount (₹)"
+            label={t('form.approvedAmount')}
             type="number"
             placeholder="0"
-            hint="Leave 0 if not yet approved"
+            hint={t('form.approvedHint')}
             error={errors.approvedAmount?.message}
             {...register('approvedAmount')}
           />
         </div>
 
         <Input
-          label="Surveyor Name"
-          placeholder="e.g. Ramesh Nair"
+          label={t('form.surveyorName')}
+          placeholder={t('form.placeholders.surveyorName')}
           error={errors.surveyorName?.message}
           fullWidth
           {...register('surveyorName')}
         />
 
         <Input
-          label="Remarks"
-          placeholder="Notes on claim status or survey findings…"
+          label={t('form.remarks')}
+          placeholder={t('form.placeholders.remarks')}
           error={errors.remarks?.message}
           fullWidth
           {...register('remarks')}

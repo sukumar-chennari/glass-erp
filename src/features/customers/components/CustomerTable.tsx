@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Pencil, Trash2 } from 'lucide-react';
 import { DataTable } from '@/components/ui/DataTable';
 import { Button } from '@/components/ui/Button';
@@ -13,10 +14,12 @@ interface CustomerTableProps {
 }
 
 export function CustomerTable({ customers, isLoading, onEdit, onDelete }: CustomerTableProps) {
+  const { t } = useTranslation(['customers', 'common']);
+
   const columns: TableColumn<Customer>[] = [
     {
       key: 'name',
-      header: 'Customer',
+      header: t('table.customer'),
       render: (c) => (
         <div className={styles.nameCell}>
           <span className={styles.customerName}>{c.name}</span>
@@ -26,18 +29,18 @@ export function CustomerTable({ customers, isLoading, onEdit, onDelete }: Custom
     },
     {
       key: 'phone',
-      header: 'Phone',
+      header: t('table.phone'),
       width: '130px',
     },
     {
       key: 'city',
-      header: 'City',
+      header: t('table.city'),
       width: '130px',
       render: (c) => c.city ?? '—',
     },
     {
       key: 'vehicles',
-      header: 'Vehicles',
+      header: t('table.vehicles'),
       render: (c) => (
         <div className={styles.vehicleList}>
           {c.vehicles.map((v) => (
@@ -51,14 +54,14 @@ export function CustomerTable({ customers, isLoading, onEdit, onDelete }: Custom
     },
     {
       key: 'totalJobs',
-      header: 'Jobs',
+      header: t('table.jobs'),
       align: 'center',
       width: '80px',
       render: (c) => <span className={styles.jobCount}>{c.totalJobs}</span>,
     },
     {
       key: 'createdAt',
-      header: 'Joined',
+      header: t('table.joined'),
       width: '110px',
       render: (c) =>
         new Date(c.createdAt).toLocaleDateString('en-IN', {
@@ -76,7 +79,7 @@ export function CustomerTable({ customers, isLoading, onEdit, onDelete }: Custom
             variant="ghost"
             size="sm"
             iconOnly
-            aria-label="Edit customer"
+            aria-label={t('table.aria.edit')}
             onClick={(e) => { e.stopPropagation(); onEdit(c); }}
           >
             <Pencil size={14} />
@@ -85,7 +88,7 @@ export function CustomerTable({ customers, isLoading, onEdit, onDelete }: Custom
             variant="ghost"
             size="sm"
             iconOnly
-            aria-label="Delete customer"
+            aria-label={t('table.aria.delete')}
             onClick={(e) => { e.stopPropagation(); onDelete(c.id); }}
           >
             <Trash2 size={14} />
@@ -100,7 +103,7 @@ export function CustomerTable({ customers, isLoading, onEdit, onDelete }: Custom
       columns={columns}
       data={customers}
       isLoading={isLoading}
-      emptyMessage="No customers yet. Add your first customer."
+      emptyMessage={t('table.empty')}
     />
   );
 }

@@ -1,6 +1,6 @@
 {
   "title": "रिपोर्ट",
-  "description": "विश्लेषण और व्यावसायिक अंतर्दृष्टि।",
+  "description": "इन्वेंटरी, बिक्री, विक्रेता और दावा गतिविधि का सारांश।",
   "sections": {
     "keyMetrics": "मुख्य मेट्रिक्स",
     "topCustomers": "जॉब के आधार पर शीर्ष ग्राहक",
@@ -9,14 +9,21 @@
   },
   "metrics": {
     "totalRevenue": "कुल राजस्व (भुगतान किया)",
+    "pendingCollections": "लंबित वसूली",
+    "jobsCompleted": "पूर्ण जॉब",
+    "claimsApproved": "स्वीकृत दावे",
+    "totalVendors": "कुल विक्रेता",
     "totalJobs": "कुल जॉब",
-    "completionRate": "पूर्णता दर",
-    "avgJobValue": "औसत जॉब मूल्य",
     "paidInvoices_one": "{{count}} भुगतान किया चालान",
     "paidInvoices_other": "{{count}} भुगतान किए चालान",
-    "completedJobs_one": "{{count}} पूर्ण जॉब",
-    "completedJobs_other": "{{count}} पूर्ण जॉब",
-    "fromTotal": "{{count}} कुल जॉब से"
+    "unpaidInvoices_one": "{{count}} अवैतनिक चालान",
+    "unpaidInvoices_other": "{{count}} अवैतनिक चालान",
+    "activeJobs_one": "{{count}} वर्तमान में सक्रिय",
+    "activeJobs_other": "{{count}} वर्तमान में सक्रिय",
+    "totalApprovedAmount": "{{amount}} कुल स्वीकृत",
+    "activeVendors_one": "{{count}} सक्रिय",
+    "activeVendors_other": "{{count}} सक्रिय",
+    "allTime": "सभी समय"
   },
   "table": {
     "customer": "ग्राहक",
@@ -26,7 +33,10 @@
     "count": "संख्या"
   },
   "empty": {
-    "noData": "कोई डेटा उपलब्ध नहीं।"
+    "noData": "कोई डेटा नहीं"
   },
-  "chartComingSoon": "चार्ट एकीकरण जल्द आ रहा है"
+  "chart": {
+    "title": "चार्ट एकीकरण जल्द आ रहा है",
+    "desc": "मासिक राजस्व, जॉब पूर्णता दर और दावा रुझानों को विज़ुअलाइज़ करने के लिए चार्टिंग लाइब्रेरी कनेक्ट करें।"
+  }
 }

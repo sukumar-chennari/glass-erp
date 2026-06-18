@@ -1,16 +1,27 @@
 {
   "title": "Technicians",
-  "description": "Manage your service technicians.",
+  "description": "Onboard and manage your service team.",
   "count_one": "{{count}} technician",
   "count_other": "{{count}} technicians",
   "table": {
-    "name": "Name",
+    "technician": "Technician",
     "phone": "Phone",
-    "specialisation": "Specialisation",
-    "activeJobs": "Active Jobs",
+    "specialization": "Specialization",
+    "experience": "Experience",
+    "experience_one": "{{count}} yr",
+    "experience_other": "{{count}} yrs",
+    "jobsHeader": "Jobs",
+    "jobs": {
+      "active": "Active",
+      "done": "Done"
+    },
     "status": "Status",
-    "actions": "Actions",
-    "empty": "No technicians found."
+    "loading": "Loading…",
+    "empty": "No technicians yet. Add your first team member.",
+    "aria": {
+      "edit": "Edit technician",
+      "delete": "Delete technician"
+    }
   },
   "form": {
     "title": {
@@ -19,8 +30,25 @@
     },
     "name": "Full Name",
     "phone": "Phone",
-    "specialisation": "Specialisation",
-    "status": "Status"
+    "email": "Email",
+    "specialization": "Specialization",
+    "yearsExperience": "Years of Experience",
+    "joiningDate": "Joining Date",
+    "status": "Status",
+    "placeholders": {
+      "name": "e.g. Arun Mehta",
+      "phone": "10-digit mobile",
+      "email": "tech@windx.in",
+      "specialization": "e.g. Windshield Replacement"
+    },
+    "errors": {
+      "nameRequired": "Name is required",
+      "phoneInvalid": "Enter a valid 10-digit mobile number",
+      "emailInvalid": "Enter a valid email"
+    },
+    "buttons": {
+      "add": "Add Technician"
+    }
   },
   "messages": {
     "added": "Technician added",

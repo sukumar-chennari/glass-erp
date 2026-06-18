@@ -1,34 +1,31 @@
 {
-  "title": "पूछताछ",
-  "description": "ग्राहक पूछताछ दर्ज करें और जॉब कार्ड में बदलें।",
-  "steps": {
-    "details": "पूछताछ विवरण",
-    "estimate": "अनुमान",
-    "whatsapp": "WhatsApp के माध्यम से भेजें"
+  "title": "पूछताछ फॉर्म भेजें",
+  "description": "पूछताछ फॉर्म का लिंक के साथ WhatsApp संदेश भेजें। ग्राहक उस पर टैप करें, अपना विवरण भरें और सबमिट करें।",
+  "send": {
+    "panelTitle": "📱 ग्राहक को भेजें",
+    "phoneLabel": "ग्राहक WhatsApp नंबर *",
+    "sendButton": "WhatsApp के माध्यम से पूछताछ लिंक भेजें",
+    "savedUrlLabel": "सहेजा गया फॉर्म URL",
+    "savedUrlEmpty": "सेट नहीं — सेटअप चरण देखें →"
   },
-  "form": {
-    "customerName": "ग्राहक का नाम",
-    "phone": "फ़ोन / WhatsApp",
-    "vehicleName": "वाहन का नाम",
-    "regNo": "पंजीकरण नं.",
-    "glassPosition": "ग्लास स्थिति",
-    "damageType": "क्षति का प्रकार",
-    "remarks": "टिप्पणियां",
-    "estimatedAmount": "अनुमानित राशि (₹)"
+  "setup": {
+    "panelTitle": "🔧 एकबारगी सेटअप",
+    "description": "<1>glass-enquiry-form.html</1> फ़ाइल को एक बार ऑनलाइन होस्ट करें — 30 सेकंड लगते हैं, हमेशा मुफ़्त।",
+    "step1Title": "चरण 1 — Netlify पर अपलोड करें (मुफ़्त)",
+    "step1Desc": "अपने ब्राउज़र में <1>app.netlify.com/drop</1> खोलें और <2>glass-enquiry-form.html</2> फ़ाइल को पेज पर ड्रैग & ड्रॉप करें। Netlify तुरंत URL देता है।",
+    "step2Title": "चरण 2 — URL यहाँ सहेजें",
+    "urlPlaceholder": "https://your-site.netlify.app/glass-enquiry-form.html",
+    "save": "सहेजें",
+    "note": "✓ एक बार सहेजें — हर ग्राहक को स्वचालित रूप से वही लिंक मिलता है।"
   },
   "whatsapp": {
-    "panelTitle": "WhatsApp पूछताछ लिंक",
-    "panelDescription": "ग्राहक को उनकी पूछताछ विवरण के साथ पूर्व-भरा WhatsApp संदेश भेजें।",
-    "sendButton": "WhatsApp के माध्यम से पूछताछ लिंक भेजें",
-    "setupTitle": "सेटअप निर्देश",
-    "setupStep1": "अपना WhatsApp Business ऐप खोलें",
-    "setupStep2": "पूर्व-भरे संदेश के साथ WhatsApp लॉन्च करने के लिए नीचे दिए गए लिंक पर टैप करें",
-    "setupStep3": "संदेश की समीक्षा करें और भेजें पर टैप करें",
-    "template": "नमस्ते {{name}}, अपने {{vehicle}} ({{regNo}}) के लिए ग्लास प्रतिस्थापन के बारे में पूछताछ करने के लिए धन्यवाद। ग्लास स्थिति: {{position}}। अनुमानित लागत: ₹{{amount}}। हम जल्द ही आपसे संपर्क करेंगे। — Glass ERP Pro"
+    "message": "नमस्ते! 👋\n\nकृपया हमारा *Glass Service Enquiry Form* भरें ताकि हम आपकी जल्दी मदद कर सकें:\n\n🔗 {{url}}\n\n_लिंक पर टैप करें, अपने वाहन & ग्लास विवरण भरें और सबमिट करें। इसमें एक मिनट से कम लगता है!_ 🪟\n\n— *Glass ERP Pro*"
   },
   "messages": {
-    "submitted": "पूछताछ जमा की गई",
-    "whatsappSent": "WhatsApp संदेश भेजा गया",
-    "submitFailed": "पूछताछ जमा करना विफल हुआ"
+    "invalidPhone": "एक वैध 10-अंकीय WhatsApp नंबर दर्ज करें।",
+    "noUrl": "अभी तक कोई फॉर्म URL सहेजा नहीं गया। पहले दाईं ओर सेटअप चरण पूरे करें।",
+    "invalidUrl": "कृपया https:// से शुरू होने वाला वैध URL दर्ज करें",
+    "urlSaved": "✓ फॉर्म URL सहेजा गया! अब आप इसे ग्राहकों को भेज सकते हैं।",
+    "whatsappOpened": "✓ WhatsApp खुला! +91 {{phone}} को फॉर्म लिंक भेजा जा रहा है"
   }
 }

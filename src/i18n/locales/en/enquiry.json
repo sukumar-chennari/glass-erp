@@ -1,34 +1,31 @@
 {
-  "title": "Enquiry",
-  "description": "Log customer enquiries and convert to job cards.",
-  "steps": {
-    "details": "Enquiry Details",
-    "estimate": "Estimate",
-    "whatsapp": "Send via WhatsApp"
+  "title": "Send Enquiry Form",
+  "description": "Send a WhatsApp message with a link to the enquiry form. Customers tap it, fill their details, and submit.",
+  "send": {
+    "panelTitle": "📱 Send to Customer",
+    "phoneLabel": "Customer WhatsApp Number *",
+    "sendButton": "Send Enquiry Link via WhatsApp",
+    "savedUrlLabel": "Saved Form URL",
+    "savedUrlEmpty": "Not set — see setup steps →"
   },
-  "form": {
-    "customerName": "Customer Name",
-    "phone": "Phone / WhatsApp",
-    "vehicleName": "Vehicle Name",
-    "regNo": "Registration No.",
-    "glassPosition": "Glass Position",
-    "damageType": "Damage Type",
-    "remarks": "Remarks",
-    "estimatedAmount": "Estimated Amount (₹)"
+  "setup": {
+    "panelTitle": "🔧 One-Time Setup",
+    "description": "Host the <1>glass-enquiry-form.html</1> file online once — takes 30 seconds, free forever.",
+    "step1Title": "Step 1 — Upload to Netlify (free)",
+    "step1Desc": "Open <1>app.netlify.com/drop</1> in your browser and drag & drop the <2>glass-enquiry-form.html</2> file onto the page. Netlify gives you a URL instantly.",
+    "step2Title": "Step 2 — Save the URL here",
+    "urlPlaceholder": "https://your-site.netlify.app/glass-enquiry-form.html",
+    "save": "Save",
+    "note": "✓ Save once — every customer gets the same link automatically."
   },
   "whatsapp": {
-    "panelTitle": "WhatsApp Enquiry Link",
-    "panelDescription": "Send a pre-filled WhatsApp message to the customer with their enquiry details.",
-    "sendButton": "Send Enquiry Link via WhatsApp",
-    "setupTitle": "Setup Instructions",
-    "setupStep1": "Open your WhatsApp Business app",
-    "setupStep2": "Tap the link button below to launch WhatsApp with pre-filled message",
-    "setupStep3": "Review the message and tap Send",
-    "template": "Hello {{name}}, thank you for enquiring about glass replacement for your {{vehicle}} ({{regNo}}). Glass position: {{position}}. Estimated cost: ₹{{amount}}. We will contact you shortly. — Glass ERP Pro"
+    "message": "Hello! 👋\n\nPlease fill in our *Glass Service Enquiry Form* so we can assist you quickly:\n\n🔗 {{url}}\n\n_Tap the link, fill in your vehicle & glass details and submit. It takes less than a minute!_ 🪟\n\n— *Glass ERP Pro*"
   },
   "messages": {
-    "submitted": "Enquiry submitted",
-    "whatsappSent": "WhatsApp message sent",
-    "submitFailed": "Failed to submit enquiry"
+    "invalidPhone": "Enter a valid 10-digit WhatsApp number.",
+    "noUrl": "No form URL saved yet. Complete the setup steps on the right first.",
+    "invalidUrl": "Please enter a valid URL starting with https://",
+    "urlSaved": "✓ Form URL saved! You can now send it to customers.",
+    "whatsappOpened": "✓ WhatsApp opened! Sending form link to +91 {{phone}}"
   }
 }

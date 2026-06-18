@@ -1,17 +1,30 @@
 {
   "title": "Invoices",
-  "description": "Generate and manage customer invoices.",
+  "description": "Customer billing and payment tracking.",
   "count_one": "{{count}} invoice",
   "count_other": "{{count}} invoices",
+  "tabs": {
+    "customer": "Customer Invoices",
+    "vendor": "Vendor Invoices"
+  },
+  "emptyVendor": {
+    "title": "No vendor invoices yet",
+    "hint": "Vendor billing will appear here once integrated."
+  },
   "table": {
-    "invoiceNo": "Invoice No.",
+    "invoiceNo": "Invoice #",
     "customer": "Customer",
-    "amount": "Amount",
-    "status": "Status",
-    "date": "Date",
+    "vehicle": "Vehicle",
+    "payment": "Payment",
+    "total": "Total",
     "dueDate": "Due Date",
-    "actions": "Actions",
-    "empty": "No invoices found."
+    "status": "Status",
+    "loading": "Loading…",
+    "empty": "No invoices yet. Create your first invoice.",
+    "aria": {
+      "edit": "Edit invoice",
+      "delete": "Delete invoice"
+    }
   },
   "status": {
     "draft": "Draft",
@@ -20,25 +33,25 @@
     "overdue": "Overdue",
     "void": "Void"
   },
-  "form": {
-    "title": {
-      "add": "New Invoice",
-      "edit": "Edit Invoice"
+  "statusModal": {
+    "title": "Update Invoice",
+    "info": {
+      "invoice": "Invoice",
+      "customer": "Customer",
+      "total": "Total"
     },
-    "customer": "Customer",
-    "items": "Line Items",
-    "notes": "Notes",
-    "dueDate": "Due Date",
-    "discount": "Discount (%)",
-    "tax": "GST (%)"
+    "form": {
+      "status": "Status",
+      "paymentDate": "Payment Date",
+      "notes": "Notes (optional)",
+      "notesPlaceholder": "Any additional notes…"
+    }
   },
   "messages": {
-    "added": "Invoice created",
     "updated": "Invoice updated",
-    "removed": "Invoice removed",
-    "markedPaid": "Invoice marked as paid",
-    "saveFailed": "Failed to save invoice",
-    "removeFailed": "Failed to remove invoice",
+    "updateFailed": "Failed to update invoice",
+    "deleted": "Invoice deleted",
+    "deleteFailed": "Failed to delete invoice",
     "confirmDelete": "Delete this invoice? This cannot be undone."
   }
 }

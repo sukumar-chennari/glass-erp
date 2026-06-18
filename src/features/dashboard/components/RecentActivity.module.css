@@ -5,6 +5,10 @@
   margin-bottom:         var(--space-6);
 }
 
+.grid > * {
+  min-width: 0;
+}
+
 @media (max-width: 1024px) {
   .grid { grid-template-columns: 1fr; }
 }

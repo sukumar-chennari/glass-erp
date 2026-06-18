@@ -1,8 +1,10 @@
+import { useTranslation } from 'react-i18next';
 import { PackagePlus } from 'lucide-react';
 import { DataTable } from '@/components/ui/DataTable';
 import { Button } from '@/components/ui/Button';
 import { StatusBadge } from '@/components/ui/Badge';
 import { STOCK_STATUS_MAP, STOCK_STATUS } from '@/constants/statuses';
+import { stockStatusKey, glassPositionKey } from '@/i18n/statusKeys';
 import { formatINR } from '@/services/mockUtils';
 import type { TableColumn } from '@/types/ui';
 import type { StockEntry } from '@/types/models/stock';
@@ -15,10 +17,12 @@ interface StockTableProps {
 }
 
 export function StockTable({ entries, isLoading, onAdjust }: StockTableProps) {
+  const { t } = useTranslation(['stock', 'common']);
+
   const columns: TableColumn<StockEntry>[] = [
     {
       key: 'productName',
-      header: 'Product',
+      header: t('table.product'),
       render: (s) => (
         <div className={styles.nameCell}>
           <span className={styles.productName}>{s.productName}</span>
@@ -28,29 +32,30 @@ export function StockTable({ entries, isLoading, onAdjust }: StockTableProps) {
     },
     {
       key: 'vehicleMake',
-      header: 'Vehicle',
+      header: t('table.vehicle'),
       render: (s) => `${s.vehicleMake} ${s.vehicleModel}`,
     },
     {
       key: 'glassPosition',
-      header: 'Position',
+      header: t('table.position'),
       width: '160px',
+      render: (s) => t(`glassPositions.${glassPositionKey(s.glassPosition)}`, { defaultValue: s.glassPosition }),
     },
     {
       key: 'vendorName',
-      header: 'Vendor',
+      header: t('table.vendor'),
       render: (s) => s.vendorName ?? '—',
     },
     {
       key: 'unitCost',
-      header: 'Unit Cost',
+      header: t('table.unitCost'),
       align: 'right',
       width: '110px',
       render: (s) => s.unitCost != null ? formatINR(s.unitCost) : '—',
     },
     {
       key: 'currentQty',
-      header: 'Qty',
+      header: t('table.qty'),
       align: 'center',
       width: '120px',
       render: (s) => (
@@ -66,19 +71,27 @@ export function StockTable({ entries, isLoading, onAdjust }: StockTableProps) {
           >
             {s.currentQty}
           </span>
-          <span className={styles.threshold}>/ {s.lowStockThreshold} min</span>
+          <span className={styles.threshold}>
+            {t('table.threshold', { threshold: s.lowStockThreshold })}
+          </span>
         </div>
       ),
     },
     {
       key: 'stockStatus',
-      header: 'Status',
+      header: t('table.status'),
       width: '120px',
-      render: (s) => <StatusBadge status={s.stockStatus} statusMap={STOCK_STATUS_MAP} />,
+      render: (entry) => (
+        <StatusBadge
+          status={entry.stockStatus}
+          statusMap={STOCK_STATUS_MAP}
+          getLabel={(s) => t(`status.${stockStatusKey(s)}`, { defaultValue: s })}
+        />
+      ),
     },
     {
       key: 'lastUpdated',
-      header: 'Updated',
+      header: t('table.updated'),
       width: '110px',
       render: (s) => (
         <span className={styles.updated}>
@@ -99,7 +112,7 @@ export function StockTable({ entries, isLoading, onAdjust }: StockTableProps) {
             variant="ghost"
             size="sm"
             iconOnly
-            aria-label="Adjust stock"
+            aria-label={t('table.aria.adjust')}
             onClick={(e) => { e.stopPropagation(); onAdjust(s); }}
           >
             <PackagePlus size={14} />
@@ -114,7 +127,7 @@ export function StockTable({ entries, isLoading, onAdjust }: StockTableProps) {
       columns={columns}
       data={entries}
       isLoading={isLoading}
-      emptyMessage="No stock entries. Stock is derived from products."
+      emptyMessage={t('table.empty')}
     />
   );
 }

@@ -1,15 +1,24 @@
 {
   "title": "Stock Management",
-  "description": "Monitor inventory levels and stock movements.",
+  "description": "Live inventory view with quick adjustments.",
+  "count_one": "{{count}} SKU",
+  "count_other": "{{count}} SKUs",
+  "alert": "{{count}} low / out of stock",
   "table": {
     "product": "Product",
-    "sku": "SKU",
+    "vehicle": "Vehicle",
+    "position": "Position",
+    "vendor": "Vendor",
+    "unitCost": "Unit Cost",
     "qty": "Qty",
-    "minQty": "Min Qty",
     "status": "Status",
-    "lastUpdated": "Last Updated",
-    "actions": "Actions",
-    "empty": "No stock entries found."
+    "updated": "Updated",
+    "loading": "Loading…",
+    "threshold": "/ {{threshold}} min",
+    "empty": "No stock entries. Stock is derived from products.",
+    "aria": {
+      "adjust": "Adjust stock"
+    }
   },
   "adjust": {
     "title": "Adjust Stock",
@@ -18,7 +27,8 @@
     "adjustment": "Adjustment",
     "reason": "Reason",
     "placeholders": {
-      "reason": "e.g. Damaged, Returned, Received shipment"
+      "adjustment": "e.g. +5 or -2",
+      "reason": "e.g. Received from PO-2025-001, Damaged unit removed"
     },
     "validation": {
       "nonZero": "Cannot adjust by 0",
@@ -27,7 +37,6 @@
   },
   "messages": {
     "adjusted": "Stock adjusted",
-    "adjustFailed": "Failed to adjust stock",
-    "confirmAdjust": "Adjust stock for this item?"
+    "adjustFailed": "Failed to adjust stock"
   }
 }

@@ -1,8 +1,10 @@
+import { useTranslation } from 'react-i18next';
 import { Pencil, Trash2 } from 'lucide-react';
 import { DataTable } from '@/components/ui/DataTable';
 import { Button } from '@/components/ui/Button';
 import { StatusBadge } from '@/components/ui/Badge';
 import { JOB_STATUS_MAP } from '@/constants/statuses';
+import { jobStatusKey, paymentTypeKey } from '@/i18n/statusKeys';
 import { formatINR } from '@/services/mockUtils';
 import type { TableColumn } from '@/types/ui';
 import type { Job } from '@/types/models/job';
@@ -16,16 +18,18 @@ interface JobTableProps {
 }
 
 export function JobTable({ jobs, isLoading, onEdit, onDelete }: JobTableProps) {
+  const { t } = useTranslation(['jobs', 'common']);
+
   const columns: TableColumn<Job>[] = [
     {
       key: 'jobNumber',
-      header: 'Job #',
+      header: t('table.jobNo'),
       width: '140px',
       render: (j) => <span className={styles.jobNumber}>{j.jobNumber}</span>,
     },
     {
       key: 'customerName',
-      header: 'Customer',
+      header: t('table.customer'),
       render: (j) => (
         <div className={styles.nameCell}>
           <span className={styles.customerName}>{j.customerName ?? '—'}</span>
@@ -35,7 +39,7 @@ export function JobTable({ jobs, isLoading, onEdit, onDelete }: JobTableProps) {
     },
     {
       key: 'vehicleName',
-      header: 'Vehicle',
+      header: t('table.vehicle'),
       render: (j) => (
         <div className={styles.vehicleCell}>
           <span className={styles.vehicleName}>{j.vehicleName}</span>
@@ -45,17 +49,18 @@ export function JobTable({ jobs, isLoading, onEdit, onDelete }: JobTableProps) {
     },
     {
       key: 'technicianName',
-      header: 'Technician',
+      header: t('table.technician'),
       render: (j) => j.technicianName ?? '—',
     },
     {
       key: 'paymentType',
-      header: 'Payment',
+      header: t('table.payment'),
       width: '100px',
+      render: (j) => t(`paymentTypes.${paymentTypeKey(j.paymentType)}`, { defaultValue: j.paymentType }),
     },
     {
       key: 'estimatedCost',
-      header: 'Est. Cost',
+      header: t('table.estimatedCost'),
       align: 'right',
       width: '110px',
       render: (j) => j.estimatedCost != null
@@ -64,7 +69,7 @@ export function JobTable({ jobs, isLoading, onEdit, onDelete }: JobTableProps) {
     },
     {
       key: 'scheduledDate',
-      header: 'Scheduled',
+      header: t('table.scheduled'),
       width: '110px',
       render: (j) =>
         new Date(j.scheduledDate).toLocaleDateString('en-IN', {
@@ -73,9 +78,15 @@ export function JobTable({ jobs, isLoading, onEdit, onDelete }: JobTableProps) {
     },
     {
       key: 'status',
-      header: 'Status',
+      header: t('table.status'),
       width: '120px',
-      render: (j) => <StatusBadge status={j.status} statusMap={JOB_STATUS_MAP} />,
+      render: (j) => (
+        <StatusBadge
+          status={j.status}
+          statusMap={JOB_STATUS_MAP}
+          getLabel={(s) => t(`status.${jobStatusKey(s)}`, { defaultValue: s })}
+        />
+      ),
     },
     {
       key: 'id',
@@ -88,7 +99,7 @@ export function JobTable({ jobs, isLoading, onEdit, onDelete }: JobTableProps) {
             variant="ghost"
             size="sm"
             iconOnly
-            aria-label="Edit job"
+            aria-label={t('table.aria.edit')}
             onClick={(e) => { e.stopPropagation(); onEdit(j); }}
           >
             <Pencil size={14} />
@@ -97,7 +108,7 @@ export function JobTable({ jobs, isLoading, onEdit, onDelete }: JobTableProps) {
             variant="ghost"
             size="sm"
             iconOnly
-            aria-label="Delete job"
+            aria-label={t('table.aria.delete')}
             onClick={(e) => { e.stopPropagation(); onDelete(j.id); }}
           >
             <Trash2 size={14} />
@@ -112,7 +123,7 @@ export function JobTable({ jobs, isLoading, onEdit, onDelete }: JobTableProps) {
       columns={columns}
       data={jobs}
       isLoading={isLoading}
-      emptyMessage="No job cards yet. Create your first job."
+      emptyMessage={t('table.empty')}
     />
   );
 }

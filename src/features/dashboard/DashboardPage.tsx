@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { AlertCircle } from 'lucide-react';
 import { PageShell }        from '@/components/layout/PageShell';
 import { KpiGrid }          from './components/KpiGrid';
@@ -7,16 +8,21 @@ import styles from './DashboardPage.module.css';
 
 export function DashboardPage() {
   const { data, isLoading, isError } = useGetDashboardQuery();
+  const { t } = useTranslation('dashboard');
+
+  const dateStr = new Date().toLocaleDateString('en-IN', {
+    weekday: 'long', day: 'numeric', month: 'long',
+  });
 
   return (
     <PageShell
-      heading="Dashboard"
-      description={`Welcome back! Here's your business at a glance — ${new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long' })}.`}
+      heading={t('title')}
+      description={t('description', { date: dateStr })}
     >
       {isError && (
         <div className={styles.errorBox}>
           <AlertCircle size={18} />
-          Failed to load dashboard data. Please refresh.
+          {t('error.loadFailed')}
         </div>
       )}
 

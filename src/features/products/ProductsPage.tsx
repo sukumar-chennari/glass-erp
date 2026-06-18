@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Plus } from 'lucide-react';
 import { PageShell, SectionCard } from '@/components/layout/PageShell';
 import { Button } from '@/components/ui/Button';
@@ -24,6 +25,7 @@ export function ProductsPage() {
   const [updateProduct, { isLoading: updating }] = useUpdateProductMutation();
   const [deleteProduct, { isLoading: deleting }] = useDeleteProductMutation();
   const toast = useToast();
+  const { t } = useTranslation(['products', 'common']);
 
   const [modalOpen, setModalOpen]           = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
@@ -42,14 +44,14 @@ export function ProductsPage() {
     try {
       if (editingProduct) {
         await updateProduct({ id: editingProduct.id, ...data }).unwrap();
-        toast.success('Product updated');
+        toast.success(t('messages.updated'));
       } else {
         await createProduct(data).unwrap();
-        toast.success('Product added');
+        toast.success(t('messages.added'));
       }
       closeModal();
     } catch {
-      toast.error('Failed to save product');
+      toast.error(t('messages.saveFailed'));
     }
   };
 
@@ -57,9 +59,9 @@ export function ProductsPage() {
     if (!deleteTarget) return;
     try {
       await deleteProduct(deleteTarget).unwrap();
-      toast.success('Product removed');
+      toast.success(t('messages.removed'));
     } catch {
-      toast.error('Failed to remove product');
+      toast.error(t('messages.removeFailed'));
     } finally {
       setDeleteTarget(null);
     }
@@ -67,18 +69,18 @@ export function ProductsPage() {
 
   return (
     <PageShell
-      heading="Products"
-      description="Glass product inventory and pricing."
+      heading={t('title')}
+      description={t('description')}
       actions={
         <Button leftIcon={<Plus size={16} />} onClick={openAdd}>
-          Add Product
+          {t('form.title.add')}
         </Button>
       }
     >
       <SectionCard>
         <div className={styles.tableHeader}>
           <span className={styles.count}>
-            {isLoading ? 'Loading…' : `${products.length} product${products.length !== 1 ? 's' : ''}`}
+            {isLoading ? t('table.loading') : t('count', { count: products.length })}
           </span>
         </div>
 
@@ -101,7 +103,7 @@ export function ProductsPage() {
 
       <ConfirmDialog
         isOpen={!!deleteTarget}
-        message="Remove this product? This cannot be undone."
+        message={t('messages.confirmDelete')}
         isLoading={deleting}
         onConfirm={handleConfirmDelete}
         onCancel={() => setDeleteTarget(null)}

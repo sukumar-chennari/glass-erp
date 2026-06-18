@@ -1,8 +1,10 @@
+import { useTranslation } from 'react-i18next';
 import { Pencil, Trash2 } from 'lucide-react';
 import { DataTable } from '@/components/ui/DataTable';
 import { Button } from '@/components/ui/Button';
 import { StatusBadge } from '@/components/ui/Badge';
 import { STOCK_STATUS_MAP, STOCK_STATUS } from '@/constants/statuses';
+import { glassPositionKey, stockStatusKey } from '@/i18n/statusKeys';
 import { formatINR } from '@/services/mockUtils';
 import type { TableColumn } from '@/types/ui';
 import type { Product } from '@/types/models/product';
@@ -16,10 +18,12 @@ interface ProductTableProps {
 }
 
 export function ProductTable({ products, isLoading, onEdit, onDelete }: ProductTableProps) {
+  const { t } = useTranslation(['products', 'common']);
+
   const columns: TableColumn<Product>[] = [
     {
       key: 'name',
-      header: 'Product',
+      header: t('table.product'),
       render: (p) => (
         <div className={styles.nameCell}>
           <span className={styles.productName}>{p.name}</span>
@@ -29,7 +33,7 @@ export function ProductTable({ products, isLoading, onEdit, onDelete }: ProductT
     },
     {
       key: 'vehicleMake',
-      header: 'Vehicle',
+      header: t('table.vehicle'),
       render: (p) => (
         <div className={styles.vehicleCell}>
           <span className={styles.vehicle}>{p.vehicleMake} {p.vehicleModel}</span>
@@ -39,12 +43,13 @@ export function ProductTable({ products, isLoading, onEdit, onDelete }: ProductT
     },
     {
       key: 'glassPosition',
-      header: 'Position',
+      header: t('table.position'),
       width: '160px',
+      render: (p) => t(`glassPositions.${glassPositionKey(p.glassPosition)}`, { defaultValue: p.glassPosition }),
     },
     {
       key: 'price',
-      header: 'Price (incl. GST)',
+      header: t('table.priceInclGst'),
       align: 'right',
       width: '140px',
       render: (p) => (
@@ -55,7 +60,7 @@ export function ProductTable({ products, isLoading, onEdit, onDelete }: ProductT
     },
     {
       key: 'stockQty',
-      header: 'Stock',
+      header: t('table.stock'),
       align: 'center',
       width: '80px',
       render: (p) => (
@@ -74,9 +79,15 @@ export function ProductTable({ products, isLoading, onEdit, onDelete }: ProductT
     },
     {
       key: 'stockStatus',
-      header: 'Status',
+      header: t('table.status'),
       width: '120px',
-      render: (p) => <StatusBadge status={p.stockStatus} statusMap={STOCK_STATUS_MAP} />,
+      render: (p) => (
+        <StatusBadge
+          status={p.stockStatus}
+          statusMap={STOCK_STATUS_MAP}
+          getLabel={(s) => t(`status.${stockStatusKey(s)}`)}
+        />
+      ),
     },
     {
       key: 'id',
@@ -89,7 +100,7 @@ export function ProductTable({ products, isLoading, onEdit, onDelete }: ProductT
             variant="ghost"
             size="sm"
             iconOnly
-            aria-label="Edit product"
+            aria-label={t('table.aria.edit')}
             onClick={(e) => { e.stopPropagation(); onEdit(p); }}
           >
             <Pencil size={14} />
@@ -98,7 +109,7 @@ export function ProductTable({ products, isLoading, onEdit, onDelete }: ProductT
             variant="ghost"
             size="sm"
             iconOnly
-            aria-label="Delete product"
+            aria-label={t('table.aria.delete')}
             onClick={(e) => { e.stopPropagation(); onDelete(p.id); }}
           >
             <Trash2 size={14} />
@@ -113,7 +124,7 @@ export function ProductTable({ products, isLoading, onEdit, onDelete }: ProductT
       columns={columns}
       data={products}
       isLoading={isLoading}
-      emptyMessage="No products found. Add your first glass product."
+      emptyMessage={t('table.empty')}
     />
   );
 }

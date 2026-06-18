@@ -1,4 +1,5 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -7,30 +8,20 @@ import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
 import { Button } from '@/components/ui/Button';
 import { TECH_STATUS } from '@/constants/statuses';
+import { techStatusKey } from '@/i18n/statusKeys';
 import type { Technician, CreateTechnicianDto, UpdateTechnicianDto } from '@/types/models/technician';
 import type { SelectOption } from '@/types/ui';
 import styles from './TechnicianModal.module.css';
 
-const techSchema = z.object({
-  name:             z.string().min(2, 'Name is required'),
-  phone:            z.string().regex(/^[6-9]\d{9}$/, 'Enter a valid 10-digit mobile number'),
-  email:            z.string().email('Enter a valid email').optional().or(z.literal('')),
-  specialization:   z.string().optional(),
-  yearsExperience:  z.coerce.number().int().min(0).max(60).optional().or(z.literal('')),
-  joiningDate:      z.string().optional(),
-  status:           z
-    .enum([TECH_STATUS.ACTIVE, TECH_STATUS.TRAINING, TECH_STATUS.INACTIVE, TECH_STATUS.ON_LEAVE])
-    .optional(),
-});
-
-type TechFormData = z.infer<typeof techSchema>;
-
-const STATUS_OPTIONS: SelectOption[] = [
-  { value: TECH_STATUS.ACTIVE,   label: 'Active'    },
-  { value: TECH_STATUS.TRAINING, label: 'Training'  },
-  { value: TECH_STATUS.ON_LEAVE, label: 'On Leave'  },
-  { value: TECH_STATUS.INACTIVE, label: 'Inactive'  },
-];
+interface TechFormData {
+  name:             string;
+  phone:            string;
+  email?:           string;
+  specialization?:  string;
+  yearsExperience?: number | string;
+  joiningDate?:     string;
+  status?:          string;
+}
 
 interface TechnicianModalProps {
   isOpen:       boolean;
@@ -47,7 +38,27 @@ export function TechnicianModal({
   technician,
   isSubmitting,
 }: TechnicianModalProps) {
+  const { t } = useTranslation(['technicians', 'common']);
   const isEdit = !!technician;
+
+  const techSchema = useMemo(() => z.object({
+    name:             z.string().min(2, t('form.errors.nameRequired')),
+    phone:            z.string().regex(/^[6-9]\d{9}$/, t('form.errors.phoneInvalid')),
+    email:            z.string().email(t('form.errors.emailInvalid')).optional().or(z.literal('')),
+    specialization:   z.string().optional(),
+    yearsExperience:  z.coerce.number().int().min(0).max(60).optional().or(z.literal('')),
+    joiningDate:      z.string().optional(),
+    status:           z
+      .enum([TECH_STATUS.ACTIVE, TECH_STATUS.TRAINING, TECH_STATUS.INACTIVE, TECH_STATUS.ON_LEAVE])
+      .optional(),
+  }), [t]);
+
+  const statusOptions = useMemo<SelectOption[]>(() => [
+    { value: TECH_STATUS.ACTIVE,   label: t(`status.${techStatusKey(TECH_STATUS.ACTIVE)}`) },
+    { value: TECH_STATUS.TRAINING, label: t(`status.${techStatusKey(TECH_STATUS.TRAINING)}`) },
+    { value: TECH_STATUS.ON_LEAVE, label: t(`status.${techStatusKey(TECH_STATUS.ON_LEAVE)}`) },
+    { value: TECH_STATUS.INACTIVE, label: t(`status.${techStatusKey(TECH_STATUS.INACTIVE)}`) },
+  ], [t]);
 
   const {
     register,
@@ -94,15 +105,15 @@ export function TechnicianModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={isEdit ? 'Edit Technician' : 'Add Technician'}
+      title={isEdit ? t('form.title.edit') : t('form.title.add')}
       maxWidth="560px"
       footer={
         <div className={styles.footer}>
           <Button variant="secondary" onClick={onClose} disabled={isSubmitting}>
-            Cancel
+            {t('actions.cancel', { ns: 'common' })}
           </Button>
           <Button type="submit" form="tech-form" loading={isSubmitting}>
-            {isEdit ? 'Save Changes' : 'Add Technician'}
+            {isEdit ? t('actions.saveChanges', { ns: 'common' }) : t('form.buttons.add')}
           </Button>
         </div>
       }
@@ -114,8 +125,8 @@ export function TechnicianModal({
         noValidate
       >
         <Input
-          label="Full Name"
-          placeholder="e.g. Arun Mehta"
+          label={t('form.name')}
+          placeholder={t('form.placeholders.name')}
           error={errors.name?.message}
           fullWidth
           required
@@ -124,16 +135,16 @@ export function TechnicianModal({
 
         <div className={styles.row}>
           <Input
-            label="Phone"
-            placeholder="10-digit mobile"
+            label={t('form.phone')}
+            placeholder={t('form.placeholders.phone')}
             error={errors.phone?.message}
             required
             {...register('phone')}
           />
           <Input
-            label="Email"
+            label={t('form.email')}
             type="email"
-            placeholder="tech@windx.in"
+            placeholder={t('form.placeholders.email')}
             error={errors.email?.message}
             {...register('email')}
           />
@@ -141,13 +152,13 @@ export function TechnicianModal({
 
         <div className={styles.row}>
           <Input
-            label="Specialization"
-            placeholder="e.g. Windshield Replacement"
+            label={t('form.specialization')}
+            placeholder={t('form.placeholders.specialization')}
             error={errors.specialization?.message}
             {...register('specialization')}
           />
           <Input
-            label="Years of Experience"
+            label={t('form.yearsExperience')}
             type="number"
             placeholder="0"
             error={errors.yearsExperience?.message}
@@ -157,15 +168,15 @@ export function TechnicianModal({
 
         <div className={styles.row}>
           <Input
-            label="Joining Date"
+            label={t('form.joiningDate')}
             type="date"
             error={errors.joiningDate?.message}
             {...register('joiningDate')}
           />
           {isEdit && (
             <Select
-              label="Status"
-              options={STATUS_OPTIONS}
+              label={t('form.status')}
+              options={statusOptions}
               error={errors.status?.message}
               {...register('status')}
             />

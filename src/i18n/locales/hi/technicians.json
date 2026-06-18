@@ -1,16 +1,27 @@
 {
   "title": "तकनीशियन",
-  "description": "अपने सेवा तकनीशियनों का प्रबंधन करें।",
+  "description": "अपनी सेवा टीम को प्रबंधित करें।",
   "count_one": "{{count}} तकनीशियन",
   "count_other": "{{count}} तकनीशियन",
   "table": {
-    "name": "नाम",
+    "technician": "तकनीशियन",
     "phone": "फ़ोन",
-    "specialisation": "विशेषज्ञता",
-    "activeJobs": "सक्रिय जॉब",
+    "specialization": "विशेषज्ञता",
+    "experience": "अनुभव",
+    "experience_one": "{{count}} वर्ष",
+    "experience_other": "{{count}} वर्ष",
+    "jobsHeader": "जॉब",
+    "jobs": {
+      "active": "सक्रिय",
+      "done": "पूर्ण"
+    },
     "status": "स्थिति",
-    "actions": "क्रियाएं",
-    "empty": "कोई तकनीशियन नहीं मिला।"
+    "loading": "लोड हो रहा है…",
+    "empty": "अभी कोई तकनीशियन नहीं। पहले सदस्य को जोड़ें।",
+    "aria": {
+      "edit": "तकनीशियन संपादित करें",
+      "delete": "तकनीशियन हटाएं"
+    }
   },
   "form": {
     "title": {
@@ -19,8 +30,25 @@
     },
     "name": "पूरा नाम",
     "phone": "फ़ोन",
-    "specialisation": "विशेषज्ञता",
-    "status": "स्थिति"
+    "email": "ईमेल",
+    "specialization": "विशेषज्ञता",
+    "yearsExperience": "अनुभव (वर्ष)",
+    "joiningDate": "शामिल होने की तिथि",
+    "status": "स्थिति",
+    "placeholders": {
+      "name": "उदा. अरुण मेहता",
+      "phone": "10-अंकीय मोबाइल",
+      "email": "tech@windx.in",
+      "specialization": "उदा. विंडशील्ड प्रतिस्थापन"
+    },
+    "errors": {
+      "nameRequired": "नाम आवश्यक है",
+      "phoneInvalid": "10-अंकीय मोबाइल नंबर दर्ज करें",
+      "emailInvalid": "मान्य ईमेल दर्ज करें"
+    },
+    "buttons": {
+      "add": "तकनीशियन जोड़ें"
+    }
   },
   "messages": {
     "added": "तकनीशियन जोड़ा गया",

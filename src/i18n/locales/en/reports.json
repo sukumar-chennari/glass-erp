@@ -1,6 +1,6 @@
 {
   "title": "Reports",
-  "description": "Analytics and business insights.",
+  "description": "Summary of inventory, sales, vendor, and claim activity.",
   "sections": {
     "keyMetrics": "Key Metrics",
     "topCustomers": "Top Customers by Jobs",
@@ -9,14 +9,21 @@
   },
   "metrics": {
     "totalRevenue": "Total Revenue (Paid)",
+    "pendingCollections": "Pending Collections",
+    "jobsCompleted": "Jobs Completed",
+    "claimsApproved": "Claims Approved",
+    "totalVendors": "Total Vendors",
     "totalJobs": "Total Jobs",
-    "completionRate": "Completion Rate",
-    "avgJobValue": "Avg. Job Value",
     "paidInvoices_one": "{{count}} paid invoice",
     "paidInvoices_other": "{{count}} paid invoices",
-    "completedJobs_one": "{{count}} completed job",
-    "completedJobs_other": "{{count}} completed jobs",
-    "fromTotal": "from {{count}} total jobs"
+    "unpaidInvoices_one": "{{count}} unpaid invoice",
+    "unpaidInvoices_other": "{{count}} unpaid invoices",
+    "activeJobs_one": "{{count}} currently active",
+    "activeJobs_other": "{{count}} currently active",
+    "totalApprovedAmount": "{{amount}} total approved",
+    "activeVendors_one": "{{count}} active",
+    "activeVendors_other": "{{count}} active",
+    "allTime": "All time"
   },
   "table": {
     "customer": "Customer",
@@ -26,7 +33,10 @@
     "count": "Count"
   },
   "empty": {
-    "noData": "No data available."
+    "noData": "No data"
   },
-  "chartComingSoon": "Chart integration coming soon"
+  "chart": {
+    "title": "Chart integration coming soon",
+    "desc": "Connect a charting library (Recharts / Chart.js) to visualize monthly revenue, job completion rates, and claim trends."
+  }
 }

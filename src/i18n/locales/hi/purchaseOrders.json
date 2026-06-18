@@ -1,30 +1,76 @@
 {
   "title": "खरीद आदेश",
-  "description": "विक्रेताओं के साथ खरीद आदेश जारी करें और ट्रैक करें।",
+  "description": "विक्रेता आदेश और डिलीवरी स्थिति ट्रैक करें।",
   "count_one": "{{count}} आदेश",
   "count_other": "{{count}} आदेश",
+  "actions": {
+    "newOrder": "नया आदेश"
+  },
   "table": {
-    "poNo": "PO नं.",
+    "poNumber": "PO नंबर",
     "vendor": "विक्रेता",
     "items": "आइटम",
-    "amount": "राशि",
+    "totalInclGst": "कुल (GST सहित)",
+    "expectedBy": "अपेक्षित डिलीवरी",
     "status": "स्थिति",
-    "date": "तिथि",
-    "actions": "क्रियाएं",
-    "empty": "कोई खरीद आदेश नहीं मिला।"
+    "loading": "लोड हो रहा है…",
+    "empty": "अभी कोई खरीद आदेश नहीं। पहला आदेश बनाएं।",
+    "itemCount_one": "{{count}} आइटम",
+    "itemCount_other": "{{count}} आइटम",
+    "aria": {
+      "edit": "आदेश संपादित करें",
+      "delete": "आदेश हटाएं"
+    }
   },
   "status": {
     "draft": "मसौदा",
     "sent": "भेजा गया",
+    "accepted": "स्वीकृत",
+    "inTransit": "पारगमन में",
     "received": "प्राप्त",
     "cancelled": "रद्द"
   },
+  "form": {
+    "title": {
+      "add": "नया खरीद आदेश",
+      "edit": "{{poNumber}} संपादित करें"
+    },
+    "vendor": "विक्रेता",
+    "vendorPlaceholder": "विक्रेता चुनें",
+    "expectedDelivery": "अपेक्षित डिलीवरी",
+    "lineItems": "लाइन आइटम",
+    "product": "उत्पाद / विवरण",
+    "productPlaceholder": "उदा. Swift फ्रंट विंडशील्ड",
+    "qty": "मात्रा",
+    "unitPrice": "इकाई मूल्य (₹)",
+    "notes": "नोट्स (वैकल्पिक)",
+    "notesPlaceholder": "कोई विशेष निर्देश…",
+    "statusLabel": "स्थिति",
+    "aria": {
+      "removeItem": "आइटम हटाएं"
+    },
+    "totals": {
+      "subtotal": "उप-योग",
+      "gst": "GST (18%)",
+      "total": "कुल"
+    },
+    "buttons": {
+      "create": "आदेश बनाएं"
+    },
+    "errors": {
+      "selectVendor": "विक्रेता चुनें",
+      "addItem": "कम से कम एक आइटम जोड़ें",
+      "productRequired": "उत्पाद का नाम आवश्यक है",
+      "minQty": "न्यूनतम 1",
+      "enterPrice": "मूल्य दर्ज करें"
+    }
+  },
   "messages": {
-    "added": "खरीद आदेश बनाया गया",
+    "created": "खरीद आदेश बनाया गया",
     "updated": "खरीद आदेश अपडेट किया गया",
-    "removed": "खरीद आदेश हटाया गया",
+    "deleted": "खरीद आदेश हटाया गया",
     "saveFailed": "खरीद आदेश सहेजना विफल हुआ",
-    "removeFailed": "खरीद आदेश हटाना विफल हुआ",
+    "deleteFailed": "खरीद आदेश हटाना विफल हुआ",
     "confirmDelete": "इस खरीद आदेश को हटाएं? इसे पूर्ववत नहीं किया जा सकता।"
   }
 }

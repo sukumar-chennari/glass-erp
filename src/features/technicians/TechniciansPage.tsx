@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { UserPlus } from 'lucide-react';
 import { PageShell, SectionCard } from '@/components/layout/PageShell';
 import { Button } from '@/components/ui/Button';
@@ -21,27 +22,28 @@ export function TechniciansPage() {
   const [updateTechnician, { isLoading: updating }] = useUpdateTechnicianMutation();
   const [deleteTechnician, { isLoading: deleting }] = useDeleteTechnicianMutation();
   const toast = useToast();
+  const { t } = useTranslation(['technicians', 'common']);
 
   const [modalOpen, setModalOpen]     = useState(false);
   const [editingTech, setEditingTech] = useState<Technician | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
 
   const openAdd  = () => { setEditingTech(null); setModalOpen(true); };
-  const openEdit = (t: Technician) => { setEditingTech(t); setModalOpen(true); };
+  const openEdit = (tech: Technician) => { setEditingTech(tech); setModalOpen(true); };
   const closeModal = () => { setModalOpen(false); setEditingTech(null); };
 
   const handleSubmit = async (data: CreateTechnicianDto | UpdateTechnicianDto) => {
     try {
       if (editingTech) {
         await updateTechnician({ id: editingTech.id, ...data }).unwrap();
-        toast.success('Technician updated');
+        toast.success(t('messages.updated'));
       } else {
         await createTechnician(data as CreateTechnicianDto).unwrap();
-        toast.success('Technician added');
+        toast.success(t('messages.added'));
       }
       closeModal();
     } catch {
-      toast.error('Failed to save technician');
+      toast.error(t('messages.saveFailed'));
     }
   };
 
@@ -49,9 +51,9 @@ export function TechniciansPage() {
     if (!deleteTarget) return;
     try {
       await deleteTechnician(deleteTarget).unwrap();
-      toast.success('Technician removed');
+      toast.success(t('messages.removed'));
     } catch {
-      toast.error('Failed to remove technician');
+      toast.error(t('messages.removeFailed'));
     } finally {
       setDeleteTarget(null);
     }
@@ -59,20 +61,18 @@ export function TechniciansPage() {
 
   return (
     <PageShell
-      heading="Technicians"
-      description="Onboard and manage your service team."
+      heading={t('title')}
+      description={t('description')}
       actions={
         <Button leftIcon={<UserPlus size={16} />} onClick={openAdd}>
-          Add Technician
+          {t('form.buttons.add')}
         </Button>
       }
     >
       <SectionCard>
         <div className={styles.tableHeader}>
           <span className={styles.count}>
-            {isLoading
-              ? 'Loading…'
-              : `${technicians.length} technician${technicians.length !== 1 ? 's' : ''}`}
+            {isLoading ? t('table.loading') : t('count', { count: technicians.length })}
           </span>
         </div>
 
@@ -94,7 +94,7 @@ export function TechniciansPage() {
 
       <ConfirmDialog
         isOpen={!!deleteTarget}
-        message="Remove this technician? This cannot be undone."
+        message={t('messages.confirmDelete')}
         isLoading={deleting}
         onConfirm={handleConfirmDelete}
         onCancel={() => setDeleteTarget(null)}

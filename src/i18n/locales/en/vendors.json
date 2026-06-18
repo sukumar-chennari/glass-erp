@@ -9,10 +9,15 @@
     "phone": "Phone",
     "gst": "GST Number",
     "city": "City",
+    "location": "Location",
     "products": "Products Supplied",
     "status": "Status",
     "actions": "Actions",
-    "empty": "No vendors found. Add your first supplier."
+    "empty": "No vendors found. Add your first supplier.",
+    "aria": {
+      "edit": "Edit vendor",
+      "delete": "Delete vendor"
+    }
   },
   "form": {
     "title": {
@@ -40,6 +45,15 @@
       "state": "e.g. Maharashtra",
       "address": "Street address (optional)",
       "productsSupplied": "e.g. Windshields, Side Glass, Sunroof"
+    },
+    "errors": {
+      "companyRequired": "Company name is required",
+      "contactRequired": "Contact person is required",
+      "phoneInvalid": "Enter a valid 10-digit mobile number",
+      "emailInvalid": "Enter a valid email address",
+      "gstLength": "GST number must be 15 characters",
+      "gstFormat": "Enter a valid GST number (e.g. 27AABCB1234A1Z5)",
+      "cityRequired": "City is required"
     }
   },
   "messages": {

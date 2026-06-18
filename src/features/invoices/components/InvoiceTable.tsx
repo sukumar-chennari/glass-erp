@@ -1,8 +1,10 @@
+import { useTranslation } from 'react-i18next';
 import { Pencil, Trash2 } from 'lucide-react';
 import { DataTable } from '@/components/ui/DataTable';
 import { Button } from '@/components/ui/Button';
 import { StatusBadge } from '@/components/ui/Badge';
 import { INVOICE_STATUS_MAP, INVOICE_STATUS } from '@/constants/statuses';
+import { invoiceStatusKey, paymentTypeKey } from '@/i18n/statusKeys';
 import { formatINR } from '@/services/mockUtils';
 import type { TableColumn } from '@/types/ui';
 import type { Invoice } from '@/types/models/invoice';
@@ -16,12 +18,13 @@ interface InvoiceTableProps {
 }
 
 export function InvoiceTable({ invoices, isLoading, onEdit, onDelete }: InvoiceTableProps) {
+  const { t } = useTranslation(['invoices', 'common']);
   const today = new Date().toISOString().slice(0, 10);
 
   const columns: TableColumn<Invoice>[] = [
     {
       key: 'invoiceNumber',
-      header: 'Invoice #',
+      header: t('table.invoiceNo'),
       width: '150px',
       render: (inv) => (
         <div>
@@ -36,7 +39,7 @@ export function InvoiceTable({ invoices, isLoading, onEdit, onDelete }: InvoiceT
     },
     {
       key: 'customerName',
-      header: 'Customer',
+      header: t('table.customer'),
       render: (inv) => (
         <div className={styles.nameCell}>
           <span className={styles.customerName}>{inv.customerName ?? '—'}</span>
@@ -46,23 +49,24 @@ export function InvoiceTable({ invoices, isLoading, onEdit, onDelete }: InvoiceT
     },
     {
       key: 'vehicleName',
-      header: 'Vehicle',
+      header: t('table.vehicle'),
     },
     {
       key: 'paymentType',
-      header: 'Payment',
+      header: t('table.payment'),
       width: '110px',
+      render: (inv) => t(`paymentTypes.${paymentTypeKey(inv.paymentType)}`, { ns: 'jobs', defaultValue: inv.paymentType }),
     },
     {
       key: 'totalAmount',
-      header: 'Total',
+      header: t('table.total'),
       align: 'right',
       width: '120px',
       render: (inv) => <span className={styles.amount}>{formatINR(inv.totalAmount)}</span>,
     },
     {
       key: 'dueDate',
-      header: 'Due Date',
+      header: t('table.dueDate'),
       width: '110px',
       render: (inv) => {
         if (!inv.dueDate) return '—';
@@ -78,9 +82,15 @@ export function InvoiceTable({ invoices, isLoading, onEdit, onDelete }: InvoiceT
     },
     {
       key: 'status',
-      header: 'Status',
+      header: t('table.status'),
       width: '110px',
-      render: (inv) => <StatusBadge status={inv.status} statusMap={INVOICE_STATUS_MAP} />,
+      render: (inv) => (
+        <StatusBadge
+          status={inv.status}
+          statusMap={INVOICE_STATUS_MAP}
+          getLabel={(s) => t(`status.${invoiceStatusKey(s)}`, { defaultValue: s })}
+        />
+      ),
     },
     {
       key: 'id',
@@ -93,7 +103,7 @@ export function InvoiceTable({ invoices, isLoading, onEdit, onDelete }: InvoiceT
             variant="ghost"
             size="sm"
             iconOnly
-            aria-label="Edit invoice"
+            aria-label={t('table.aria.edit')}
             onClick={(e) => { e.stopPropagation(); onEdit(inv); }}
           >
             <Pencil size={14} />
@@ -102,7 +112,7 @@ export function InvoiceTable({ invoices, isLoading, onEdit, onDelete }: InvoiceT
             variant="ghost"
             size="sm"
             iconOnly
-            aria-label="Delete invoice"
+            aria-label={t('table.aria.delete')}
             onClick={(e) => { e.stopPropagation(); onDelete(inv.id); }}
           >
             <Trash2 size={14} />
@@ -117,7 +127,7 @@ export function InvoiceTable({ invoices, isLoading, onEdit, onDelete }: InvoiceT
       columns={columns}
       data={invoices}
       isLoading={isLoading}
-      emptyMessage="No invoices yet. Create your first invoice."
+      emptyMessage={t('table.empty')}
     />
   );
 }

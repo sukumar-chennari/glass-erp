@@ -30,12 +30,45 @@
       "delete": "दावा हटाएं"
     }
   },
+  "table": {
+    "claimNo": "दावा नं.",
+    "customer": "ग्राहक",
+    "insurer": "बीमाकर्ता",
+    "glass": "ग्लास",
+    "amount": "राशि",
+    "daysPending": "लंबित दिन",
+    "status": "स्थिति",
+    "claimedLine": "दावा: {{amount}}",
+    "approvedLine": "स्वीकृत: {{amount}}",
+    "balanceLine": "शेष: {{amount}}",
+    "daysUnit": "{{count}}दि",
+    "loading": "लोड हो रहा है…",
+    "empty": "अभी तक कोई बीमा दावा नहीं।",
+    "aria": {
+      "edit": "दावा संपादित करें",
+      "delete": "दावा हटाएं"
+    }
+  },
   "form": {
     "title": "दावा अपडेट करें",
     "status": "स्थिति",
     "approvedAmount": "स्वीकृत राशि (₹)",
     "surveyorName": "सर्वेक्षक का नाम",
-    "remarks": "टिप्पणियां"
+    "remarks": "टिप्पणियां",
+    "approvedHint": "अभी स्वीकृत नहीं हुआ तो 0 छोड़ें",
+    "placeholders": {
+      "surveyorName": "जैसे रमेश नायर",
+      "remarks": "दावे की स्थिति या सर्वेक्षण पर नोट्स…"
+    },
+    "info": {
+      "claimNo": "दावा नं.",
+      "customer": "ग्राहक",
+      "insurer": "बीमाकर्ता",
+      "claimedAmount": "दावा राशि"
+    },
+    "errors": {
+      "exceedsClaimed": "दावा राशि ({{amount}}) से अधिक नहीं हो सकता"
+    }
   },
   "empty": {
     "title": "कोई दावा नहीं मिला",

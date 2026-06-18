@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ClipboardPlus } from 'lucide-react';
 import { PageShell, SectionCard } from '@/components/layout/PageShell';
 import { Button } from '@/components/ui/Button';
@@ -26,6 +27,7 @@ export function JobsPage() {
   const [updateJob, { isLoading: updating }] = useUpdateJobMutation();
   const [deleteJob, { isLoading: deleting }] = useDeleteJobMutation();
   const toast = useToast();
+  const { t } = useTranslation(['jobs', 'common']);
 
   const [modalOpen, setModalOpen]   = useState(false);
   const [editingJob, setEditingJob] = useState<Job | null>(null);
@@ -37,7 +39,7 @@ export function JobsPage() {
   );
 
   const technicianOptions = useMemo<SelectOption[]>(
-    () => technicians.map((t) => ({ value: t.id, label: t.name })),
+    () => technicians.map((tech) => ({ value: tech.id, label: tech.name })),
     [technicians],
   );
 
@@ -49,14 +51,14 @@ export function JobsPage() {
     try {
       if (editingJob) {
         await updateJob({ id: editingJob.id, ...data }).unwrap();
-        toast.success('Job updated');
+        toast.success(t('messages.updated'));
       } else {
         await createJob(data).unwrap();
-        toast.success('Job created');
+        toast.success(t('messages.added'));
       }
       closeModal();
     } catch {
-      toast.error('Failed to save job');
+      toast.error(t('messages.saveFailed'));
     }
   };
 
@@ -64,9 +66,9 @@ export function JobsPage() {
     if (!deleteTarget) return;
     try {
       await deleteJob(deleteTarget).unwrap();
-      toast.success('Job deleted');
+      toast.success(t('messages.removed'));
     } catch {
-      toast.error('Failed to delete job');
+      toast.error(t('messages.removeFailed'));
     } finally {
       setDeleteTarget(null);
     }
@@ -74,18 +76,18 @@ export function JobsPage() {
 
   return (
     <PageShell
-      heading="Job Cards"
-      description="Create jobs, assign technicians and track status."
+      heading={t('title')}
+      description={t('description')}
       actions={
         <Button leftIcon={<ClipboardPlus size={16} />} onClick={openAdd}>
-          New Job
+          {t('form.title.add')}
         </Button>
       }
     >
       <SectionCard>
         <div className={styles.tableHeader}>
           <span className={styles.count}>
-            {isLoading ? 'Loading…' : `${jobs.length} job${jobs.length !== 1 ? 's' : ''}`}
+            {isLoading ? t('table.loading') : t('count', { count: jobs.length })}
           </span>
         </div>
 
@@ -109,7 +111,7 @@ export function JobsPage() {
 
       <ConfirmDialog
         isOpen={!!deleteTarget}
-        message="Delete this job card? This cannot be undone."
+        message={t('messages.confirmDelete')}
         isLoading={deleting}
         onConfirm={handleConfirmDelete}
         onCancel={() => setDeleteTarget(null)}

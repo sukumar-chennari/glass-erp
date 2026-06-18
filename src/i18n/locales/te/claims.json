@@ -30,12 +30,45 @@
       "delete": "క్లెయిమ్ తొలగించు"
     }
   },
+  "table": {
+    "claimNo": "క్లెయిమ్ నం.",
+    "customer": "కస్టమర్",
+    "insurer": "బీమాదారు",
+    "glass": "గ్లాస్",
+    "amount": "మొత్తం",
+    "daysPending": "పెండింగ్ రోజులు",
+    "status": "స్థితి",
+    "claimedLine": "క్లెయిమ్: {{amount}}",
+    "approvedLine": "ఆమోదం: {{amount}}",
+    "balanceLine": "బ్యాలెన్స్: {{amount}}",
+    "daysUnit": "{{count}}రో",
+    "loading": "లోడ్ అవుతోంది…",
+    "empty": "ఇంకా బీమా క్లెయిమ్‌లు లేవు.",
+    "aria": {
+      "edit": "క్లెయిమ్ సవరించు",
+      "delete": "క్లెయిమ్ తొలగించు"
+    }
+  },
   "form": {
     "title": "క్లెయిమ్ నవీకరించు",
     "status": "స్థితి",
     "approvedAmount": "ఆమోదించిన మొత్తం (₹)",
     "surveyorName": "సర్వేయర్ పేరు",
-    "remarks": "వ్యాఖ్యలు"
+    "remarks": "వ్యాఖ్యలు",
+    "approvedHint": "ఇంకా ఆమోదించకపోతే 0 వదిలేయండి",
+    "placeholders": {
+      "surveyorName": "ఉదా. రమేష్ నాయర్",
+      "remarks": "క్లెయిమ్ స్థితి లేదా సర్వే గురించి గమనికలు…"
+    },
+    "info": {
+      "claimNo": "క్లెయిమ్ నం.",
+      "customer": "కస్టమర్",
+      "insurer": "బీమాదారు",
+      "claimedAmount": "క్లెయిమ్ మొత్తం"
+    },
+    "errors": {
+      "exceedsClaimed": "క్లెయిమ్ మొత్తం ({{amount}}) మించకూడదు"
+    }
   },
   "empty": {
     "title": "క్లెయిమ్‌లు కనుగొనబడలేదు",

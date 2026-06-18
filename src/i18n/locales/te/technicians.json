@@ -1,16 +1,27 @@
 {
   "title": "టెక్నీషియన్లు",
-  "description": "మీ సేవా టెక్నీషియన్లను నిర్వహించండి.",
+  "description": "మీ సేవా బృందాన్ని నిర్వహించండి.",
   "count_one": "{{count}} టెక్నీషియన్",
   "count_other": "{{count}} టెక్నీషియన్లు",
   "table": {
-    "name": "పేరు",
+    "technician": "టెక్నీషియన్",
     "phone": "ఫోన్",
-    "specialisation": "నైపుణ్యం",
-    "activeJobs": "చురుకైన జాబ్‌లు",
+    "specialization": "నైపుణ్యం",
+    "experience": "అనుభవం",
+    "experience_one": "{{count}} సం.",
+    "experience_other": "{{count}} సం.",
+    "jobsHeader": "జాబ్‌లు",
+    "jobs": {
+      "active": "చురుకుగా",
+      "done": "పూర్తయింది"
+    },
     "status": "స్థితి",
-    "actions": "చర్యలు",
-    "empty": "టెక్నీషియన్లు కనుగొనబడలేదు."
+    "loading": "లోడ్ అవుతోంది…",
+    "empty": "ఇంకా టెక్నీషియన్లు లేరు. మొదటి సభ్యుడిని జోడించండి.",
+    "aria": {
+      "edit": "టెక్నీషియన్ సవరించు",
+      "delete": "టెక్నీషియన్ తొలగించు"
+    }
   },
   "form": {
     "title": {
@@ -19,8 +30,25 @@
     },
     "name": "పూర్తి పేరు",
     "phone": "ఫోన్",
-    "specialisation": "నైపుణ్యం",
-    "status": "స్థితి"
+    "email": "ఇమెయిల్",
+    "specialization": "నైపుణ్యం",
+    "yearsExperience": "అనుభవం (సంవత్సరాలు)",
+    "joiningDate": "చేరిన తేదీ",
+    "status": "స్థితి",
+    "placeholders": {
+      "name": "ఉదా. అరుణ్ మెహతా",
+      "phone": "10-అంకె మొబైల్",
+      "email": "tech@windx.in",
+      "specialization": "ఉదా. విండ్‌షీల్డ్ మార్పు"
+    },
+    "errors": {
+      "nameRequired": "పేరు అవసరం",
+      "phoneInvalid": "సరైన 10-అంకె మొబైల్ నంబర్ నమోదు చేయండి",
+      "emailInvalid": "సరైన ఇమెయిల్ నమోదు చేయండి"
+    },
+    "buttons": {
+      "add": "టెక్నీషియన్ జోడించు"
+    }
   },
   "messages": {
     "added": "టెక్నీషియన్ జోడించారు",

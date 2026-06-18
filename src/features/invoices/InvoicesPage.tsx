@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { PageShell, SectionCard } from '@/components/layout/PageShell';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { useToast } from '@/components/ui/Toast';
@@ -17,6 +18,7 @@ export function InvoicesPage() {
   const [updateInvoice, { isLoading: updating }] = useUpdateInvoiceMutation();
   const [deleteInvoice, { isLoading: deleting }] = useDeleteInvoiceMutation();
   const toast = useToast();
+  const { t } = useTranslation(['invoices', 'common']);
 
   const [modalOpen, setModalOpen]           = useState(false);
   const [editingInvoice, setEditingInvoice] = useState<Invoice | null>(null);
@@ -30,10 +32,10 @@ export function InvoicesPage() {
     if (!editingInvoice) return;
     try {
       await updateInvoice({ id: editingInvoice.id, ...dto }).unwrap();
-      toast.success('Invoice updated');
+      toast.success(t('messages.updated'));
       closeModal();
     } catch {
-      toast.error('Failed to update invoice');
+      toast.error(t('messages.updateFailed'));
     }
   };
 
@@ -41,9 +43,9 @@ export function InvoicesPage() {
     if (!deleteTarget) return;
     try {
       await deleteInvoice(deleteTarget).unwrap();
-      toast.success('Invoice deleted');
+      toast.success(t('messages.deleted'));
     } catch {
-      toast.error('Failed to delete invoice');
+      toast.error(t('messages.deleteFailed'));
     } finally {
       setDeleteTarget(null);
     }
@@ -51,21 +53,21 @@ export function InvoicesPage() {
 
   return (
     <PageShell
-      heading="Invoices"
-      description="Customer billing and payment tracking."
+      heading={t('title')}
+      description={t('description')}
     >
       <div className={styles.tabs}>
         <button
           className={`${styles.tab} ${activeTab === 'customer' ? styles.tabActive : ''}`}
           onClick={() => setActiveTab('customer')}
         >
-          Customer Invoices
+          {t('tabs.customer')}
         </button>
         <button
           className={`${styles.tab} ${activeTab === 'vendor' ? styles.tabActive : ''}`}
           onClick={() => setActiveTab('vendor')}
         >
-          Vendor Invoices
+          {t('tabs.vendor')}
         </button>
       </div>
 
@@ -74,9 +76,7 @@ export function InvoicesPage() {
           <>
             <div className={styles.tableHeader}>
               <span className={styles.count}>
-                {isLoading
-                  ? 'Loading…'
-                  : `${invoices.length} invoice${invoices.length !== 1 ? 's' : ''}`}
+                {isLoading ? t('table.loading') : t('count', { count: invoices.length })}
               </span>
             </div>
             <InvoiceTable
@@ -88,8 +88,8 @@ export function InvoicesPage() {
           </>
         ) : (
           <div className={styles.emptyTab}>
-            <p className={styles.emptyTitle}>No vendor invoices yet</p>
-            <p className={styles.emptyHint}>Vendor billing will appear here once integrated.</p>
+            <p className={styles.emptyTitle}>{t('emptyVendor.title')}</p>
+            <p className={styles.emptyHint}>{t('emptyVendor.hint')}</p>
           </div>
         )}
       </SectionCard>
@@ -104,7 +104,7 @@ export function InvoicesPage() {
 
       <ConfirmDialog
         isOpen={!!deleteTarget}
-        message="Delete this invoice? This cannot be undone."
+        message={t('messages.confirmDelete')}
         isLoading={deleting}
         onConfirm={handleConfirmDelete}
         onCancel={() => setDeleteTarget(null)}
