@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { KpiCard }  from '@/components/ui/KpiCard';
 import type { DashboardKpi } from '@/types/models/dashboard';
 import styles from './KpiGrid.module.css';
@@ -8,6 +9,8 @@ interface KpiGridProps {
 }
 
 export function KpiGrid({ kpis, isLoading }: KpiGridProps) {
+  const { t } = useTranslation('dashboard');
+
   if (isLoading) {
     return (
       <div className={styles.grid}>
@@ -21,7 +24,16 @@ export function KpiGrid({ kpis, isLoading }: KpiGridProps) {
   return (
     <div className={styles.grid}>
       {kpis.map((kpi) => (
-        <KpiCard key={kpi.id} kpi={kpi} />
+        <KpiCard
+          key={kpi.id}
+          kpi={{
+            ...kpi,
+            label:  t(`kpis.${kpi.id}.label`,  { defaultValue: kpi.label }),
+            change: kpi.change
+              ? t(`kpis.${kpi.id}.change`, { defaultValue: kpi.change })
+              : undefined,
+          }}
+        />
       ))}
     </div>
   );

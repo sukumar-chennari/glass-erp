@@ -1,7 +1,7 @@
 import { Pencil, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/Button';
-import { claimStatusKey } from '@/i18n/statusKeys';
+import { claimStatusKey, glassPositionKey } from '@/i18n/statusKeys';
 import type { Claim } from '@/types/models/claim';
 import styles from './ClaimCard.module.css';
 
@@ -32,7 +32,7 @@ interface ClaimCardProps {
 }
 
 export function ClaimCard({ claim, onEdit, onDelete }: ClaimCardProps) {
-  const { t } = useTranslation('claims');
+  const { t } = useTranslation(['claims', 'common']);
   const hasApproval = claim.approvedAmount > 0;
 
   const pct = hasApproval
@@ -93,7 +93,7 @@ export function ClaimCard({ claim, onEdit, onDelete }: ClaimCardProps) {
           </div>
           <div className={styles.infoItem}>
             <span className={styles.infoLbl}>{t('card.glass')}</span>
-            <span className={styles.infoVal}>{claim.glassPosition}</span>
+            <span className={styles.infoVal}>{t(`glassPositions.${glassPositionKey(claim.glassPosition)}`, { defaultValue: claim.glassPosition })}</span>
           </div>
           <div className={styles.infoItem}>
             <span className={styles.infoLbl}>{t('card.insurer')}</span>

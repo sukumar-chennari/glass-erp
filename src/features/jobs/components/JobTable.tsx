@@ -4,7 +4,7 @@ import { DataTable } from '@/components/ui/DataTable';
 import { Button } from '@/components/ui/Button';
 import { StatusBadge } from '@/components/ui/Badge';
 import { JOB_STATUS_MAP } from '@/constants/statuses';
-import { jobStatusKey, paymentTypeKey } from '@/i18n/statusKeys';
+import { jobStatusKey, paymentTypeKey, glassPositionKey, damageTypeKey } from '@/i18n/statusKeys';
 import { formatINR } from '@/services/mockUtils';
 import type { TableColumn } from '@/types/ui';
 import type { Job } from '@/types/models/job';
@@ -43,7 +43,11 @@ export function JobTable({ jobs, isLoading, onEdit, onDelete }: JobTableProps) {
       render: (j) => (
         <div className={styles.vehicleCell}>
           <span className={styles.vehicleName}>{j.vehicleName}</span>
-          <span className={styles.position}>{j.glassPosition} — {j.damageType}</span>
+          <span className={styles.position}>
+              {t(`glassPositions.${glassPositionKey(j.glassPosition)}`, { defaultValue: j.glassPosition })}
+              {' — '}
+              {t(`damageTypes.${damageTypeKey(j.damageType)}`, { defaultValue: j.damageType })}
+            </span>
         </div>
       ),
     },

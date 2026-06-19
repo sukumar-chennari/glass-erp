@@ -7,6 +7,7 @@ import { useGetClaimsQuery } from '@/features/claims/services/claimsApi';
 import { useGetVendorsQuery } from '@/features/vendors/services/vendorsApi';
 import { formatINR } from '@/services/mockUtils';
 import { JOB_STATUS, INVOICE_STATUS, CLAIM_STATUS, VENDOR_STATUS } from '@/constants/statuses';
+import { glassPositionKey } from '@/i18n/statusKeys';
 import styles from './ReportsPage.module.css';
 
 export function ReportsPage() {
@@ -131,7 +132,7 @@ export function ReportsPage() {
               topPositions.map(([position, count], i) => (
                 <div key={position} className={styles.rankItem}>
                   <span className={styles.rankNum}>{i + 1}</span>
-                  <span className={styles.rankName}>{position}</span>
+                  <span className={styles.rankName}>{t(`glassPositions.${glassPositionKey(position)}`, { defaultValue: position })}</span>
                   <div className={styles.barTrack}>
                     <div
                       className={styles.barFill}

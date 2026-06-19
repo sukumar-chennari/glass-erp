@@ -43,5 +43,15 @@
     "claims": "कोई लंबित दावा नहीं।",
     "jobs": "कोई हाल का जॉब नहीं।"
   },
-  "viewAll": "सभी देखें"
+  "viewAll": "सभी देखें",
+  "kpis": {
+    "revenue-today":    { "label": "आज की कमाई",        "change": "कल से +12%"                },
+    "active-jobs":      { "label": "सक्रिय जॉब",         "change": "4 लंबित · 8 प्रगति में"   },
+    "stock":            { "label": "स्टॉक उपलब्ध",      "change": "▼ 3 आइटम कम स्टॉक"        },
+    "claims":           { "label": "बीमा दावे",          "change": "इस महीने 3 स्वीकृत"       },
+    "pending-invoices": { "label": "लंबित बिल",          "change": "7 बकाया"                   },
+    "orders-transit":   { "label": "ट्रांजिट में ऑर्डर", "change": "आज 2 आएंगे"               },
+    "total-customers":  { "label": "कुल ग्राहक",         "change": "इस महीने +5 नए"            },
+    "revenue-monthly":  { "label": "मासिक कमाई",         "change": "पिछले महीने से +18%"       }
+  }
 }

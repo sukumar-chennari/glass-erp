@@ -43,5 +43,15 @@
     "claims": "No pending claims.",
     "jobs": "No recent jobs."
   },
-  "viewAll": "View All"
+  "viewAll": "View All",
+  "kpis": {
+    "revenue-today":    { "label": "Today's Revenue",    "change": "+12% vs yesterday"        },
+    "active-jobs":      { "label": "Active Jobs",         "change": "4 pending · 8 in progress" },
+    "stock":            { "label": "Stock Available",     "change": "▼ 3 items low stock"       },
+    "claims":           { "label": "Insurance Claims",    "change": "3 approved this month"     },
+    "pending-invoices": { "label": "Pending Invoices",    "change": "7 overdue"                 },
+    "orders-transit":   { "label": "Orders In Transit",   "change": "2 arriving today"          },
+    "total-customers":  { "label": "Total Customers",     "change": "+5 new this month"         },
+    "revenue-monthly":  { "label": "Monthly Revenue",     "change": "+18% vs last month"        }
+  }
 }

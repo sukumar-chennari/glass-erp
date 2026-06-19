@@ -5,7 +5,7 @@ import { DataTable }    from '@/components/ui/DataTable';
 import { Button }       from '@/components/ui/Button';
 import { StatusBadge }  from '@/components/ui/Badge';
 import { JOB_STATUS_MAP, CLAIM_STATUS_MAP } from '@/constants/statuses';
-import { claimStatusKey, jobStatusKey } from '@/i18n/statusKeys';
+import { claimStatusKey, jobStatusKey, glassPositionKey } from '@/i18n/statusKeys';
 import { ROUTES }       from '@/constants/routes';
 import type {
   DashboardRecentCustomer,
@@ -135,7 +135,8 @@ export function RecentJobs({ data, isLoading }: RecentJobsProps) {
     { key: 'jobNumber',     header: t('table.jobs.jobNo')    },
     { key: 'customerName',  header: t('table.jobs.customer') },
     { key: 'vehicleName',   header: t('table.jobs.vehicle')  },
-    { key: 'glassPosition', header: t('table.jobs.glass')    },
+    { key: 'glassPosition', header: t('table.jobs.glass'),
+      render: (r) => t(`glassPositions.${glassPositionKey(r.glassPosition)}`, { defaultValue: r.glassPosition }) },
     {
       key: 'scheduledDate', header: t('table.jobs.date'),
       render: (r) =>

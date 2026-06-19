@@ -4,7 +4,7 @@ import { DataTable } from '@/components/ui/DataTable';
 import { Button } from '@/components/ui/Button';
 import { StatusBadge } from '@/components/ui/Badge';
 import { CLAIM_STATUS_MAP } from '@/constants/statuses';
-import { claimStatusKey } from '@/i18n/statusKeys';
+import { claimStatusKey, glassPositionKey } from '@/i18n/statusKeys';
 import { formatINR } from '@/services/mockUtils';
 import type { TableColumn } from '@/types/ui';
 import type { Claim } from '@/types/models/claim';
@@ -54,6 +54,7 @@ export function ClaimTable({ claims, isLoading, onEdit, onDelete }: ClaimTablePr
       key: 'glassPosition',
       header: t('table.glass'),
       width: '150px',
+      render: (c) => t(`glassPositions.${glassPositionKey(c.glassPosition)}`, { defaultValue: c.glassPosition }),
     },
     {
       key: 'claimedAmount',
