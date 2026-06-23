@@ -23,7 +23,7 @@ const BASE_LOCALE = 'en';
 const LOCALES = ['en', 'te', 'hi'];
 
 const NAMESPACES = [
-  'claims', 'common', 'customers', 'dashboard', 'enquiry', 'errors',
+  'auth', 'claims', 'common', 'customers', 'dashboard', 'enquiry', 'errors',
   'invoices', 'jobs', 'nav', 'products', 'purchaseOrders', 'reports',
   'settings', 'stock', 'technicians', 'vendors',
 ];

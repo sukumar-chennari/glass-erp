@@ -16,45 +16,61 @@ function RouterErrorPage() {
     </div>
   );
 }
-import { AppLayout }     from '@/components/layout/AppLayout';
-import { DashboardPage } from '@/features/dashboard/DashboardPage';
-import { VendorsPage }   from '@/features/vendors/VendorsPage';
-import { ProductsPage }   from '@/features/products/ProductsPage';
-import { CustomersPage }    from '@/features/customers/CustomersPage';
-import { TechniciansPage }      from '@/features/technicians/TechniciansPage';
-import { PurchaseOrdersPage }   from '@/features/purchaseOrders/PurchaseOrdersPage';
-import { StockPage }            from '@/features/stock/StockPage';
-import { JobsPage }             from '@/features/jobs/JobsPage';
-import { InvoicesPage }         from '@/features/invoices/InvoicesPage';
-import { ClaimsPage }           from '@/features/claims/ClaimsPage';
-import { ReportsPage }          from '@/features/reports/ReportsPage';
-import { SettingsPage }         from '@/features/settings/SettingsPage';
-import { EnquiryPage }          from '@/features/enquiry/EnquiryPage';
 
-import { ROUTES }        from '@/constants/routes';
+import { AppLayout }           from '@/components/layout/AppLayout';
+import { ProtectedRoute }      from '@/components/auth/ProtectedRoute';
+import { LoginPage }           from '@/features/auth/LoginPage';
+import { DashboardPage }       from '@/features/dashboard/DashboardPage';
+import { VendorsPage }         from '@/features/vendors/VendorsPage';
+import { ProductsPage }        from '@/features/products/ProductsPage';
+import { CustomersPage }       from '@/features/customers/CustomersPage';
+import { TechniciansPage }     from '@/features/technicians/TechniciansPage';
+import { PurchaseOrdersPage }  from '@/features/purchaseOrders/PurchaseOrdersPage';
+import { StockPage }           from '@/features/stock/StockPage';
+import { JobsPage }            from '@/features/jobs/JobsPage';
+import { InvoicesPage }        from '@/features/invoices/InvoicesPage';
+import { ClaimsPage }          from '@/features/claims/ClaimsPage';
+import { ReportsPage }         from '@/features/reports/ReportsPage';
+import { SettingsPage }        from '@/features/settings/SettingsPage';
+import { EnquiryPage }         from '@/features/enquiry/EnquiryPage';
+
+import { ROUTES }              from '@/constants/routes';
 
 export const router = createBrowserRouter([
+  // Public: login (no auth required)
+  {
+    path:         ROUTES.LOGIN,
+    element:      <LoginPage />,
+    errorElement: <RouterErrorPage />,
+  },
+
+  // Protected: all app routes inside AppLayout
   {
     path:         '/',
-    element:      <AppLayout />,
+    element:      <ProtectedRoute />,
     errorElement: <RouterErrorPage />,
     children: [
-      { index: true, element: <Navigate to={ROUTES.DASHBOARD} replace /> },
+      {
+        element: <AppLayout />,
+        children: [
+          { index: true, element: <Navigate to={ROUTES.DASHBOARD} replace /> },
 
-      { path: ROUTES.DASHBOARD, element: <DashboardPage /> },
+          { path: ROUTES.DASHBOARD,      element: <DashboardPage /> },
 
-      { path: ROUTES.VENDORS, element: <VendorsPage /> },
-      { path: ROUTES.PRODUCTS, element: <ProductsPage /> },
-      { path: ROUTES.PURCHASE_ORDERS, element: <PurchaseOrdersPage /> },
-      { path: ROUTES.STOCK, element: <StockPage /> },
-      { path: ROUTES.CUSTOMERS, element: <CustomersPage /> },
-      { path: ROUTES.TECHNICIANS, element: <TechniciansPage /> },
-      { path: ROUTES.JOBS, element: <JobsPage /> },
-      { path: ROUTES.INVOICES, element: <InvoicesPage /> },
-      { path: ROUTES.CLAIMS, element: <ClaimsPage /> },
-      { path: ROUTES.REPORTS,  element: <ReportsPage />  },
-      { path: ROUTES.SETTINGS, element: <SettingsPage /> },
-      { path: ROUTES.ENQUIRY,  element: <EnquiryPage /> },
+          { path: ROUTES.VENDORS,        element: <VendorsPage /> },
+          { path: ROUTES.PRODUCTS,       element: <ProductsPage /> },
+          { path: ROUTES.PURCHASE_ORDERS,element: <PurchaseOrdersPage /> },
+          { path: ROUTES.STOCK,          element: <StockPage /> },
+          { path: ROUTES.CUSTOMERS,      element: <CustomersPage /> },
+          { path: ROUTES.TECHNICIANS,    element: <TechniciansPage /> },
+          { path: ROUTES.JOBS,           element: <JobsPage /> },
+          { path: ROUTES.INVOICES,       element: <InvoicesPage /> },
+          { path: ROUTES.CLAIMS,         element: <ClaimsPage /> },
+          { path: ROUTES.REPORTS,        element: <ReportsPage /> },
+          { path: ROUTES.SETTINGS,       element: <SettingsPage /> },
+          { path: ROUTES.ENQUIRY,        element: <EnquiryPage /> },
+        ],
+      },
     ],
   },
 ]);

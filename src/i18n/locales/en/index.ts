@@ -1,3 +1,4 @@
+import auth           from './auth.json';
 import common         from './common.json';
 import nav            from './nav.json';
 import dashboard      from './dashboard.json';
@@ -16,6 +17,7 @@ import reports        from './reports.json';
 import errors         from './errors.json';
 
 export const enResources = {
+  auth,
   common,
   nav,
   dashboard,

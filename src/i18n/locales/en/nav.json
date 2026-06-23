@@ -22,7 +22,13 @@
       "tagline": "Automobile Glass ERP"
     },
     "user": {
-      "role": "Admin"
+      "role": "Admin",
+      "logout": "Sign out",
+      "roles": {
+        "tenant_user":  "User",
+        "tenant_admin": "Admin",
+        "super_admin":  "Super Admin"
+      }
     },
     "aria": {
       "expand": "Expand sidebar",

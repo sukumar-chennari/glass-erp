@@ -1,19 +1,34 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import * as LucideIcons from 'lucide-react';
-import { ChevronLeft, Diamond } from 'lucide-react';
+import { ChevronLeft, Diamond, LogOut } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { toggleSidebar, closeMobileSidebar } from '@/store/slices/uiSlice';
 import { NAV_ITEMS, type NavItem } from '@/constants/nav';
+import { useAuth } from '@/context/AuthContext';
+import { ROUTES } from '@/constants/routes';
 import styles from './Sidebar.module.css';
 
+function getInitials(name: string): string {
+  const parts = name.trim().split(/\s+/);
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return ((parts[0][0] ?? '') + (parts[1][0] ?? '')).toUpperCase();
+}
+
 export function Sidebar() {
-  const { t } = useTranslation('nav');
-  const dispatch    = useAppDispatch();
-  const collapsed   = useAppSelector((s) => s.ui.sidebarCollapsed);
-  const mobileOpen  = useAppSelector((s) => s.ui.sidebarMobileOpen);
+  const { t }      = useTranslation('nav');
+  const dispatch   = useAppDispatch();
+  const collapsed  = useAppSelector((s) => s.ui.sidebarCollapsed);
+  const mobileOpen = useAppSelector((s) => s.ui.sidebarMobileOpen);
+  const { session, logout } = useAuth();
+  const navigate   = useNavigate();
 
   const sections: NavItem['section'][] = ['main', 'management'];
+
+  function handleLogout() {
+    logout();
+    navigate(ROUTES.LOGIN, { replace: true });
+  }
 
   return (
     <aside className={`${styles.sidebar} ${collapsed ? styles.collapsed : ''} ${mobileOpen ? styles.mobileOpen : ''}`}>
@@ -90,15 +105,31 @@ export function Sidebar() {
         })}
       </nav>
 
-      {/* User card */}
+      {/* User card + logout */}
       <div className={styles.footer}>
         <div className={styles.userCard}>
-          <div className={styles.avatar}>JS</div>
-          {!collapsed && (
+          <div className={styles.avatar}>
+            {session ? getInitials(session.user.name) : '?'}
+          </div>
+
+          {!collapsed && session && (
             <div className={styles.userInfo}>
-              <div className={styles.userName}>John Smith</div>
-              <div className={styles.userRole}>{t('sidebar.user.role')}</div>
+              <div className={styles.userName}>{session.user.name}</div>
+              <div className={styles.userRole}>
+                {t(`sidebar.user.roles.${session.role}`, { defaultValue: session.role })}
+              </div>
             </div>
+          )}
+
+          {!collapsed && (
+            <button
+              className={styles.logoutBtn}
+              onClick={handleLogout}
+              aria-label={t('sidebar.user.logout')}
+              title={t('sidebar.user.logout')}
+            >
+              <LogOut size={15} />
+            </button>
           )}
         </div>
       </div>
