@@ -25,9 +25,10 @@
       "role": "Admin",
       "logout": "Sign out",
       "roles": {
-        "tenant_user":  "User",
-        "tenant_admin": "Admin",
-        "super_admin":  "Super Admin"
+        "super_admin":    "Super Admin",
+        "branch_manager": "Branch Manager",
+        "technician":     "Technician",
+        "operator":       "Operator"
       }
     },
     "aria": {

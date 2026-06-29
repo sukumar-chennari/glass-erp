@@ -25,9 +25,10 @@
       "role": "అడ్మిన్",
       "logout": "సైన్ అవుట్",
       "roles": {
-        "tenant_user":  "వినియోగదారు",
-        "tenant_admin": "అడ్మిన్",
-        "super_admin":  "సూపర్ అడ్మిన్"
+        "super_admin":    "సూపర్ అడ్మిన్",
+        "branch_manager": "బ్రాంచ్ మేనేజర్",
+        "technician":     "టెక్నీషియన్",
+        "operator":       "ఆపరేటర్"
       }
     },
     "aria": {

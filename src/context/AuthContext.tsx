@@ -1,130 +1,82 @@
+/**
+ * React auth context — thin wrapper over the auth service layer.
+ *
+ * Contains only React state management. All business logic (storage,
+ * API calls, shape validation) lives in src/services/auth/.
+ *
+ * To swap mock → real API: change one import in src/services/auth/index.ts.
+ */
+
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+import { authService } from '@/services/auth';
+import type { Session, LoginCredentials, VerifyOtpOptions } from '@/services/auth';
 
-// ── Types ────────────────────────────────────────────────────────────────────
+// Re-export types so existing imports from '@/context/AuthContext' keep working.
+export type { AuthUser, UserRole, Session, AuthBranch } from '@/services/auth';
+export { AuthError } from '@/services/auth';
 
-export interface AuthUser {
-  id: string;
-  name: string;
-  email: string;
-}
-
-export type UserRole = 'tenant_user' | 'tenant_admin' | 'super_admin';
-
-export interface Session {
-  user: AuthUser;
-  role: UserRole;
-  tenantId: string;
-  tenantName: string;
-  permissions: string[];
-}
-
-interface LoginCredentials {
-  identifier: string;
-  password: string;
-}
+// ── Context ───────────────────────────────────────────────────────────────────
 
 interface AuthContextValue {
-  session: Session | null;
+  session:   Session | null;
   isLoading: boolean;
-  login: (credentials: LoginCredentials) => Promise<void>;
-  logout: () => void;
+  /**
+   * Authenticate with identifier + password.
+   * Returns the Session on success (OTP skipped).
+   * Throws AuthError(OTP_REQUIRED) when OTP is required — callers navigate to /verify-otp.
+   */
+  login:     (credentials: LoginCredentials) => Promise<Session>;
+  /** Optimistic: clears local state immediately, calls server best-effort. */
+  logout:    () => void;
+  /**
+   * Complete OTP challenge after a successful password auth.
+   * Returns the final Session so callers can navigate to the role default route.
+   */
+  verifyOtp: (opts: VerifyOtpOptions) => Promise<Session>;
+  /** Resend OTP to the user's registered contact using the challenge token. */
+  resendOtp: (otpToken: string) => Promise<void>;
 }
-
-// ── Context ──────────────────────────────────────────────────────────────────
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-// Bump suffix when Session shape changes to auto-invalidate stale stored sessions.
-const SESSION_KEY = 'erp-session-v1';
-
-// ── Shape guard ───────────────────────────────────────────────────────────────
-// Prevents corrupt/outdated localStorage data from being trusted as a Session.
-
-function isValidSession(data: unknown): data is Session {
-  if (!data || typeof data !== 'object') return false;
-  const d = data as Record<string, unknown>;
-  return (
-    typeof d.tenantId === 'string' &&
-    typeof d.tenantName === 'string' &&
-    typeof d.role === 'string' &&
-    d.user !== null &&
-    typeof d.user === 'object' &&
-    typeof (d.user as Record<string, unknown>).id === 'string' &&
-    typeof (d.user as Record<string, unknown>).name === 'string'
-  );
-}
-
-// ── Mock adapter ──────────────────────────────────────────────────────────────
-// Swap login() body only when integrating a real API.
-// Swap point: replace the setTimeout + buildMockSession with an API call,
-// and parse the response into a Session object with the same shape.
-
-function buildMockSession(identifier: string): Session {
-  const isEmail = identifier.includes('@');
-  return {
-    user: {
-      id: 'mock-user-1',
-      name: isEmail ? identifier.split('@')[0] : 'ERP User',
-      email: isEmail ? identifier : `${identifier}@glasserp.local`,
-    },
-    role: 'tenant_admin',
-    tenantId: 'tenant-001',
-    tenantName: 'Glass ERP',
-    permissions: [
-      'jobs:read',     'jobs:write',
-      'invoices:read', 'invoices:write',
-      'claims:read',   'claims:write',
-      'reports:read',
-    ],
-  };
-}
-
-// ── Provider ─────────────────────────────────────────────────────────────────
+// ── Provider ──────────────────────────────────────────────────────────────────
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [session, setSession]     = useState<Session | null>(null);
+  const [session,   setSession]   = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem(SESSION_KEY);
-      if (stored) {
-        const parsed: unknown = JSON.parse(stored);
-        if (isValidSession(parsed)) {
-          setSession(parsed);
-        } else {
-          // Clear stale / schema-mismatched session silently
-          localStorage.removeItem(SESSION_KEY);
-        }
-      }
-    } catch {
-      localStorage.removeItem(SESSION_KEY);
-    } finally {
-      setIsLoading(false);
-    }
+    authService.getSession()
+      .then(setSession)
+      .catch(() => null)
+      .finally(() => setIsLoading(false));
   }, []);
 
-  const login = async ({ identifier, password: _password }: LoginCredentials) => {
-    // --- SWAP POINT ---
-    // Replace this block with a real API call:
-    //   const response = await apiClient.post('/auth/login', { identifier, password });
-    //   const newSession: Session = mapResponseToSession(response.data);
-    // ---------------------
-    await new Promise((resolve) => setTimeout(resolve, 600));
-    const newSession = buildMockSession(identifier);
-    // ------------------
-    localStorage.setItem(SESSION_KEY, JSON.stringify(newSession));
+  const login = async (credentials: LoginCredentials): Promise<Session> => {
+    // If OTP is required, authService.login throws AuthError(OTP_REQUIRED).
+    // That propagates to the caller (LoginPage) which handles the navigation.
+    const newSession = await authService.login(credentials);
     setSession(newSession);
+    return newSession;
   };
 
   const logout = () => {
-    localStorage.removeItem(SESSION_KEY);
-    setSession(null);
-    // When integrating a real API, also call: apiClient.post('/auth/logout')
+    setSession(null);                // clear immediately — navigation can follow right away
+    void authService.logout();       // server-side cleanup, fire-and-forget
+  };
+
+  const verifyOtp = async (opts: VerifyOtpOptions): Promise<Session> => {
+    const newSession = await authService.verifyOtp(opts);
+    setSession(newSession);
+    return newSession;
+  };
+
+  const resendOtp = async (otpToken: string): Promise<void> => {
+    await authService.resendOtp(otpToken);
   };
 
   return (
-    <AuthContext.Provider value={{ session, isLoading, login, logout }}>
+    <AuthContext.Provider value={{ session, isLoading, login, logout, verifyOtp, resendOtp }}>
       {children}
     </AuthContext.Provider>
   );
@@ -139,10 +91,11 @@ export function useAuth(): AuthContextValue {
 }
 
 /**
- * Returns true when the current session includes the given permission string.
- * Use for conditional rendering of actions the user shouldn't see or trigger.
+ * True when the current session includes the given permission string.
+ * Use to conditionally render actions the user is not allowed to take.
  *
- * Example: const canWrite = useHasPermission('jobs:write');
+ * Example:
+ *   const canWrite = useHasPermission('invoices:write');
  */
 export function useHasPermission(permission: string): boolean {
   const { session } = useAuth();

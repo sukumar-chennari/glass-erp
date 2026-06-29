@@ -6,6 +6,8 @@ import { Select } from '@/components/ui/Select';
 import { Button } from '@/components/ui/Button';
 import { useToast } from '@/components/ui/Toast';
 import { AppearanceSection } from './components/AppearanceSection';
+import { AdminSettingsLanding } from './components/AdminSettingsLanding';
+import { useAuth } from '@/context/AuthContext';
 import type { SelectOption } from '@/types/ui';
 import styles from './SettingsPage.module.css';
 
@@ -45,6 +47,7 @@ function Toggle({ id, title, desc, checked, onChange }: ToggleProps) {
 }
 
 export function SettingsPage() {
+  const { session } = useAuth();
   const { t } = useTranslation(['settings', 'common']);
   const toast = useToast();
   const [saving, setSaving] = useState(false);
@@ -65,6 +68,10 @@ export function SettingsPage() {
     { value: 'INR', label: t('business.currencyOptions.inr') },
     { value: 'USD', label: t('business.currencyOptions.usd') },
   ];
+
+  if (session?.role === 'super_admin') {
+    return <AdminSettingsLanding />;
+  }
 
   const handleSaveBusinessInfo = async () => {
     setSaving(true);

@@ -25,9 +25,10 @@
       "role": "व्यवस्थापक",
       "logout": "साइन आउट",
       "roles": {
-        "tenant_user":  "उपयोगकर्ता",
-        "tenant_admin": "व्यवस्थापक",
-        "super_admin":  "सुपर व्यवस्थापक"
+        "super_admin":    "सुपर व्यवस्थापक",
+        "branch_manager": "शाखा प्रबंधक",
+        "technician":     "तकनीशियन",
+        "operator":       "ऑपरेटर"
       }
     },
     "aria": {

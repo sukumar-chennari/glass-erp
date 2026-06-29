@@ -1,4 +1,4 @@
-import { createBrowserRouter, Navigate, useRouteError, isRouteErrorResponse, Link } from 'react-router-dom';
+import { createBrowserRouter, useRouteError, isRouteErrorResponse, Link } from 'react-router-dom';
 
 function RouterErrorPage() {
   const error = useRouteError();
@@ -17,9 +17,13 @@ function RouterErrorPage() {
   );
 }
 
-import { AppLayout }           from '@/components/layout/AppLayout';
-import { ProtectedRoute }      from '@/components/auth/ProtectedRoute';
-import { LoginPage }           from '@/features/auth/LoginPage';
+import { AppLayout }             from '@/components/layout/AppLayout';
+import { ProtectedRoute }         from '@/components/auth/ProtectedRoute';
+import { RoleDefaultRedirect }    from '@/components/auth/RoleDefaultRedirect';
+import { LoginPage }            from '@/features/auth/LoginPage';
+import { ForgotPasswordPage }   from '@/features/auth/ForgotPasswordPage';
+import { ResetPasswordPage }    from '@/features/auth/ResetPasswordPage';
+import { VerifyOtpPage }        from '@/features/auth/VerifyOtpPage';
 import { DashboardPage }       from '@/features/dashboard/DashboardPage';
 import { VendorsPage }         from '@/features/vendors/VendorsPage';
 import { ProductsPage }        from '@/features/products/ProductsPage';
@@ -32,15 +36,32 @@ import { InvoicesPage }        from '@/features/invoices/InvoicesPage';
 import { ClaimsPage }          from '@/features/claims/ClaimsPage';
 import { ReportsPage }         from '@/features/reports/ReportsPage';
 import { SettingsPage }        from '@/features/settings/SettingsPage';
+import { UsersPage }           from '@/features/settings/pages/UsersPage';
+import { BranchesPage }        from '@/features/settings/pages/BranchesPage';
 import { EnquiryPage }         from '@/features/enquiry/EnquiryPage';
 
 import { ROUTES }              from '@/constants/routes';
 
 export const router = createBrowserRouter([
-  // Public: login (no auth required)
+  // Public: auth flow (no authentication required)
   {
     path:         ROUTES.LOGIN,
     element:      <LoginPage />,
+    errorElement: <RouterErrorPage />,
+  },
+  {
+    path:         ROUTES.FORGOT_PASSWORD,
+    element:      <ForgotPasswordPage />,
+    errorElement: <RouterErrorPage />,
+  },
+  {
+    path:         ROUTES.RESET_PASSWORD,
+    element:      <ResetPasswordPage />,
+    errorElement: <RouterErrorPage />,
+  },
+  {
+    path:         ROUTES.VERIFY_OTP,
+    element:      <VerifyOtpPage />,
     errorElement: <RouterErrorPage />,
   },
 
@@ -53,7 +74,7 @@ export const router = createBrowserRouter([
       {
         element: <AppLayout />,
         children: [
-          { index: true, element: <Navigate to={ROUTES.DASHBOARD} replace /> },
+          { index: true, element: <RoleDefaultRedirect /> },
 
           { path: ROUTES.DASHBOARD,      element: <DashboardPage /> },
 
@@ -67,8 +88,10 @@ export const router = createBrowserRouter([
           { path: ROUTES.INVOICES,       element: <InvoicesPage /> },
           { path: ROUTES.CLAIMS,         element: <ClaimsPage /> },
           { path: ROUTES.REPORTS,        element: <ReportsPage /> },
-          { path: ROUTES.SETTINGS,       element: <SettingsPage /> },
-          { path: ROUTES.ENQUIRY,        element: <EnquiryPage /> },
+          { path: ROUTES.SETTINGS,          element: <SettingsPage /> },
+          { path: ROUTES.SETTINGS_USERS,    element: <UsersPage /> },
+          { path: ROUTES.SETTINGS_BRANCHES, element: <BranchesPage /> },
+          { path: ROUTES.ENQUIRY,           element: <EnquiryPage /> },
         ],
       },
     ],

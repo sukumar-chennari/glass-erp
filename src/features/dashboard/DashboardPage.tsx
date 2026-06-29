@@ -3,12 +3,15 @@ import { AlertCircle } from 'lucide-react';
 import { PageShell }        from '@/components/layout/PageShell';
 import { KpiGrid }          from './components/KpiGrid';
 import { RecentActivity }   from './components/RecentActivity';
+import { BranchManagerDashboard } from './components/BranchManagerDashboard';
 import { useGetDashboardQuery } from './services/dashboardApi';
+import { useAuth } from '@/context/AuthContext';
 import styles from './DashboardPage.module.css';
 
 export function DashboardPage() {
   const { data, isLoading, isError } = useGetDashboardQuery();
   const { t } = useTranslation('dashboard');
+  const { session } = useAuth();
 
   const dateStr = new Date().toLocaleDateString('en-IN', {
     weekday: 'long', day: 'numeric', month: 'long',
@@ -37,6 +40,8 @@ export function DashboardPage() {
         recentJobs={data?.recentJobs         ?? []}
         isLoading={isLoading}
       />
+
+      {session?.role === 'branch_manager' && <BranchManagerDashboard />}
     </PageShell>
   );
 }

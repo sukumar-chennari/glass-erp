@@ -1,26 +1,45 @@
 /**
  * Sidebar navigation configuration.
- * Adding/reordering nav items requires changes here only.
+ *
+ * Each item declares which roles can see it via `roles`.
+ * Omit `roles` to show the item to all roles (use sparingly — prefer explicit).
+ *
+ * Role matrix:
+ *   super_admin    → system config: dashboard, reports, settings
+ *   branch_manager → full branch access: all items
+ *   operator       → day-to-day: jobs, customers, stock, invoices, claims, enquiry
+ *   technician     → field work: jobs, customers only
+ *
+ * Keep in sync with src/utils/roleRouting.ts canRoleAccessPath.
  */
+import type { UserRole } from '@/services/auth';
 import { ROUTES } from './routes';
 
 export interface NavItem {
-  id: string;
-  label: string;
-  icon: string;       // lucide-react icon name
-  path: string;
-  badgeKey?: string;  // key into notification/count store
-  section: 'main' | 'management';
+  id:        string;
+  label:     string;
+  icon:      string;       // lucide-react icon name
+  path:      string;
+  badgeKey?: string;       // key into notification/count store
+  section:   'main' | 'management';
+  /**
+   * Roles that can see and navigate to this item.
+   * Undefined = visible to all roles. Prefer explicit role lists.
+   */
+  roles?: UserRole[];
 }
 
 export const NAV_ITEMS: NavItem[] = [
-  // ── Main ───────────────────────────────────────────────────────────
+
+  // ── Main ───────────────────────────────────────────────────────────────────
   {
     id:      'dashboard',
     label:   'Dashboard',
     icon:    'LayoutDashboard',
     path:    ROUTES.DASHBOARD,
     section: 'main',
+    roles:   ['super_admin', 'branch_manager', 'operator'],
+    // Technicians land directly on Jobs — Dashboard has no relevant data for them.
   },
   {
     id:       'vendors',
@@ -29,6 +48,7 @@ export const NAV_ITEMS: NavItem[] = [
     path:     ROUTES.VENDORS,
     badgeKey: 'vendors',
     section:  'main',
+    roles:    ['branch_manager'],
   },
   {
     id:       'products',
@@ -37,6 +57,7 @@ export const NAV_ITEMS: NavItem[] = [
     path:     ROUTES.PRODUCTS,
     badgeKey: 'products',
     section:  'main',
+    roles:    ['branch_manager'],
   },
   {
     id:       'purchaseOrders',
@@ -45,6 +66,7 @@ export const NAV_ITEMS: NavItem[] = [
     path:     ROUTES.PURCHASE_ORDERS,
     badgeKey: 'purchaseOrders',
     section:  'main',
+    roles:    ['branch_manager'],
   },
   {
     id:       'customers',
@@ -53,6 +75,7 @@ export const NAV_ITEMS: NavItem[] = [
     path:     ROUTES.CUSTOMERS,
     badgeKey: 'customers',
     section:  'main',
+    roles:    ['branch_manager', 'operator', 'technician'],
   },
   {
     id:       'technicians',
@@ -61,9 +84,10 @@ export const NAV_ITEMS: NavItem[] = [
     path:     ROUTES.TECHNICIANS,
     badgeKey: 'technicians',
     section:  'main',
+    roles:    ['branch_manager'],
   },
 
-  // ── Management ─────────────────────────────────────────────────────
+  // ── Management ─────────────────────────────────────────────────────────────
   {
     id:       'jobs',
     label:    'Job Cards',
@@ -71,13 +95,17 @@ export const NAV_ITEMS: NavItem[] = [
     path:     ROUTES.JOBS,
     badgeKey: 'jobs',
     section:  'management',
+    roles:    ['branch_manager', 'operator', 'technician'],
+    // TODO: technician should see only their assigned jobs — requires backend
+    // filtering by assignee. Until then, all jobs are visible for technician too.
   },
   {
-    id:       'stock',
-    label:    'Stock Management',
-    icon:     'Warehouse',
-    path:     ROUTES.STOCK,
-    section:  'management',
+    id:      'stock',
+    label:   'Stock Management',
+    icon:    'Warehouse',
+    path:    ROUTES.STOCK,
+    section: 'management',
+    roles:   ['branch_manager', 'operator'],
   },
   {
     id:       'invoices',
@@ -86,6 +114,7 @@ export const NAV_ITEMS: NavItem[] = [
     path:     ROUTES.INVOICES,
     badgeKey: 'invoices',
     section:  'management',
+    roles:    ['branch_manager', 'operator'],
   },
   {
     id:       'claims',
@@ -94,6 +123,7 @@ export const NAV_ITEMS: NavItem[] = [
     path:     ROUTES.CLAIMS,
     badgeKey: 'claims',
     section:  'management',
+    roles:    ['branch_manager', 'operator'],
   },
   {
     id:      'enquiry',
@@ -101,6 +131,7 @@ export const NAV_ITEMS: NavItem[] = [
     icon:    'MessageCircle',
     path:    ROUTES.ENQUIRY,
     section: 'management',
+    roles:   ['branch_manager', 'operator'],
   },
   {
     id:      'reports',
@@ -108,6 +139,7 @@ export const NAV_ITEMS: NavItem[] = [
     icon:    'BarChart2',
     path:    ROUTES.REPORTS,
     section: 'management',
+    roles:   ['super_admin', 'branch_manager'],
   },
   {
     id:      'settings',
@@ -115,6 +147,8 @@ export const NAV_ITEMS: NavItem[] = [
     icon:    'Settings',
     path:    ROUTES.SETTINGS,
     section: 'management',
+    roles:   ['super_admin', 'branch_manager'],
+    // TODO (super_admin): settings page needs a Users sub-section for account
+    // management (create/deactivate staff). Branch-level settings for branch_manager.
   },
 ];
-

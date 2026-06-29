@@ -4,8 +4,9 @@ import * as LucideIcons from 'lucide-react';
 import { ChevronLeft, Diamond, LogOut } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { toggleSidebar, closeMobileSidebar } from '@/store/slices/uiSlice';
-import { NAV_ITEMS, type NavItem } from '@/constants/nav';
+import type { NavItem } from '@/constants/nav';
 import { useAuth } from '@/context/AuthContext';
+import { getRoleNavItems } from '@/utils/roleRouting';
 import { ROUTES } from '@/constants/routes';
 import styles from './Sidebar.module.css';
 
@@ -23,6 +24,8 @@ export function Sidebar() {
   const { session, logout } = useAuth();
   const navigate   = useNavigate();
 
+  // Only show nav items the current role is allowed to access
+  const roleItems  = getRoleNavItems(session?.role);
   const sections: NavItem['section'][] = ['main', 'management'];
 
   function handleLogout() {
@@ -57,7 +60,10 @@ export function Sidebar() {
       {/* Navigation */}
       <nav className={styles.navContent} aria-label={t('sidebar.aria.nav')}>
         {sections.map((section) => {
-          const items = NAV_ITEMS.filter((n) => n.section === section);
+          const items = roleItems.filter((n) => n.section === section);
+          // Hide the section entirely if the role has no items in it
+          if (items.length === 0) return null;
+
           return (
             <div key={section}>
               {!collapsed && (

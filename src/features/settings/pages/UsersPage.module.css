@@ -1,0 +1,59 @@
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  text-decoration: none;
+  margin-bottom: var(--space-3);
+  transition: color var(--transition-fast);
+}
+
+.back:hover {
+  color: var(--color-primary);
+}
+
+.tableHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.count {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.cellPrimary {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.cellMuted {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.hint {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  margin: 0;
+  padding: var(--space-3);
+  background: var(--color-bg-subtle);
+  border-radius: var(--radius-md);
+}
+
+.modalFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+}

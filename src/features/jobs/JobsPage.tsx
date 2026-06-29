@@ -7,6 +7,8 @@ import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { useToast } from '@/components/ui/Toast';
 import { JobTable } from './components/JobTable';
 import { JobModal } from './components/JobModal';
+import { TechnicianJobView } from './components/TechnicianJobView';
+import { useAuth } from '@/context/AuthContext';
 import {
   useGetJobsQuery,
   useCreateJobMutation,
@@ -20,6 +22,7 @@ import type { SelectOption } from '@/types/ui';
 import styles from './JobsPage.module.css';
 
 export function JobsPage() {
+  const { session } = useAuth();
   const { data: jobs = [], isLoading } = useGetJobsQuery();
   const { data: customers = [] }       = useGetCustomersQuery();
   const { data: technicians = [] }     = useGetTechniciansQuery();
@@ -32,6 +35,10 @@ export function JobsPage() {
   const [modalOpen, setModalOpen]   = useState(false);
   const [editingJob, setEditingJob] = useState<Job | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
+
+  if (session?.role === 'technician') {
+    return <TechnicianJobView />;
+  }
 
   const customerOptions = useMemo<SelectOption[]>(
     () => customers.map((c) => ({ value: c.id, label: `${c.name} (${c.phone})` })),

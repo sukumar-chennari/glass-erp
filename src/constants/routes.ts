@@ -3,9 +3,12 @@
  * Never hardcode path strings in components or router — import from here.
  */
 export const ROUTES = {
-  ROOT:           '/',
-  LOGIN:          '/login',
-  DASHBOARD:      '/dashboard',
+  ROOT:            '/',
+  LOGIN:           '/login',
+  FORGOT_PASSWORD: '/forgot-password',
+  RESET_PASSWORD:  '/reset-password',   // ?token=<signed>&type=setup|reset
+  VERIFY_OTP:      '/verify-otp',        // ?token=<otp-session-token>
+  DASHBOARD:       '/dashboard',
   VENDORS:        '/vendors',
   PRODUCTS:       '/products',
   PURCHASE_ORDERS:'/purchase-orders',
@@ -17,7 +20,9 @@ export const ROUTES = {
   CLAIMS:         '/insurance-claims',
   REPORTS:        '/reports',
   SETTINGS:       '/settings',
-  ENQUIRY:        '/enquiry',
+  ENQUIRY:          '/enquiry',
+  SETTINGS_USERS:   '/settings/users',
+  SETTINGS_BRANCHES:'/settings/branches',
 } as const;
 
 export type AppRoute = typeof ROUTES[keyof typeof ROUTES];

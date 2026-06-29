@@ -1,0 +1,64 @@
+/* VerifyOtpPage — page-specific styles only.
+   The glass card shell, backdrop, brand header, and footer live in AuthCard.module.css. */
+
+.form {
+  display:        flex;
+  flex-direction: column;
+  gap:            var(--space-4);
+}
+
+.formError {
+  font-size:     var(--font-size-sm);
+  color:         var(--color-danger-text);
+  margin:        0;
+  padding:       var(--space-3) var(--space-4);
+  background:    color-mix(in srgb, var(--color-danger-text) 10%, transparent);
+  border:        1px solid color-mix(in srgb, var(--color-danger-text) 25%, transparent);
+  border-radius: var(--radius-md);
+}
+
+.resend {
+  display:         flex;
+  justify-content: center;
+  margin-top:      var(--space-3);
+  font-size:       var(--font-size-sm);
+}
+
+.resendBtn {
+  background:      none;
+  border:          none;
+  padding:         0;
+  cursor:          pointer;
+  color:           var(--color-primary);
+  font-size:       inherit;
+  text-decoration: underline;
+  transition:      opacity var(--transition-fast);
+}
+.resendBtn:hover          { opacity: 0.8; }
+.resendBtn:focus-visible  {
+  outline:        2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius:  var(--radius-sm);
+}
+
+.cooldown {
+  color: var(--color-text-secondary);
+}
+
+.backLink {
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  gap:             var(--space-1);
+  margin-top:      var(--space-4);
+  font-size:       var(--font-size-sm);
+  color:           var(--color-primary);
+  text-decoration: none;
+  transition:      opacity var(--transition-fast);
+}
+.backLink:hover          { opacity: 0.8; text-decoration: underline; }
+.backLink:focus-visible  {
+  outline:        2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius:  var(--radius-sm);
+}
