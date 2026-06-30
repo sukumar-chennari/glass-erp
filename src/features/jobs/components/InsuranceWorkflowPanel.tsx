@@ -1,23 +1,25 @@
 import { useState } from 'react';
-import { CheckCircle2, Clock, AlertTriangle } from 'lucide-react';
+import { CheckCircle2, Clock, AlertTriangle, Package } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { useToast } from '@/components/ui/Toast';
 import { useUpdateJobMutation } from '@/features/jobs/services/jobsApi';
 import type { Job, InsuranceProcessing, InsuranceProcessingState } from '@/types/models/job';
 import styles from './InsuranceWorkflowPanel.module.css';
 
-// Step index mapping: lower = earlier in the process
+// Step index mapping — exhaustive over all InsuranceProcessingState members
 const STATE_STEP: Record<InsuranceProcessingState, number> = {
   verifying_policy:   0,
   break_in_review:    0,
   documents_pending:  1,
-  claim_submitted:    2,
-  surveyor_assigned:  3,
-  approved:           4,
-  excess_pending:     5,
-  excess_collected:   5,
-  settlement_pending: 6,
-  settled:            7,
+  docs_compiled:      2,
+  packet_ready:       3,
+  claim_submitted:    4,
+  surveyor_assigned:  5,
+  approved:           6,
+  excess_pending:     7,
+  excess_collected:   7,
+  settlement_pending: 8,
+  settled:            9,
   rejected:           -1,
 };
 
@@ -26,8 +28,13 @@ const DEFAULT_DOCS = [
   { id: 'dl',     label: 'Driving Licence Copy',           required: true,  uploaded: false },
   { id: 'claim',  label: 'Claim Form (Insurer Template)',  required: true,  uploaded: false },
   { id: 'photos', label: 'Damage Photos (min 3)',          required: true,  uploaded: false },
+  { id: 'policy', label: 'Insurance Policy Copy',          required: true,  uploaded: false },
   { id: 'fir',    label: 'FIR Copy (theft/accident only)', required: false, uploaded: false },
 ];
+
+function fmtTs(iso: string) {
+  return new Date(iso).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' });
+}
 
 interface Props { job: Job; }
 
@@ -39,6 +46,7 @@ export function InsuranceWorkflowPanel({ job }: Props) {
   const [claimInput,    setClaimInput]    = useState('');
   const [surveyorInput, setSurveyorInput] = useState('');
   const [approvedInput, setApprovedInput] = useState('');
+  const [packetRef,     setPacketRef]     = useState('');
 
   async function advance(newState: InsuranceProcessingState, extra?: Partial<InsuranceProcessing>) {
     const base = proc ?? {
@@ -84,7 +92,7 @@ export function InsuranceWorkflowPanel({ job }: Props) {
     );
   }
 
-  const curStep   = STATE_STEP[proc.state] ?? 0;
+  const curStep    = STATE_STEP[proc.state] ?? 0;
   const isRejected = proc.state === 'rejected';
 
   function stepStatus(stepIdx: number): 'done' | 'active' | 'pending' | 'blocked' {
@@ -128,14 +136,29 @@ export function InsuranceWorkflowPanel({ job }: Props) {
                 />
                 Flag as Break-In (theft/vandalism)
               </label>
-              <Button size="sm" disabled={isLoading} onClick={() => advance('documents_pending')}>
-                Verify Policy (Mock)
+              <label className={styles.checkRow}>
+                <input
+                  type="checkbox"
+                  checked={!!proc.accidentDateValidated}
+                  onChange={(e) => setProc({ ...proc, accidentDateValidated: e.target.checked })}
+                />
+                Accident date matches policy coverage period
+              </label>
+              <Button
+                size="sm"
+                disabled={isLoading || !proc.accidentDateValidated}
+                onClick={() => advance('documents_pending')}
+              >
+                {proc.accidentDateValidated ? 'Verify Policy (Mock)' : 'Confirm accident date first'}
               </Button>
             </div>
           )}
+          {stepStatus(0) === 'done' && proc.accidentDateValidated && (
+            <div className={styles.metaRow}>Accident date validated</div>
+          )}
         </StepRow>
 
-        {/* ── Step 1: Documents ───────────────────────────────────── */}
+        {/* ── Step 1: Documents Collection ────────────────────────── */}
         <StepRow
           label="Documents Collection"
           status={stepStatus(1)}
@@ -159,27 +182,93 @@ export function InsuranceWorkflowPanel({ job }: Props) {
               <Button
                 size="sm"
                 disabled={!allRequiredUploaded || isLoading}
-                onClick={() => advance('claim_submitted', {
-                  claimNumber: claimInput || `CLM-${Date.now().toString().slice(-6)}`,
-                })}
+                onClick={() => advance('docs_compiled')}
               >
-                {allRequiredUploaded ? 'Submit Claim →' : `Upload remaining ${proc.documents.filter((d) => d.required && !d.uploaded).length} docs first`}
+                {allRequiredUploaded ? 'Compile Document Packet →' : `Upload remaining ${proc.documents.filter((d) => d.required && !d.uploaded).length} docs first`}
               </Button>
             </div>
           )}
         </StepRow>
 
-        {/* ── Step 2: Claim Submitted ─────────────────────────────── */}
+        {/* ── Step 2: Compile Document Packet ─────────────────────── */}
         <StepRow
-          label="Claim Submitted"
+          label="Compile Document Packet"
           status={stepStatus(2)}
-          sub={proc.claimNumber ? `Claim #${proc.claimNumber}` : 'Awaiting claim submission'}
+          sub={
+            curStep > 2
+              ? proc.packetArtifactRef ? `Packet: ${proc.packetArtifactRef}` : 'Packet compiled'
+              : 'Aggregate docs into claim submission packet'
+          }
         >
           {stepStatus(2) === 'active' && (
             <div className={styles.stepActions}>
               <input
                 className={styles.smallInput}
-                placeholder="Surveyor ref / leave blank"
+                placeholder="Packet ref (e.g. PKT-2025-001)"
+                value={packetRef}
+                onChange={(e) => setPacketRef(e.target.value)}
+              />
+              <Button
+                size="sm"
+                disabled={isLoading}
+                onClick={() => advance('packet_ready', {
+                  packetArtifactRef: packetRef || `PKT-${Date.now().toString().slice(-5)}`,
+                })}
+              >
+                Mark Packet Compiled
+              </Button>
+            </div>
+          )}
+          {stepStatus(2) === 'done' && proc.packetArtifactRef && (
+            <div className={styles.metaRow}>
+              <Package size={12} /> {proc.packetArtifactRef}
+            </div>
+          )}
+        </StepRow>
+
+        {/* ── Step 3: Packet Ready to Submit ──────────────────────── */}
+        <StepRow
+          label="Claim Packet Ready"
+          status={stepStatus(3)}
+          sub={
+            curStep > 3
+              ? 'Packet reviewed and approved for submission'
+              : 'Review compiled packet before submitting to insurer'
+          }
+        >
+          {stepStatus(3) === 'active' && (
+            <div className={styles.stepActions}>
+              <p className={styles.stepHint}>
+                Verify all documents in the packet are legible and complete before submitting to the insurer.
+              </p>
+              <Button
+                size="sm"
+                disabled={isLoading}
+                onClick={() => advance('claim_submitted', {
+                  claimNumber: claimInput || `CLM-${Date.now().toString().slice(-6)}`,
+                  submittedToInsurerAt: new Date().toISOString(),
+                })}
+              >
+                Submit to Insurer →
+              </Button>
+            </div>
+          )}
+          {stepStatus(3) === 'done' && proc.submittedToInsurerAt && (
+            <div className={styles.metaRow}>Submitted {fmtTs(proc.submittedToInsurerAt)}</div>
+          )}
+        </StepRow>
+
+        {/* ── Step 4: Claim Submitted ─────────────────────────────── */}
+        <StepRow
+          label="Claim Submitted"
+          status={stepStatus(4)}
+          sub={proc.claimNumber ? `Claim #${proc.claimNumber}` : 'Awaiting claim processing'}
+        >
+          {stepStatus(4) === 'active' && (
+            <div className={styles.stepActions}>
+              <input
+                className={styles.smallInput}
+                placeholder="Update claim number (optional)"
                 value={claimInput}
                 onChange={(e) => setClaimInput(e.target.value)}
               />
@@ -190,13 +279,13 @@ export function InsuranceWorkflowPanel({ job }: Props) {
           )}
         </StepRow>
 
-        {/* ── Step 3: Surveyor Assessment ────────────────────────── */}
+        {/* ── Step 5: Surveyor Assessment ────────────────────────── */}
         <StepRow
           label="Surveyor Assessment"
-          status={stepStatus(3)}
+          status={stepStatus(5)}
           sub={proc.surveyorName && proc.surveyorName !== 'Pending assignment' ? `Surveyor: ${proc.surveyorName}` : 'Awaiting surveyor visit'}
         >
-          {stepStatus(3) === 'active' && (
+          {stepStatus(5) === 'active' && (
             <div className={styles.stepActions}>
               <input
                 className={styles.smallInput}
@@ -225,17 +314,17 @@ export function InsuranceWorkflowPanel({ job }: Props) {
           )}
         </StepRow>
 
-        {/* ── Step 4: Approval ────────────────────────────────────── */}
+        {/* ── Step 6: Approval ────────────────────────────────────── */}
         <StepRow
           label="Claim Approved"
-          status={stepStatus(4)}
+          status={stepStatus(6)}
           sub={
             proc.approvedAmount
               ? `Approved ₹${proc.approvedAmount.toLocaleString('en-IN')}`
-              : curStep > 4 ? 'Approved' : 'Awaiting insurer approval'
+              : curStep > 6 ? 'Approved' : 'Awaiting insurer approval'
           }
         >
-          {stepStatus(4) === 'active' && (
+          {stepStatus(6) === 'active' && (
             <div className={styles.stepActions}>
               <input
                 className={styles.smallInput}
@@ -258,13 +347,13 @@ export function InsuranceWorkflowPanel({ job }: Props) {
           )}
         </StepRow>
 
-        {/* ── Step 5: Excess (conditional) ────────────────────────── */}
+        {/* ── Step 7: Excess (conditional) ────────────────────────── */}
         {hasExcess && (
           <StepRow
             label="Excess Amount Collection"
-            status={stepStatus(5)}
+            status={stepStatus(7)}
             sub={
-              proc.excessCollected || curStep > 5
+              proc.excessCollected || curStep > 7
                 ? `₹${job.insuranceDetails?.excessAmount?.toLocaleString('en-IN')} collected from customer`
                 : `Collect ₹${job.insuranceDetails?.excessAmount?.toLocaleString('en-IN')} from customer`
             }
@@ -281,18 +370,24 @@ export function InsuranceWorkflowPanel({ job }: Props) {
           </StepRow>
         )}
 
-        {/* ── Step 6: Settlement ──────────────────────────────────── */}
+        {/* ── Step 8: Settlement ──────────────────────────────────── */}
         <StepRow
           label="Insurance Settlement"
-          status={stepStatus(6)}
+          status={stepStatus(8)}
           sub={
             proc.state === 'settled'
-              ? 'Insurer transfer received — job financially closed'
+              ? proc.settlementReceivedAt
+                ? `Transfer received ${fmtTs(proc.settlementReceivedAt)}`
+                : 'Insurer transfer received — job financially closed'
               : 'Awaiting insurer payment transfer'
           }
         >
           {proc.state === 'settlement_pending' && (
-            <Button size="sm" disabled={isLoading} onClick={() => advance('settled')}>
+            <Button
+              size="sm"
+              disabled={isLoading}
+              onClick={() => advance('settled', { settlementReceivedAt: new Date().toISOString() })}
+            >
               Mark Settlement Received
             </Button>
           )}

@@ -351,3 +351,17 @@
   font-size: var(--font-size-sm);
   color: var(--color-text-muted);
 }
+
+/* ── Link-state screen icon variants ── */
+.iconWarning { color: #d97706; }  /* amber — expired */
+.iconDanger  { color: var(--color-danger, #e53e3e); }  /* red — invalid */
+
+/* ── Support phone link ── */
+.supportLink {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  text-decoration: none;
+  letter-spacing: .03em;
+}
+.supportLink:hover { text-decoration: underline; }

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Monitor, LogOut, Clock } from 'lucide-react';
 import { PageShell, SectionCard } from '@/components/layout/PageShell';
 import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
@@ -205,6 +206,14 @@ export function SettingsPage() {
         </div>
       </SectionCard>
 
+      {/* Security & Sessions */}
+      <SectionCard>
+        <div className={styles.section}>
+          <h3 className={styles.sectionTitle}>Security &amp; Sessions</h3>
+          <SecuritySection />
+        </div>
+      </SectionCard>
+
       {/* System */}
       <SectionCard>
         <div className={styles.section}>
@@ -226,5 +235,83 @@ export function SettingsPage() {
         </div>
       </SectionCard>
     </PageShell>
+  );
+}
+
+// ── Security & Sessions section ───────────────────────────────────────────────
+// TODO (backend): GET /auth/sessions, DELETE /auth/sessions/:id, GET /auth/activity
+
+const MOCK_SESSIONS = [
+  { id: 's-001', device: 'Chrome on Windows', ip: '49.205.XX.XX', location: 'Hyderabad', lastActive: 'Now',        current: true  },
+  { id: 's-002', device: 'Safari on iPhone',  ip: '157.47.XX.XX', location: 'Secunderabad', lastActive: '2 days ago', current: false },
+];
+
+const MOCK_ACTIVITY = [
+  { id: 'a-001', action: 'Login',          device: 'Chrome on Windows', at: 'Today 9:41 AM',       success: true  },
+  { id: 'a-002', action: 'Password change', device: 'Chrome on Windows', at: 'Yesterday 3:15 PM',   success: true  },
+  { id: 'a-003', action: 'Login attempt',   device: 'Unknown device',    at: '2 days ago 11:07 PM', success: false },
+  { id: 'a-004', action: 'Login',           device: 'Safari on iPhone',  at: '3 days ago 8:20 AM',  success: true  },
+];
+
+function SecuritySection() {
+  const toast = useToast();
+  const [signingOut, setSigningOut] = useState(false);
+
+  async function signOutOtherSessions() {
+    setSigningOut(true);
+    await new Promise((r) => setTimeout(r, 700));
+    setSigningOut(false);
+    toast.success('All other sessions signed out.'); // TODO (backend): DELETE /auth/sessions/others
+  }
+
+  return (
+    <div className={styles.securityWrap}>
+      {/* Active sessions */}
+      <div className={styles.secSubTitle}>
+        <Monitor size={14} />
+        Active Sessions
+      </div>
+      <div className={styles.sessionList}>
+        {MOCK_SESSIONS.map((s) => (
+          <div key={s.id} className={styles.sessionRow}>
+            <div className={styles.sessionInfo}>
+              <span className={styles.sessionDevice}>{s.device}</span>
+              <span className={styles.sessionMeta}>{s.ip} · {s.location} · {s.lastActive}</span>
+            </div>
+            {s.current
+              ? <span className={styles.currentBadge}>This device</span>
+              : <span className={styles.sessionAgo}>{s.lastActive}</span>
+            }
+          </div>
+        ))}
+      </div>
+      <Button
+        size="sm"
+        variant="ghost"
+        leftIcon={<LogOut size={13} />}
+        loading={signingOut}
+        onClick={signOutOtherSessions}
+      >
+        Sign out other sessions
+      </Button>
+
+      {/* Login activity */}
+      <div className={styles.secSubTitle} style={{ marginTop: 'var(--space-5)' }}>
+        <Clock size={14} />
+        Recent Login Activity
+      </div>
+      <div className={styles.activityList}>
+        {MOCK_ACTIVITY.map((a) => (
+          <div key={a.id} className={`${styles.activityRow} ${!a.success ? styles.activityFail : ''}`}>
+            <div className={`${styles.activityDot} ${a.success ? styles.activityDotOk : styles.activityDotFail}`} />
+            <div className={styles.activityInfo}>
+              <span className={styles.activityAction}>{a.action}</span>
+              <span className={styles.activityMeta}>{a.device} · {a.at}</span>
+            </div>
+            {!a.success && <span className={styles.failBadge}>Failed</span>}
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }

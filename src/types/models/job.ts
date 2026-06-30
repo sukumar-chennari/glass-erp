@@ -17,6 +17,8 @@ export type InsuranceProcessingState =
   | 'verifying_policy'
   | 'break_in_review'
   | 'documents_pending'
+  | 'docs_compiled'       // all docs aggregated into a packet
+  | 'packet_ready'        // PDF/packet reviewed and ready to submit
   | 'claim_submitted'
   | 'surveyor_assigned'
   | 'approved'
@@ -34,14 +36,18 @@ export interface InsuranceDoc {
 }
 
 export interface InsuranceProcessing {
-  state:            InsuranceProcessingState;
-  isBreakIn?:       boolean;
-  claimNumber?:     string;
-  surveyorName?:    string;
-  approvedAmount?:  number;
-  documents:        InsuranceDoc[];
-  excessCollected?: boolean;
-  updatedAt:        string;
+  state:                  InsuranceProcessingState;
+  isBreakIn?:             boolean;
+  accidentDateValidated?: boolean;
+  claimNumber?:           string;
+  packetArtifactRef?:     string;    // e.g. "PKT-2025-001" — PDF claim packet ref
+  submittedToInsurerAt?:  string;    // ISO timestamp when packet was submitted
+  settlementReceivedAt?:  string;    // ISO timestamp when settlement transfer received
+  surveyorName?:          string;
+  approvedAmount?:        number;
+  documents:              InsuranceDoc[];
+  excessCollected?:       boolean;
+  updatedAt:              string;
 }
 
 // ── Stage History (technician execution timeline) ─────────────────────

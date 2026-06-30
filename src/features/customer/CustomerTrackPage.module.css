@@ -1,0 +1,252 @@
+/* Outer page — full viewport, no app chrome */
+.page {
+  min-height: 100vh;
+  background: var(--color-bg-subtle);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: 60px;
+}
+
+/* ── Header ── */
+.header {
+  width: 100%;
+  background: var(--color-primary);
+  color: #fff;
+  padding: var(--space-4) var(--space-4) var(--space-3);
+  text-align: center;
+}
+.logo      { font-size: 1.25rem; font-weight: 700; letter-spacing: -.5px; }
+.headerSub { font-size: var(--font-size-xs); opacity: .8; margin-top: 2px; }
+
+/* ── Content ── */
+.content {
+  width: 100%;
+  max-width: 480px;
+  flex: 1;
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* ── State boxes (no-ref, not-found) ── */
+.stateBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: var(--space-5) var(--space-4);
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+}
+.iconWarning { color: #d97706; }
+.iconDanger  { color: var(--color-danger, #e53e3e); }
+.stateTitle  { font-size: 1.2rem; font-weight: 700; margin: 0; color: var(--color-text-primary); }
+.stateDesc   { font-size: var(--font-size-sm); color: var(--color-text-muted); line-height: 1.6; margin: 0; max-width: 300px; }
+
+.ctaLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 12px var(--space-5);
+  background: var(--color-primary);
+  color: #fff;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  text-decoration: none;
+  transition: opacity .15s;
+}
+.ctaLink:hover { opacity: .9; }
+
+.phoneLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  text-decoration: none;
+}
+.phoneLink:hover { text-decoration: underline; }
+
+/* ── Reference card ── */
+.refCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  background: var(--color-bg-light);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+}
+.refMeta   { display: flex; flex-direction: column; gap: 2px; }
+.refLabel  { font-size: var(--font-size-xs); color: var(--color-text-muted); font-weight: 500; text-transform: uppercase; letter-spacing: .06em; }
+.refNo     { font-size: 1.2rem; font-weight: 700; color: var(--color-primary); letter-spacing: .06em; }
+
+.completedBadge, .activeBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: var(--radius-full, 999px);
+  white-space: nowrap;
+}
+.completedBadge {
+  background: color-mix(in srgb, #10b981 12%, transparent);
+  color: #10b981;
+  border: 1px solid color-mix(in srgb, #10b981 30%, transparent);
+}
+.activeBadge {
+  background: color-mix(in srgb, var(--color-primary) 10%, transparent);
+  color: var(--color-primary);
+  border: 1px solid color-mix(in srgb, var(--color-primary) 30%, transparent);
+}
+
+/* ── Summary card ── */
+.summaryCard {
+  background: var(--color-bg-light);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+.summaryRow {
+  display: flex;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--font-size-sm);
+  border-bottom: 1px solid var(--color-border);
+}
+.summaryRow:last-child { border-bottom: none; }
+.summaryRow span:first-child { color: var(--color-text-muted); min-width: 80px; flex-shrink: 0; }
+.summaryRow span:last-child  { color: var(--color-text-primary); font-weight: 500; flex: 1; }
+
+/* ── Section title ── */
+.sectionTitle {
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin-bottom: -8px;
+}
+
+/* ── Timeline ── */
+.timeline {
+  display: flex;
+  flex-direction: column;
+  background: var(--color-bg-light);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+}
+
+.milestoneRow {
+  display: flex;
+  gap: var(--space-3);
+  min-height: 40px;
+}
+
+.milestoneLeft {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  width: 22px;
+}
+
+.dot {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.dotDone {
+  background: color-mix(in srgb, #10b981 15%, transparent);
+  color: #10b981;
+  border: 2px solid #10b981;
+}
+.dotActive {
+  background: color-mix(in srgb, var(--color-primary) 15%, transparent);
+  color: var(--color-primary);
+  border: 2px solid var(--color-primary);
+}
+.dotPending {
+  background: var(--color-bg-subtle);
+  border: 2px solid var(--color-border);
+}
+
+.connector {
+  flex: 1;
+  width: 2px;
+  background: var(--color-border);
+  margin: 3px 0;
+  min-height: 10px;
+}
+.connectorDone { background: #10b981; }
+
+.milestoneBody {
+  flex: 1;
+  padding: 1px 0 var(--space-3);
+}
+.milestoneActive {
+  padding: var(--space-2) var(--space-3);
+  background: color-mix(in srgb, var(--color-primary) 5%, var(--color-bg-subtle));
+  border: 1px solid color-mix(in srgb, var(--color-primary) 20%, transparent);
+  border-radius: var(--radius-sm);
+}
+
+.milestoneLabel  { font-size: var(--font-size-sm); font-weight: 600; color: var(--color-text-primary); line-height: 22px; }
+.milestoneTime   { font-size: var(--font-size-xs); color: #10b981; font-weight: 500; }
+.milestoneDetail { font-size: var(--font-size-xs); color: var(--color-text-muted); }
+
+/* ── Branch contact card ── */
+.branchCard {
+  background: var(--color-bg-light);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.branchName {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+}
+.branchHours {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+.branchActions {
+  display: flex;
+  gap: var(--space-3);
+}
+.branchBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 10px var(--space-4);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  transition: opacity .15s;
+  flex: 1;
+  justify-content: center;
+  background: var(--color-primary);
+  color: #fff;
+}
+.branchBtn:hover { opacity: .9; }
+.branchBtnWa {
+  background: #25D366;
+  color: #fff;
+}

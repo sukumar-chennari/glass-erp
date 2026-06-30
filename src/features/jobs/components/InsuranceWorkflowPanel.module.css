@@ -218,6 +218,25 @@
   font-style: italic;
 }
 
+/* ── Metadata row (timestamps, refs shown below done steps) ─────────── */
+.metaRow {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  font-style: italic;
+  margin-top: 2px;
+}
+
+/* ── Step hint text ──────────────────────────────────────────────────── */
+.stepHint {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  line-height: 1.5;
+  margin: 0;
+}
+
 /* ── Rejected alert ──────────────────────────────────────────────────── */
 .rejectedAlert {
   display: flex;

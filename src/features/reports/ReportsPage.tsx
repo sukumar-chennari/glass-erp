@@ -287,6 +287,12 @@ export function ReportsPage() {
         )}
       </SectionCard>
 
+      {/* Lost Leads */}
+      <SectionCard>
+        <SectionHeader title="Lost Leads" />
+        <LostLeadsSection />
+      </SectionCard>
+
       {/* Revenue chart placeholder */}
       <SectionCard>
         <SectionHeader title={t('sections.monthlyRevenue')} />
@@ -299,5 +305,39 @@ export function ReportsPage() {
         </div>
       </SectionCard>
     </PageShell>
+  );
+}
+
+// ── Lost Leads breakdown ──────────────────────────────────────────────────────
+// TODO (backend): GET /reports/lost-leads — currently mock data
+const LOST_REASONS: Array<{ reason: string; count: number; pct: number }> = [
+  { reason: 'Declined pricing — too expensive',    count: 38, pct: 34 },
+  { reason: 'Found another vendor',                count: 27, pct: 24 },
+  { reason: 'Customer unresponsive / wrong number',count: 22, pct: 20 },
+  { reason: 'Insurance claim rejected upfront',    count: 14, pct: 13 },
+  { reason: 'Competitor quoted faster TAT',         count:  7, pct:  6 },
+  { reason: 'Other / unknown',                     count:  4, pct:  3 },
+];
+const TOTAL_LOST = LOST_REASONS.reduce((a, r) => a + r.count, 0);
+
+function LostLeadsSection() {
+  return (
+    <div className={styles.lostLeads}>
+      <div className={styles.lostSummary}>
+        <span className={styles.lostTotal}>{TOTAL_LOST}</span>
+        <span className={styles.lostLabel}>enquiries closed as lost this month</span>
+      </div>
+      <div className={styles.lostRows}>
+        {LOST_REASONS.map((r) => (
+          <div key={r.reason} className={styles.lostRow}>
+            <span className={styles.lostReason}>{r.reason}</span>
+            <div className={styles.lostBar}>
+              <div className={styles.lostBarFill} style={{ width: `${r.pct}%` }} />
+            </div>
+            <span className={styles.lostCount}>{r.count}</span>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }

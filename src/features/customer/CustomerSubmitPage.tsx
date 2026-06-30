@@ -1,6 +1,8 @@
 import { useState, useRef } from 'react';
-import { CheckCircle2, Car, Wrench, MapPin, CreditCard, ClipboardList, Camera, X, ArrowLeft } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
+import { CheckCircle2, Car, Wrench, MapPin, CreditCard, ClipboardList, Camera, X, ArrowLeft, Clock, AlertTriangle, Search } from 'lucide-react';
 import { BranchSelector } from './components/BranchSelector';
+import { ROUTES } from '@/constants/routes';
 import styles from './CustomerSubmitPage.module.css';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
@@ -69,12 +71,95 @@ const STEPS = [
 
 // ── Main component ─────────────────────────────────────────────────────────────
 
+// ── Link-state screens ─────────────────────────────────────────────────────────
+// Simulate WhatsApp-linked journey states via ?state= param (real backend validates token server-side)
+
+function LinkExpiredScreen() {
+  return (
+    <div className={styles.page}>
+      <div className={styles.header}><div className={styles.logo}>WindX Glass</div></div>
+      <div className={styles.confirmScreen}>
+        <div className={`${styles.confirmIcon} ${styles.iconWarning}`}><Clock size={52} /></div>
+        <h2 className={styles.confirmTitle}>Link Expired</h2>
+        <p className={styles.confirmDesc}>
+          This booking link has expired. WhatsApp links are valid for 48 hours.
+          Please contact us to get a fresh link.
+        </p>
+        <div className={styles.refBox} style={{ background: 'none' }}>
+          <span className={styles.refLabel}>Need help?</span>
+          <a href="tel:04023456789" className={styles.supportLink}>040-23456789</a>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function LinkAlreadySubmittedScreen({ refNo }: { refNo?: string }) {
+  return (
+    <div className={styles.page}>
+      <div className={styles.header}><div className={styles.logo}>WindX Glass</div></div>
+      <div className={styles.confirmScreen}>
+        <div className={styles.confirmIcon}><CheckCircle2 size={52} /></div>
+        <h2 className={styles.confirmTitle}>Already Submitted</h2>
+        <p className={styles.confirmDesc}>
+          A request has already been submitted using this link. You can track your request status below.
+        </p>
+        {refNo && (
+          <div className={styles.refBox}>
+            <span className={styles.refLabel}>Your Reference</span>
+            <span className={styles.refNo}>{refNo}</span>
+          </div>
+        )}
+        <a
+          href={`${ROUTES.TRACK}?ref=${refNo ?? 'SUB-DEMO1'}`}
+          className={styles.btnNext}
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', textDecoration: 'none' }}
+        >
+          <Search size={15} />
+          Track My Request
+        </a>
+      </div>
+    </div>
+  );
+}
+
+function LinkInvalidScreen() {
+  return (
+    <div className={styles.page}>
+      <div className={styles.header}><div className={styles.logo}>WindX Glass</div></div>
+      <div className={styles.confirmScreen}>
+        <div className={`${styles.confirmIcon} ${styles.iconDanger}`}><AlertTriangle size={52} /></div>
+        <h2 className={styles.confirmTitle}>Invalid Link</h2>
+        <p className={styles.confirmDesc}>
+          This link is not valid or has already been used. Please contact WindX Glass directly.
+        </p>
+        <div className={styles.refBox} style={{ background: 'none' }}>
+          <span className={styles.refLabel}>Contact us</span>
+          <a href="tel:04023456789" className={styles.supportLink}>040-23456789</a>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Main form ──────────────────────────────────────────────────────────────────
+
 export function CustomerSubmitPage() {
+  const [searchParams] = useSearchParams();
+  const linkState = searchParams.get('state');     // 'expired' | 'submitted' | 'invalid'
+  const existingRef = searchParams.get('ref');     // reference if already submitted
+
+  // All hooks must come before any early returns (React rules of hooks)
   const [step,      setStep]      = useState<Step>(1);
   const [form,      setForm]      = useState<FormState>(EMPTY);
   const [errors,    setErrors]    = useState<Partial<Record<keyof FormState, string>>>({});
   const [submitted, setSubmitted] = useState(false);
   const [refNo,     setRefNo]     = useState('');
+
+  // Render link-state screens (no form needed)
+  if (linkState === 'expired')   return <LinkExpiredScreen />;
+  if (linkState === 'submitted') return <LinkAlreadySubmittedScreen refNo={existingRef ?? undefined} />;
+  if (linkState === 'invalid')   return <LinkInvalidScreen />;
 
   function update<K extends keyof FormState>(key: K, val: FormState[K]) {
     setForm((f) => ({ ...f, [key]: val }));
@@ -606,7 +691,15 @@ function ConfirmationScreen({
             {branchName}
           </div>
         )}
-        <button type="button" className={styles.btnNext} onClick={onNew}>
+        <a
+          href={`${ROUTES.TRACK}?ref=${refNo}`}
+          className={styles.btnNext}
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', textDecoration: 'none' }}
+        >
+          <Search size={15} />
+          Track My Request
+        </a>
+        <button type="button" className={styles.btnBack} style={{ width: '100%', justifyContent: 'center' }} onClick={onNew}>
           Submit another request
         </button>
       </div>

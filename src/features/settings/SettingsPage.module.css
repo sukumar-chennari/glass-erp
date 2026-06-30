@@ -150,3 +150,62 @@
   color: var(--color-primary);
   font-weight: 600;
 }
+
+/* ── Security & Sessions ── */
+.securityWrap { display: flex; flex-direction: column; gap: var(--space-3); }
+.secSubTitle {
+  display: flex; align-items: center; gap: var(--space-2);
+  font-size: var(--font-size-xs); font-weight: 700;
+  letter-spacing: .05em; text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.sessionList { display: flex; flex-direction: column; gap: var(--space-2); }
+.sessionRow {
+  display: flex; align-items: center; gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-bg-subtle);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+.sessionInfo { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.sessionDevice { font-size: var(--font-size-sm); font-weight: 500; color: var(--color-text-primary); }
+.sessionMeta   { font-size: var(--font-size-xs); color: var(--color-text-muted); }
+.sessionAgo    { font-size: var(--font-size-xs); color: var(--color-text-muted); }
+.currentBadge {
+  font-size: 11px; font-weight: 600; padding: 2px 8px;
+  background: color-mix(in srgb, var(--color-primary) 10%, transparent);
+  color: var(--color-primary);
+  border: 1px solid color-mix(in srgb, var(--color-primary) 25%, transparent);
+  border-radius: var(--radius-full, 999px);
+  white-space: nowrap;
+}
+
+.activityList { display: flex; flex-direction: column; }
+.activityRow {
+  display: flex; align-items: center; gap: var(--space-3);
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+.activityRow:last-child { border-bottom: none; }
+.activityFail { opacity: .85; }
+
+.activityDot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.activityDotOk   { background: #10b981; }
+.activityDotFail { background: #ef4444; }
+
+.activityInfo  { flex: 1; display: flex; flex-direction: column; gap: 1px; }
+.activityAction{ font-size: var(--font-size-sm); font-weight: 500; color: var(--color-text-primary); }
+.activityMeta  { font-size: var(--font-size-xs); color: var(--color-text-muted); }
+
+.failBadge {
+  font-size: 11px; font-weight: 600; padding: 2px 7px;
+  background: color-mix(in srgb, #ef4444 10%, transparent);
+  color: #ef4444;
+  border: 1px solid color-mix(in srgb, #ef4444 25%, transparent);
+  border-radius: var(--radius-full, 999px);
+}

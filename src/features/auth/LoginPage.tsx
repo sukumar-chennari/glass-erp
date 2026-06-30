@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Eye, EyeOff } from 'lucide-react';
@@ -21,6 +21,9 @@ export function LoginPage() {
   const [fieldErrors,  setFieldErrors]  = useState<{ identifier?: string; password?: string }>({});
   const [formError,    setFormError]    = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [lockUntil,    setLockUntil]    = useState<Date | null>(null);
+  const [countdown,    setCountdown]    = useState('');
+  const countdownRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Redirect if already authenticated (handles direct navigation to /login)
   useEffect(() => {
@@ -28,6 +31,27 @@ export function LoginPage() {
       navigate(ROUTES.DASHBOARD, { replace: true });
     }
   }, [session, isLoading, navigate]);
+
+  // Live countdown timer for account lockout
+  useEffect(() => {
+    if (!lockUntil) return;
+    function tick() {
+      const remaining = lockUntil!.getTime() - Date.now();
+      if (remaining <= 0) {
+        setLockUntil(null);
+        setCountdown('');
+        setFormError('');
+        if (countdownRef.current) clearInterval(countdownRef.current);
+        return;
+      }
+      const m = Math.floor(remaining / 60_000);
+      const s = Math.floor((remaining % 60_000) / 1_000);
+      setCountdown(`${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`);
+    }
+    tick();
+    countdownRef.current = setInterval(tick, 1_000);
+    return () => { if (countdownRef.current) clearInterval(countdownRef.current); };
+  }, [lockUntil]);
 
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,11 +76,11 @@ export function LoginPage() {
           navigate(`${ROUTES.VERIFY_OTP}?token=${err.otpToken ?? ''}`, { replace: true });
           return;
         } else if (err.code === 'ACCOUNT_LOCKED') {
-          // Compute remaining minutes from lockUntil ISO timestamp
-          const minutes = err.lockUntil
-            ? Math.max(1, Math.ceil((new Date(err.lockUntil).getTime() - Date.now()) / 60_000))
-            : 30;
-          setFormError(t('errors.accountLocked', { minutes }));
+          const until = err.lockUntil
+            ? new Date(err.lockUntil)
+            : new Date(Date.now() + 30 * 60_000);
+          setLockUntil(until);
+          setFormError(t('errors.accountLocked', { minutes: Math.ceil((until.getTime() - Date.now()) / 60_000) }));
         } else if (err.code === 'ACCOUNT_INACTIVE') {
           setFormError(t('errors.accountInactive'));
         } else {
@@ -112,8 +136,13 @@ export function LoginPage() {
         />
 
         {formError && <p className={styles.formError} role="alert">{formError}</p>}
+        {lockUntil && countdown && (
+          <p className={styles.lockCountdown} role="status">
+            Try again in <strong>{countdown}</strong>
+          </p>
+        )}
 
-        <Button type="submit" variant="primary" size="lg" fullWidth loading={isSubmitting}>
+        <Button type="submit" variant="primary" size="lg" fullWidth loading={isSubmitting} disabled={!!lockUntil}>
           {t('form.submit')}
         </Button>
       </form>

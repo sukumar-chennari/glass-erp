@@ -25,6 +25,7 @@ export const ROUTES = {
   SETTINGS_BRANCHES: '/settings/branches',
   SETTINGS_PRICING:  '/settings/pricing',
   SUBMIT:            '/submit',
+  TRACK:             '/track',
 } as const;
 
 export type AppRoute = typeof ROUTES[keyof typeof ROUTES];

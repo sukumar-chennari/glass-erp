@@ -41,6 +41,7 @@ import { BranchesPage }        from '@/features/settings/pages/BranchesPage';
 import { PricingPage }         from '@/features/settings/pages/PricingPage';
 import { EnquiryPage }         from '@/features/enquiry/EnquiryPage';
 import { CustomerSubmitPage }  from '@/features/customer/CustomerSubmitPage';
+import { CustomerTrackPage }   from '@/features/customer/CustomerTrackPage';
 
 import { ROUTES }              from '@/constants/routes';
 
@@ -69,6 +70,11 @@ export const router = createBrowserRouter([
   {
     path:         ROUTES.SUBMIT,
     element:      <CustomerSubmitPage />,
+    errorElement: <RouterErrorPage />,
+  },
+  {
+    path:         ROUTES.TRACK,
+    element:      <CustomerTrackPage />,
     errorElement: <RouterErrorPage />,
   },
 

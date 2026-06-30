@@ -30,6 +30,17 @@
   border-radius: var(--radius-md);
 }
 
+.lockCountdown {
+  font-size:     var(--font-size-sm);
+  color:         var(--color-text-muted);
+  text-align:    center;
+  margin:        -8px 0 0;
+}
+.lockCountdown strong {
+  color:         var(--color-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
 .forgotLink {
   display:         block;
   text-align:      center;
