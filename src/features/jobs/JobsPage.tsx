@@ -36,10 +36,7 @@ export function JobsPage() {
   const [editingJob, setEditingJob] = useState<Job | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
 
-  if (session?.role === 'technician') {
-    return <TechnicianJobView />;
-  }
-
+  // useMemo must be called before any conditional return (Rules of Hooks)
   const customerOptions = useMemo<SelectOption[]>(
     () => customers.map((c) => ({ value: c.id, label: `${c.name} (${c.phone})` })),
     [customers],
@@ -49,6 +46,10 @@ export function JobsPage() {
     () => technicians.map((tech) => ({ value: tech.id, label: tech.name })),
     [technicians],
   );
+
+  if (session?.role === 'technician') {
+    return <TechnicianJobView />;
+  }
 
   const openAdd  = () => { setEditingJob(null); setModalOpen(true); };
   const openEdit = (j: Job) => { setEditingJob(j); setModalOpen(true); };

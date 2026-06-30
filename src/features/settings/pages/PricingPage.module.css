@@ -1,0 +1,61 @@
+.tableWrap { overflow-x: auto; }
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-sm);
+}
+
+.table th {
+  text-align: left;
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  border-bottom: 2px solid var(--color-border);
+  white-space: nowrap;
+}
+
+.table td {
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: middle;
+}
+
+.table tr:last-child td { border-bottom: none; }
+
+.table tr:hover td { background: var(--color-bg-subtle); }
+
+.glassCol  { min-width: 200px; }
+.glassLabel {
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.priceVal {
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-primary);
+}
+
+.priceInput {
+  width: 90px;
+  padding: 6px 10px;
+  font-size: var(--font-size-sm);
+  border: 1.5px solid var(--color-primary);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-light);
+  color: var(--color-text-primary);
+  outline: none;
+  font-variant-numeric: tabular-nums;
+}
+
+.hint {
+  margin-top: var(--space-4);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  line-height: 1.6;
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border);
+}

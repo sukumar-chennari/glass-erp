@@ -95,6 +95,17 @@
   opacity: 0.65;
 }
 
+.cardAssigned {
+  border-color: color-mix(in srgb, var(--color-primary) 35%, transparent);
+  background: color-mix(in srgb, var(--color-primary) 3%, var(--color-bg-light));
+}
+
+.assignedChip {
+  color: var(--color-primary) !important;
+  border-color: color-mix(in srgb, var(--color-primary) 35%, transparent) !important;
+  background: color-mix(in srgb, var(--color-primary) 8%, transparent) !important;
+}
+
 .cardHeader {
   display: flex;
   align-items: center;
@@ -188,4 +199,69 @@
 .empty p {
   margin: 0;
   font-size: var(--font-size-sm);
+}
+
+/* ── Card state variants ─────────────────────────────────────────────── */
+.cardWorking {
+  border-color: color-mix(in srgb, #10b981 35%, transparent);
+  background: color-mix(in srgb, #10b981 3%, var(--color-bg-light));
+}
+
+.cardInTransit {
+  border-color: color-mix(in srgb, #3b82f6 30%, transparent);
+  background: color-mix(in srgb, #3b82f6 2%, var(--color-bg-light));
+}
+
+/* ── Stage progress bar ──────────────────────────────────────────────── */
+.stageBar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: var(--space-1) 0;
+}
+
+.stageDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  transition: background var(--transition-fast);
+}
+
+/* Make the line between dots */
+.stageDot + .stageDot {
+  position: relative;
+}
+
+.stageDot + .stageDot::before {
+  content: '';
+  position: absolute;
+  left: -4px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 1.5px;
+  background: var(--color-border);
+}
+
+.stageDotDone {
+  background: #10b981;
+}
+
+.stageDotActive {
+  background: var(--color-primary);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-primary) 25%, transparent);
+}
+
+.stageDotPending {
+  background: var(--color-border);
+}
+
+/* ── Stage timestamp ─────────────────────────────────────────────────── */
+.stageTs {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--color-text-muted);
 }

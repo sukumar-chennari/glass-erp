@@ -123,3 +123,74 @@
   font-size: var(--font-size-sm);
   padding: var(--space-4);
 }
+
+/* ── TAT ── */
+.tatGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-5);
+}
+.tatBox   { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.tatBig   { font-size: 2rem; font-weight: 700; color: var(--color-text-primary); }
+.tatDanger{ color: var(--color-danger, #e53e3e); }
+.tatLabel { font-size: var(--font-size-xs); color: var(--color-text-muted); text-align: center; }
+.tatNote  { padding: var(--space-3) var(--space-5); font-size: var(--font-size-xs); color: var(--color-text-muted); border-top: 1px solid var(--color-border); }
+.overdueWarn {
+  display: inline-flex; align-items: center; gap: 4px;
+  color: var(--color-danger, #e53e3e);
+  margin-left: var(--space-2);
+}
+
+/* ── Branch table ── */
+.branchTable { padding: 0 var(--space-5) var(--space-4); }
+.branchHeader {
+  display: grid; grid-template-columns: 1fr 80px 80px 120px;
+  gap: var(--space-3);
+  font-size: var(--font-size-xs); font-weight: 600; color: var(--color-text-muted);
+  text-transform: uppercase; letter-spacing: .04em;
+  padding: var(--space-2) 0;
+  border-bottom: 2px solid var(--color-border);
+}
+.branchRow {
+  display: grid; grid-template-columns: 1fr 80px 80px 120px;
+  gap: var(--space-3); align-items: center;
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--color-border);
+  font-size: var(--font-size-sm);
+}
+.branchRow:last-child { border-bottom: none; }
+.branchName  { font-weight: 500; color: var(--color-text-primary); }
+.branchBarWrap { display: flex; align-items: center; gap: var(--space-2); }
+.branchBar { height: 6px; background: var(--color-primary); border-radius: 3px; min-width: 2px; }
+.branchPct { font-size: var(--font-size-xs); color: var(--color-text-muted); }
+.branchNote { font-size: var(--font-size-xs); color: var(--color-text-muted); padding: var(--space-3) var(--space-5) 0; border-top: 1px solid var(--color-border); }
+
+/* ── Stock health ── */
+.stockSummary {
+  display: flex; gap: var(--space-3);
+  padding: var(--space-4) var(--space-5) var(--space-3);
+}
+.stockBadge {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-bg-subtle);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-xs); color: var(--color-text-muted);
+  flex: 1;
+}
+.stockNum  { font-size: 1.5rem; font-weight: 700; color: var(--color-text-primary); }
+.stockOos  { background: color-mix(in srgb, var(--color-danger, #e53e3e) 8%, var(--color-bg-subtle)); }
+.stockOos .stockNum { color: var(--color-danger, #e53e3e); }
+.stockLow  { background: color-mix(in srgb, var(--color-warning, #ed8936) 8%, var(--color-bg-subtle)); }
+.stockLow .stockNum { color: var(--color-warning, #ed8936); }
+
+.stockAlerts { display: flex; flex-direction: column; gap: var(--space-2); padding: 0 var(--space-5) var(--space-4); }
+.alertRow {
+  display: flex; align-items: center; gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+}
+.alertOos { background: color-mix(in srgb, var(--color-danger, #e53e3e) 8%, transparent); color: var(--color-danger, #e53e3e); }
+.alertLow { background: color-mix(in srgb, var(--color-warning, #ed8936) 8%, transparent); color: var(--color-warning, #ed8936); }

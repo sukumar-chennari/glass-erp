@@ -41,3 +41,39 @@
   .row  { grid-template-columns: 1fr; }
   .row3 { grid-template-columns: 1fr; }
 }
+
+/* ── Tabs ──────────────────────────────────────────────────────────── */
+.tabBar {
+  display: flex;
+  border-bottom: 1px solid var(--color-border);
+  margin-bottom: var(--space-4);
+  gap: 0;
+}
+
+.tab {
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--color-text-muted);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  cursor: pointer;
+  transition: color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.tab:hover { color: var(--color-text-primary); }
+
+.tabActive {
+  color: var(--color-primary) !important;
+  border-bottom-color: var(--color-primary) !important;
+  font-weight: 600;
+}
+
+/* ── Operations panel ─────────────────────────────────────────────── */
+.opsPanel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}

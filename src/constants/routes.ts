@@ -20,9 +20,11 @@ export const ROUTES = {
   CLAIMS:         '/insurance-claims',
   REPORTS:        '/reports',
   SETTINGS:       '/settings',
-  ENQUIRY:          '/enquiry',
-  SETTINGS_USERS:   '/settings/users',
-  SETTINGS_BRANCHES:'/settings/branches',
+  ENQUIRY:           '/enquiry',
+  SETTINGS_USERS:    '/settings/users',
+  SETTINGS_BRANCHES: '/settings/branches',
+  SETTINGS_PRICING:  '/settings/pricing',
+  SUBMIT:            '/submit',
 } as const;
 
 export type AppRoute = typeof ROUTES[keyof typeof ROUTES];

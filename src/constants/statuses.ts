@@ -62,6 +62,11 @@ export const PO_STATUS_MAP: Record<PoStatus, StatusDisplay> = {
 // ── Job Card ────────────────────────────────────────────────────────
 export const JOB_STATUS = {
   PENDING:     'Pending',
+  ASSIGNED:    'Assigned',
+  ACCEPTED:    'Accepted',
+  TRAVELLING:  'Travelling',
+  ARRIVED:     'Arrived',
+  WORKING:     'Working',
   IN_PROGRESS: 'In Progress',
   COMPLETED:   'Completed',
   CANCELLED:   'Cancelled',
@@ -71,6 +76,11 @@ export type JobStatus = typeof JOB_STATUS[keyof typeof JOB_STATUS];
 
 export const JOB_STATUS_MAP: Record<JobStatus, StatusDisplay> = {
   [JOB_STATUS.PENDING]:     { label: 'Pending',     variant: 'neutral' },
+  [JOB_STATUS.ASSIGNED]:    { label: 'Assigned',    variant: 'primary' },
+  [JOB_STATUS.ACCEPTED]:    { label: 'Accepted',    variant: 'info'    },
+  [JOB_STATUS.TRAVELLING]:  { label: 'Travelling',  variant: 'info'    },
+  [JOB_STATUS.ARRIVED]:     { label: 'Arrived',     variant: 'warning' },
+  [JOB_STATUS.WORKING]:     { label: 'Working',     variant: 'primary' },
   [JOB_STATUS.IN_PROGRESS]: { label: 'In Progress', variant: 'warning' },
   [JOB_STATUS.COMPLETED]:   { label: 'Completed',   variant: 'success' },
   [JOB_STATUS.CANCELLED]:   { label: 'Cancelled',   variant: 'danger'  },
@@ -129,4 +139,26 @@ export const TECH_STATUS_MAP: Record<TechStatus, StatusDisplay> = {
   [TECH_STATUS.TRAINING]: { label: 'Training', variant: 'warning' },
   [TECH_STATUS.INACTIVE]: { label: 'Inactive', variant: 'neutral' },
   [TECH_STATUS.ON_LEAVE]: { label: 'On Leave', variant: 'neutral' },
+};
+
+// ── Payment ─────────────────────────────────────────────────────────
+export const PAYMENT_STATUS = {
+  PENDING:             'Pending',
+  CASH_COLLECTED:      'Cash Collected',
+  EXCESS_PENDING:      'Excess Pending',
+  EXCESS_COLLECTED:    'Excess Collected',
+  INSURANCE_PENDING:   'Insurance Pending',
+  INSURANCE_SETTLED:   'Insurance Settled',
+  FINANCIALLY_CLOSED:  'Financially Closed',
+} as const;
+export type PaymentStatus = typeof PAYMENT_STATUS[keyof typeof PAYMENT_STATUS];
+
+export const PAYMENT_STATUS_MAP: Record<PaymentStatus, StatusDisplay> = {
+  [PAYMENT_STATUS.PENDING]:            { label: 'Payment Pending',    variant: 'neutral' },
+  [PAYMENT_STATUS.CASH_COLLECTED]:     { label: 'Cash Collected',     variant: 'success' },
+  [PAYMENT_STATUS.EXCESS_PENDING]:     { label: 'Excess Pending',     variant: 'warning' },
+  [PAYMENT_STATUS.EXCESS_COLLECTED]:   { label: 'Excess Collected',   variant: 'info'    },
+  [PAYMENT_STATUS.INSURANCE_PENDING]:  { label: 'Insurance Pending',  variant: 'warning' },
+  [PAYMENT_STATUS.INSURANCE_SETTLED]:  { label: 'Insurance Settled',  variant: 'success' },
+  [PAYMENT_STATUS.FINANCIALLY_CLOSED]: { label: 'Financially Closed', variant: 'success' },
 };

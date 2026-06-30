@@ -1,10 +1,11 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
-import { Sidebar }       from '@/components/layout/Sidebar';
-import { TopHeader }     from '@/components/layout/TopHeader';
-import { ErrorBoundary } from '@/components/ErrorBoundary';
-import { useAuth }       from '@/context/AuthContext';
+import { Sidebar }              from '@/components/layout/Sidebar';
+import { TopHeader }            from '@/components/layout/TopHeader';
+import { ErrorBoundary }        from '@/components/ErrorBoundary';
+import { SessionExpiredModal }  from '@/features/auth/SessionExpiredModal';
+import { useAuth }              from '@/context/AuthContext';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { closeMobileSidebar } from '@/store/slices/uiSlice';
+import { closeMobileSidebar }   from '@/store/slices/uiSlice';
 import { canRoleAccessPath, getRoleDefaultRoute } from '@/utils/roleRouting';
 import styles from './AppLayout.module.css';
 
@@ -30,6 +31,7 @@ export function AppLayout() {
 
   return (
     <div className={styles.root}>
+      <SessionExpiredModal />
       <Sidebar />
 
       {/* Tap-away overlay on mobile */}

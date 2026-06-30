@@ -204,3 +204,107 @@
   justify-content: flex-end;
   gap: var(--space-3);
 }
+
+/* ── View tabs (Enquiries / Submissions) ─────────────────────────────── */
+.viewTabs {
+  display: flex;
+  gap: var(--space-1);
+  border-bottom: 1px solid var(--color-border);
+  margin-bottom: var(--space-5);
+}
+
+.viewTab {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--color-text-muted);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  cursor: pointer;
+  transition: color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.viewTab:hover {
+  color: var(--color-text-primary);
+}
+
+.viewTabActive {
+  color: var(--color-primary) !important;
+  border-bottom-color: var(--color-primary) !important;
+  font-weight: 600;
+}
+
+.viewTabBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+  background: var(--color-primary);
+  border-radius: var(--radius-full, 999px);
+}
+
+/* ── Price group ─────────────────────────────────────────────────────── */
+.priceGroup {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.brandChip {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  background: var(--color-bg-subtle);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 1px 5px;
+}
+
+/* ── Submissions ─────────────────────────────────────────────────────── */
+.subDesc {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+  max-width: 260px;
+}
+
+.photoChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #3b82f6;
+  background: color-mix(in srgb, #3b82f6 10%, transparent);
+  border-radius: var(--radius-sm);
+  padding: 1px 6px;
+  width: fit-content;
+}
+
+.subEmpty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-8) var(--space-4);
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.subEmpty p {
+  margin: 0;
+  font-size: var(--font-size-sm);
+}

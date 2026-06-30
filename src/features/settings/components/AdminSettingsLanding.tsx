@@ -31,15 +31,15 @@ const CARDS: EntryCard[] = [
     icon:      Tag,
     title:     'Pricing',
     desc:      'Configure glass type pricing and labour rates.',
-    href:      '#',
-    available: false,
+    href:      ROUTES.SETTINGS_PRICING,
+    available: true,
   },
   {
     icon:      BarChart2,
     title:     'Reports',
     desc:      'Business reports, exports, and performance snapshots.',
     href:      ROUTES.REPORTS,
-    available: false,
+    available: true,
   },
 ];
 

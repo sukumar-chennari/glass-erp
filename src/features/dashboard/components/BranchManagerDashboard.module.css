@@ -108,6 +108,9 @@
   color: #ef4444;
   white-space: nowrap;
 }
+.tatDateDanger { color: #ef4444; font-weight: 600; }
+.tatDateWarn   { color: #f59e0b; font-weight: 600; }
+.tatItemDanger { background: color-mix(in srgb, #ef4444 4%, transparent); }
 
 /* ── Active Jobs ─────────────────────────────────────────────────────── */
 .jobNo {
@@ -195,4 +198,10 @@
 .techJobs {
   font-size: var(--font-size-xs);
   color: var(--color-text-muted);
+}
+
+.unassigned {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  font-style: italic;
 }

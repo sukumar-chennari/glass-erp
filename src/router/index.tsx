@@ -38,7 +38,9 @@ import { ReportsPage }         from '@/features/reports/ReportsPage';
 import { SettingsPage }        from '@/features/settings/SettingsPage';
 import { UsersPage }           from '@/features/settings/pages/UsersPage';
 import { BranchesPage }        from '@/features/settings/pages/BranchesPage';
+import { PricingPage }         from '@/features/settings/pages/PricingPage';
 import { EnquiryPage }         from '@/features/enquiry/EnquiryPage';
+import { CustomerSubmitPage }  from '@/features/customer/CustomerSubmitPage';
 
 import { ROUTES }              from '@/constants/routes';
 
@@ -62,6 +64,11 @@ export const router = createBrowserRouter([
   {
     path:         ROUTES.VERIFY_OTP,
     element:      <VerifyOtpPage />,
+    errorElement: <RouterErrorPage />,
+  },
+  {
+    path:         ROUTES.SUBMIT,
+    element:      <CustomerSubmitPage />,
     errorElement: <RouterErrorPage />,
   },
 
@@ -91,6 +98,7 @@ export const router = createBrowserRouter([
           { path: ROUTES.SETTINGS,          element: <SettingsPage /> },
           { path: ROUTES.SETTINGS_USERS,    element: <UsersPage /> },
           { path: ROUTES.SETTINGS_BRANCHES, element: <BranchesPage /> },
+          { path: ROUTES.SETTINGS_PRICING,  element: <PricingPage /> },
           { path: ROUTES.ENQUIRY,           element: <EnquiryPage /> },
         ],
       },

@@ -7,7 +7,7 @@
  * To swap mock → real API: change one import in src/services/auth/index.ts.
  */
 
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useRef, useState, useCallback, type ReactNode } from 'react';
 import { authService } from '@/services/auth';
 import type { Session, LoginCredentials, VerifyOtpOptions } from '@/services/auth';
 
@@ -18,8 +18,9 @@ export { AuthError } from '@/services/auth';
 // ── Context ───────────────────────────────────────────────────────────────────
 
 interface AuthContextValue {
-  session:   Session | null;
-  isLoading: boolean;
+  session:          Session | null;
+  isLoading:        boolean;
+  isSessionExpired: boolean;
   /**
    * Authenticate with identifier + password.
    * Returns the Session on success (OTP skipped).
@@ -39,11 +40,16 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+// 30-minute inactivity timeout
+const INACTIVITY_MS = 30 * 60 * 1000;
+
 // ── Provider ──────────────────────────────────────────────────────────────────
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [session,   setSession]   = useState<Session | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [session,          setSession]          = useState<Session | null>(null);
+  const [isLoading,        setIsLoading]        = useState(true);
+  const [isSessionExpired, setIsSessionExpired] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     authService.getSession()
@@ -53,17 +59,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = async (credentials: LoginCredentials): Promise<Session> => {
-    // If OTP is required, authService.login throws AuthError(OTP_REQUIRED).
-    // That propagates to the caller (LoginPage) which handles the navigation.
     const newSession = await authService.login(credentials);
     setSession(newSession);
+    setIsSessionExpired(false);
     return newSession;
   };
 
-  const logout = () => {
-    setSession(null);                // clear immediately — navigation can follow right away
-    void authService.logout();       // server-side cleanup, fire-and-forget
-  };
+  const logout = useCallback(() => {
+    setSession(null);
+    setIsSessionExpired(false);
+    if (timerRef.current) clearTimeout(timerRef.current);
+    void authService.logout();
+  }, []);
 
   const verifyOtp = async (opts: VerifyOtpOptions): Promise<Session> => {
     const newSession = await authService.verifyOtp(opts);
@@ -75,8 +82,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await authService.resendOtp(otpToken);
   };
 
+  // Inactivity timer: fires after INACTIVITY_MS of no user input
+  const resetTimer = useCallback(() => {
+    if (!session) return;
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => {
+      setIsSessionExpired(true);
+      setSession(null);
+      void authService.logout();
+    }, INACTIVITY_MS);
+  }, [session]);
+
+  useEffect(() => {
+    if (!session) return;
+    const events = ['mousemove', 'keydown', 'click', 'touchstart', 'scroll'] as const;
+    events.forEach((e) => window.addEventListener(e, resetTimer, { passive: true }));
+    resetTimer();
+    return () => {
+      events.forEach((e) => window.removeEventListener(e, resetTimer));
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, [session, resetTimer]);
+
   return (
-    <AuthContext.Provider value={{ session, isLoading, login, logout, verifyOtp, resendOtp }}>
+    <AuthContext.Provider value={{
+      session, isLoading, isSessionExpired,
+      login, logout, verifyOtp, resendOtp,
+    }}>
       {children}
     </AuthContext.Provider>
   );
@@ -93,9 +125,6 @@ export function useAuth(): AuthContextValue {
 /**
  * True when the current session includes the given permission string.
  * Use to conditionally render actions the user is not allowed to take.
- *
- * Example:
- *   const canWrite = useHasPermission('invoices:write');
  */
 export function useHasPermission(permission: string): boolean {
   const { session } = useAuth();

@@ -1,0 +1,111 @@
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+}
+
+.jobMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-bg-subtle);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-4);
+}
+
+.jobNo {
+  font-weight: 700;
+  font-family: monospace;
+  font-size: var(--font-size-xs);
+  color: var(--color-primary);
+}
+
+.vehicle {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.loading,
+.empty {
+  padding: var(--space-6) var(--space-4);
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.techRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-3);
+  border-radius: var(--radius-md);
+  border: 2px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  transition: background 0.12s, border-color 0.12s;
+}
+
+.techRow:hover:not(:disabled) {
+  background: var(--color-bg-subtle);
+  border-color: var(--color-border);
+}
+
+.selected {
+  background: color-mix(in srgb, var(--color-primary) 8%, transparent) !important;
+  border-color: var(--color-primary) !important;
+}
+
+.busy {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--color-primary) 12%, transparent);
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 15px;
+  flex-shrink: 0;
+}
+
+.techInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.techName {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.techSpec {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.loadChip {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}

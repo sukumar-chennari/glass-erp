@@ -3,11 +3,20 @@ import { mockableQuery, mockableMutation } from '@/services/mockUtils';
 import { jobMock } from '@/mocks/jobs';
 import { customerMock } from '@/mocks/customers';
 import { technicianMock } from '@/mocks/technicians';
-import type { Job, CreateJobDto } from '@/types/models/job';
+import type {
+  Job, CreateJobDto,
+  InsuranceProcessing, StockResolution, StageEvent,
+} from '@/types/models/job';
+import type { PaymentStatus } from '@/constants/statuses';
 
 interface UpdateJobArg extends Partial<CreateJobDto> {
-  id:      string;
-  status?: Job['status'];
+  id:                   string;
+  status?:              Job['status'];
+  technicianName?:      string;
+  stageHistory?:        StageEvent[];
+  paymentStatus?:       PaymentStatus;
+  insuranceProcessing?: InsuranceProcessing;
+  stockResolution?:     StockResolution;
 }
 
 export const jobsApi = baseApi.injectEndpoints({
@@ -42,7 +51,14 @@ export const jobsApi = baseApi.injectEndpoints({
 
     updateJob: builder.mutation<Job, UpdateJobArg>({
       ...mockableMutation<Job, UpdateJobArg>({
-        mockFn: ({ id, ...dto }) => jobMock.update(id, dto),
+        mockFn: ({ id, ...dto }) => {
+          // Resolve technician name when technicianId is being set
+          const technicianName =
+            dto.technicianId && !dto.technicianName
+              ? technicianMock.list().find((t) => t.id === dto.technicianId)?.name
+              : dto.technicianName;
+          return jobMock.update(id, { ...dto, technicianName });
+        },
         url: (arg) => `/jobs/${arg.id}`,
         method: 'PUT',
         body: ({ id: _id, ...dto }) => dto,

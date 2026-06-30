@@ -1,0 +1,120 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.tiersRow {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-3);
+}
+
+@media (max-width: 520px) {
+  .tiersRow { grid-template-columns: 1fr; }
+}
+
+.tier {
+  position: relative;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4) var(--space-3);
+  cursor: pointer;
+  text-align: left;
+  background: var(--color-bg-light);
+  transition: border-color 0.12s, background 0.12s;
+  width: 100%;
+}
+
+.tier:hover {
+  border-color: var(--color-primary);
+}
+
+.tierSelected {
+  border-color: var(--color-primary) !important;
+  background: color-mix(in srgb, var(--color-primary) 5%, transparent) !important;
+}
+
+.checkIcon {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  color: var(--color-primary);
+}
+
+.tierBrand {
+  font-size: var(--font-size-sm);
+  font-weight: 800;
+  color: var(--color-text-primary);
+  margin-bottom: 2px;
+}
+
+.tierDesc {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-1);
+}
+
+.tierWarranty {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-3);
+}
+
+.breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--space-2);
+}
+
+.bRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-primary);
+}
+
+.bLabel {
+  color: var(--color-text-muted);
+}
+
+.total {
+  font-weight: 700;
+  font-size: var(--font-size-sm);
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--space-1);
+  margin-top: 2px;
+}
+
+.stockRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin-top: var(--space-2);
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+.summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-bg-subtle);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+}
+
+.summaryLabel {
+  color: var(--color-text-muted);
+}
+
+.selectedPrice {
+  font-weight: 800;
+  font-size: 18px;
+  color: var(--color-primary);
+  font-variant-numeric: tabular-nums;
+}

@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Plus, PhoneCall, CheckCircle, ClipboardList } from 'lucide-react';
+import { Plus, PhoneCall, CheckCircle, ClipboardList, Inbox, Image, Eye } from 'lucide-react';
 import { PageShell, SectionCard } from '@/components/layout/PageShell';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -8,12 +8,17 @@ import { DataTable } from '@/components/ui/DataTable';
 import { Badge } from '@/components/ui/Badge';
 import { Modal } from '@/components/ui/Modal';
 import { useToast } from '@/components/ui/Toast';
+import { PricingBreakdown } from './components/PricingBreakdown';
+import { SubmissionReviewModal } from './components/SubmissionReviewModal';
+import type { CustomerSubmission } from './types';
 import type { TableColumn, SelectOption } from '@/types/ui';
 import styles from './EnquiryPage.module.css';
 
 // ── Types ──────────────────────────────────────────────────────────────
-type EnquiryStatus = 'pending' | 'price_confirmed' | 'converted' | 'closed';
-type EnquirySource = 'phone' | 'walk_in' | 'whatsapp';
+type EnquiryStatus  = 'pending' | 'price_confirmed' | 'converted' | 'closed';
+type EnquirySource  = 'phone' | 'walk_in' | 'whatsapp';
+type ViewTab        = 'enquiries' | 'submissions';
+type StatusFilter   = 'all' | EnquiryStatus;
 
 interface Enquiry {
   id:           string;
@@ -26,37 +31,40 @@ interface Enquiry {
   source:       EnquirySource;
   status:       EnquiryStatus;
   quotedPrice:  number | null;
+  priceBrand:   string | null;
   closeReason:  string | null;
   closeNotes:   string | null;
   createdAt:    string;
   jobRef:       string | null;
 }
 
+// CustomerSubmission imported from ./types
+
 // ── Constants ──────────────────────────────────────────────────────────
 const GLASS_OPTIONS: SelectOption[] = [
-  { value: 'Front Windshield',      label: 'Front Windshield' },
-  { value: 'Rear Windshield',       label: 'Rear Windshield' },
-  { value: 'Driver Side Window',    label: 'Driver Side Window' },
+  { value: 'Front Windshield',      label: 'Front Windshield'      },
+  { value: 'Rear Windshield',       label: 'Rear Windshield'       },
+  { value: 'Driver Side Window',    label: 'Driver Side Window'    },
   { value: 'Passenger Side Window', label: 'Passenger Side Window' },
-  { value: 'Rear Left Window',      label: 'Rear Left Window' },
-  { value: 'Rear Right Window',     label: 'Rear Right Window' },
-  { value: 'Sunroof Glass',         label: 'Sunroof Glass' },
-  { value: 'Quarter Glass',         label: 'Quarter Glass' },
+  { value: 'Rear Left Window',      label: 'Rear Left Window'      },
+  { value: 'Rear Right Window',     label: 'Rear Right Window'     },
+  { value: 'Sunroof Glass',         label: 'Sunroof Glass'         },
+  { value: 'Quarter Glass',         label: 'Quarter Glass'         },
 ];
 
 const SOURCE_OPTIONS: SelectOption[] = [
   { value: 'phone',    label: 'Phone Call' },
-  { value: 'walk_in',  label: 'Walk-in' },
-  { value: 'whatsapp', label: 'WhatsApp' },
+  { value: 'walk_in',  label: 'Walk-in'    },
+  { value: 'whatsapp', label: 'WhatsApp'   },
 ];
 
 const CLOSE_REASON_OPTIONS: SelectOption[] = [
-  { value: 'declined_price',  label: 'Customer declined price' },
-  { value: 'found_vendor',    label: 'Found another vendor' },
-  { value: 'wrong_number',    label: 'Wrong number' },
-  { value: 'test_spam',       label: 'Test / spam enquiry' },
-  { value: 'other_channel',   label: 'Converted via other channel' },
-  { value: 'other',           label: 'Other' },
+  { value: 'declined_price',  label: 'Customer declined price'       },
+  { value: 'found_vendor',    label: 'Found another vendor'          },
+  { value: 'wrong_number',    label: 'Wrong number'                  },
+  { value: 'test_spam',       label: 'Test / spam enquiry'           },
+  { value: 'other_channel',   label: 'Converted via other channel'  },
+  { value: 'other',           label: 'Other'                         },
 ];
 
 const CLOSE_REASON_LABEL: Record<string, string> = Object.fromEntries(
@@ -70,7 +78,15 @@ const STATUS_DISPLAY: Record<EnquiryStatus, { label: string; variant: 'info' | '
   closed:          { label: 'Closed',          variant: 'neutral' },
 };
 
-// ── Mock Data ──────────────────────────────────────────────────────────
+const FILTER_TABS: { id: StatusFilter; label: string }[] = [
+  { id: 'all',             label: 'All'             },
+  { id: 'pending',         label: 'Pending'         },
+  { id: 'price_confirmed', label: 'Price Confirmed' },
+  { id: 'converted',       label: 'Converted'       },
+  { id: 'closed',          label: 'Closed'          },
+];
+
+// ── Mock data ──────────────────────────────────────────────────────────
 let nextEnqNum = 1058;
 
 const INITIAL_ENQUIRIES: Enquiry[] = [
@@ -79,7 +95,8 @@ const INITIAL_ENQUIRIES: Enquiry[] = [
     phone: '9876543210', customerName: 'Ravi Kumar',
     vehicleNumber: 'DL 01 AB 1234', vehicleModel: 'Honda City 2020',
     glassType: 'Front Windshield', source: 'phone',
-    status: 'pending', quotedPrice: null, closeReason: null, closeNotes: null,
+    status: 'pending', quotedPrice: null, priceBrand: null,
+    closeReason: null, closeNotes: null,
     createdAt: '2026-06-29T09:15:00Z', jobRef: null,
   },
   {
@@ -87,7 +104,8 @@ const INITIAL_ENQUIRIES: Enquiry[] = [
     phone: '9876543211', customerName: 'Priya Sharma',
     vehicleNumber: 'HR 26 CD 5678', vehicleModel: 'Maruti Swift 2018',
     glassType: 'Rear Windshield', source: 'whatsapp',
-    status: 'price_confirmed', quotedPrice: 4200, closeReason: null, closeNotes: null,
+    status: 'price_confirmed', quotedPrice: 4400, priceBrand: 'OEE',
+    closeReason: null, closeNotes: null,
     createdAt: '2026-06-29T08:30:00Z', jobRef: null,
   },
   {
@@ -95,7 +113,8 @@ const INITIAL_ENQUIRIES: Enquiry[] = [
     phone: '9876543212', customerName: 'Mohan Singh',
     vehicleNumber: 'UP 07 EF 9012', vehicleModel: 'Hyundai i20 2021',
     glassType: 'Driver Side Window', source: 'walk_in',
-    status: 'converted', quotedPrice: 3800, closeReason: null, closeNotes: null,
+    status: 'converted', quotedPrice: 3100, priceBrand: 'OEM',
+    closeReason: null, closeNotes: null,
     createdAt: '2026-06-29T07:45:00Z', jobRef: 'JC-2025-0847',
   },
   {
@@ -103,7 +122,8 @@ const INITIAL_ENQUIRIES: Enquiry[] = [
     phone: '9876543213', customerName: 'Anjali Verma',
     vehicleNumber: 'MH 02 GH 3456', vehicleModel: 'Toyota Innova 2022',
     glassType: 'Sunroof Glass', source: 'phone',
-    status: 'closed', quotedPrice: 12500, closeReason: 'declined_price', closeNotes: 'Too expensive',
+    status: 'closed', quotedPrice: 16200, priceBrand: 'OEM',
+    closeReason: 'declined_price', closeNotes: 'Too expensive',
     createdAt: '2026-06-28T16:00:00Z', jobRef: null,
   },
   {
@@ -111,7 +131,8 @@ const INITIAL_ENQUIRIES: Enquiry[] = [
     phone: '9876543214', customerName: 'Suresh Reddy',
     vehicleNumber: 'TS 09 IJ 7890', vehicleModel: 'Kia Seltos 2023',
     glassType: 'Front Windshield', source: 'whatsapp',
-    status: 'pending', quotedPrice: null, closeReason: null, closeNotes: null,
+    status: 'pending', quotedPrice: null, priceBrand: null,
+    closeReason: null, closeNotes: null,
     createdAt: '2026-06-28T14:20:00Z', jobRef: null,
   },
   {
@@ -119,8 +140,44 @@ const INITIAL_ENQUIRIES: Enquiry[] = [
     phone: '9876543215', customerName: 'Kavita Nair',
     vehicleNumber: 'KL 07 MN 2345', vehicleModel: 'Tata Nexon EV 2023',
     glassType: 'Quarter Glass', source: 'phone',
-    status: 'price_confirmed', quotedPrice: 2100, closeReason: null, closeNotes: null,
+    status: 'price_confirmed', quotedPrice: 2100, priceBrand: 'OEE',
+    closeReason: null, closeNotes: null,
     createdAt: '2026-06-28T11:30:00Z', jobRef: null,
+  },
+];
+
+const INITIAL_SUBMISSIONS: CustomerSubmission[] = [
+  {
+    id: 'sub-001', phone: '9876541234', name: 'Karthik Rao',
+    vehicleNo: 'AP 10 AB 5678', vehicleMake: 'Maruti', vehicleModel: 'Baleno', vehicleYear: 2022,
+    glassType: 'Front Windshield', glassPosition: 'Front Windshield',
+    description: 'Stone chip — small crack spreading from impact point. Noticed yesterday morning.',
+    submittedAt: '2026-06-30T08:10:00Z',
+    photoCount: 3, rcUploaded: false, whatsappVerified: true,
+    preferredBranch: 'Hyderabad Main Branch',
+    paymentPreference: 'insurance',
+    insuranceInsurer: 'HDFC Ergo', insurancePolicyNo: 'HDFC-2024-KB-5432',
+  },
+  {
+    id: 'sub-002', phone: '9876548765', name: 'Fatima Sheikh',
+    vehicleNo: 'TN 22 CD 9012', vehicleMake: 'Hyundai', vehicleModel: 'Creta', vehicleYear: 2023,
+    glassType: 'Rear Windshield', glassPosition: 'Rear Windshield',
+    description: 'Complete shatter due to accident. Vehicle is currently at home. Urgent.',
+    submittedAt: '2026-06-30T07:45:00Z',
+    photoCount: 0, rcUploaded: true, whatsappVerified: false,
+    preferredBranch: 'Chennai East Branch',
+    paymentPreference: 'insurance',
+    insuranceInsurer: 'New India Assurance',
+  },
+  {
+    id: 'sub-003', phone: '9876542233', name: 'Ramesh Patil',
+    vehicleNo: 'MH 14 PQ 3344', vehicleMake: 'Tata', vehicleModel: 'Harrier', vehicleYear: 2023,
+    glassType: 'Driver Side Window', glassPosition: 'Driver Side Window',
+    description: 'Crack on driver window — noticed after parking lot incident. Need urgent replacement.',
+    submittedAt: '2026-06-30T06:55:00Z',
+    photoCount: 5, rcUploaded: true, whatsappVerified: true,
+    preferredBranch: 'Pune Central Branch',
+    paymentPreference: 'cash',
   },
 ];
 
@@ -131,21 +188,32 @@ function fmtDate(iso: string) {
   });
 }
 
-// ── Sub-modals ─────────────────────────────────────────────────────────
-interface CreateModalProps {
-  isOpen:  boolean;
-  onClose: () => void;
-  onSave:  (e: Omit<Enquiry, 'id' | 'enquiryNo' | 'status' | 'quotedPrice' | 'closeReason' | 'closeNotes' | 'createdAt' | 'jobRef'>) => void;
+// ── Create Enquiry Modal ───────────────────────────────────────────────
+interface CreateFormState {
+  phone: string; customerName: string; vehicleNumber: string;
+  vehicleModel: string; glassType: string; source: EnquirySource;
 }
 
-function CreateEnquiryModal({ isOpen, onClose, onSave }: CreateModalProps) {
-  const [form, setForm] = useState({
+interface CreateModalProps {
+  isOpen:    boolean;
+  onClose:   () => void;
+  prefill?:  Partial<CreateFormState> | null;
+  onSave:    (d: CreateFormState) => void;
+}
+
+function CreateEnquiryModal({ isOpen, onClose, prefill, onSave }: CreateModalProps) {
+  const [form, setForm] = useState<CreateFormState>({
     phone: '', customerName: '', vehicleNumber: '', vehicleModel: '',
-    glassType: 'Front Windshield', source: 'phone' as EnquirySource,
+    glassType: 'Front Windshield', source: 'phone',
   });
 
-  function f(key: keyof typeof form, val: string) {
-    setForm((prev) => ({ ...prev, [key]: val }));
+  // Apply prefill when modal opens with it
+  useState(() => {
+    if (isOpen && prefill) setForm((p) => ({ ...p, ...prefill }));
+  });
+
+  function f(k: keyof CreateFormState, v: string) {
+    setForm((prev) => ({ ...prev, [k]: v }));
   }
 
   function handleSave() {
@@ -215,33 +283,45 @@ function CreateEnquiryModal({ isOpen, onClose, onSave }: CreateModalProps) {
   );
 }
 
+// ── Confirm Price Modal ───────────────────────────────────────────────
 interface ConfirmPriceModalProps {
-  isOpen:   boolean;
-  onClose:  () => void;
-  enquiry:  Enquiry | null;
-  onSave:   (price: number) => void;
+  isOpen:  boolean;
+  onClose: () => void;
+  enquiry: Enquiry | null;
+  onSave:  (price: number, brand: string) => void;
 }
 
 function ConfirmPriceModal({ isOpen, onClose, enquiry, onSave }: ConfirmPriceModalProps) {
-  const [price, setPrice] = useState('');
+  const [selectedPrice, setSelectedPrice] = useState<number | null>(null);
+  const [selectedBrand, setSelectedBrand] = useState('');
+
+  function handleClose() {
+    setSelectedPrice(null);
+    setSelectedBrand('');
+    onClose();
+  }
 
   function handleSave() {
-    const n = Number(price);
-    if (!n || n <= 0) return;
-    onSave(n);
-    setPrice('');
+    if (!selectedPrice) return;
+    onSave(selectedPrice, selectedBrand);
+    setSelectedPrice(null);
+    setSelectedBrand('');
   }
 
   return (
     <Modal
       isOpen={isOpen}
-      onClose={() => { onClose(); setPrice(''); }}
+      onClose={handleClose}
       title="Confirm Price"
-      maxWidth="420px"
+      maxWidth="640px"
       footer={
         <div className={styles.modalFooter}>
-          <Button variant="ghost" onClick={() => { onClose(); setPrice(''); }}>Cancel</Button>
-          <Button onClick={handleSave} disabled={!price || Number(price) <= 0}>Confirm Price</Button>
+          <Button variant="ghost" onClick={handleClose}>Cancel</Button>
+          <Button onClick={handleSave} disabled={!selectedPrice}>
+            {selectedPrice
+              ? `Confirm ₹${selectedPrice.toLocaleString('en-IN')} (${selectedBrand})`
+              : 'Select a pricing tier above'}
+          </Button>
         </div>
       }
     >
@@ -253,26 +333,24 @@ function ConfirmPriceModal({ isOpen, onClose, enquiry, onSave }: ConfirmPriceMod
             <span className={styles.enquiryMetaGlass}>{enquiry.glassType}</span>
           </div>
         )}
-        <Input
-          label="Quoted Price (₹)"
-          type="number"
-          min="1"
-          value={price}
-          onChange={(e) => setPrice(e.target.value)}
-          placeholder="e.g. 4500"
-          fullWidth
-          autoFocus
-        />
+        {enquiry && (
+          <PricingBreakdown
+            glassType={enquiry.glassType}
+            vehicleModel={enquiry.vehicleModel}
+            onSelect={(price, brand) => { setSelectedPrice(price); setSelectedBrand(brand); }}
+          />
+        )}
       </div>
     </Modal>
   );
 }
 
+// ── Close Enquiry Modal ───────────────────────────────────────────────
 interface CloseModalProps {
-  isOpen:   boolean;
-  onClose:  () => void;
-  enquiry:  Enquiry | null;
-  onSave:   (reason: string, notes: string) => void;
+  isOpen:  boolean;
+  onClose: () => void;
+  enquiry: Enquiry | null;
+  onSave:  (reason: string, notes: string) => void;
 }
 
 function CloseEnquiryModal({ isOpen, onClose, enquiry, onSave }: CloseModalProps) {
@@ -324,37 +402,32 @@ function CloseEnquiryModal({ isOpen, onClose, enquiry, onSave }: CloseModalProps
 }
 
 // ── Main Page ──────────────────────────────────────────────────────────
-type StatusFilter = 'all' | EnquiryStatus;
-
-const FILTER_TABS: { id: StatusFilter; label: string }[] = [
-  { id: 'all',             label: 'All'             },
-  { id: 'pending',         label: 'Pending'         },
-  { id: 'price_confirmed', label: 'Price Confirmed' },
-  { id: 'converted',       label: 'Converted'       },
-  { id: 'closed',          label: 'Closed'          },
-];
-
 export function EnquiryPage() {
   const toast = useToast();
 
+  const [viewTab,    setViewTab]   = useState<ViewTab>('enquiries');
   const [enquiries,  setEnquiries] = useState<Enquiry[]>(INITIAL_ENQUIRIES);
+  const [submissions,setSubs]      = useState<CustomerSubmission[]>(INITIAL_SUBMISSIONS);
   const [filter,     setFilter]    = useState<StatusFilter>('all');
   const [createOpen, setCreate]    = useState(false);
+  const [prefill,    setPrefill]   = useState<Partial<CreateFormState> | null>(null);
   const [priceTgt,   setPriceTgt]  = useState<Enquiry | null>(null);
   const [closeTgt,   setCloseTgt]  = useState<Enquiry | null>(null);
+  const [reviewSub,  setReviewSub] = useState<CustomerSubmission | null>(null);
 
   const filtered = useMemo(
     () => filter === 'all' ? enquiries : enquiries.filter((e) => e.status === filter),
     [enquiries, filter],
   );
 
-  function handleCreate(data: Parameters<CreateModalProps['onSave']>[0]) {
+  function handleCreate(data: CreateFormState) {
     const e: Enquiry = {
       ...data,
       id:          `enq-${Date.now()}`,
       enquiryNo:   `ENQ-${nextEnqNum++}`,
       status:      'pending',
       quotedPrice: null,
+      priceBrand:  null,
       closeReason: null,
       closeNotes:  null,
       createdAt:   new Date().toISOString(),
@@ -363,21 +436,30 @@ export function EnquiryPage() {
     setEnquiries((prev) => [e, ...prev]);
     toast.success(`Enquiry ${e.enquiryNo} created.`);
     setCreate(false);
+    setPrefill(null);
   }
 
-  function handleConfirmPrice(price: number) {
+  function handleConfirmPrice(price: number, brand: string) {
     if (!priceTgt) return;
     setEnquiries((prev) =>
-      prev.map((e) => e.id === priceTgt.id ? { ...e, status: 'price_confirmed', quotedPrice: price } : e),
+      prev.map((e) =>
+        e.id === priceTgt.id
+          ? { ...e, status: 'price_confirmed', quotedPrice: price, priceBrand: brand }
+          : e,
+      ),
     );
-    toast.success(`Price ₹${price.toLocaleString('en-IN')} confirmed for ${priceTgt.enquiryNo}.`);
+    toast.success(`₹${price.toLocaleString('en-IN')} (${brand}) confirmed for ${priceTgt.enquiryNo}.`);
     setPriceTgt(null);
   }
 
   function handleClose(reason: string, notes: string) {
     if (!closeTgt) return;
     setEnquiries((prev) =>
-      prev.map((e) => e.id === closeTgt.id ? { ...e, status: 'closed', closeReason: reason, closeNotes: notes || null } : e),
+      prev.map((e) =>
+        e.id === closeTgt.id
+          ? { ...e, status: 'closed', closeReason: reason, closeNotes: notes || null }
+          : e,
+      ),
     );
     toast.success(`${closeTgt.enquiryNo} closed.`);
     setCloseTgt(null);
@@ -392,9 +474,26 @@ export function EnquiryPage() {
     toast.success(`${enquiry.enquiryNo} converted to job ${mockRef}.`);
   }
 
+  function handleCreateFromSubmission(sub: CustomerSubmission) {
+    setPrefill({
+      phone: sub.phone, customerName: sub.name,
+      vehicleNumber: sub.vehicleNo, vehicleModel: sub.vehicleModel,
+      glassType: sub.glassType, source: 'whatsapp',
+    });
+    setSubs((prev) => prev.filter((s) => s.id !== sub.id));
+    setViewTab('enquiries');
+    setCreate(true);
+  }
+
+  function handleDismissSubmission(id: string) {
+    setSubs((prev) => prev.filter((s) => s.id !== id));
+    toast.success('Submission dismissed.');
+  }
+
   const pendingCount   = enquiries.filter((e) => e.status === 'pending').length;
   const confirmedCount = enquiries.filter((e) => e.status === 'price_confirmed').length;
 
+  // ── Enquiry table columns ──────────────────────────────────────────
   const columns: TableColumn<Enquiry>[] = [
     {
       key: 'enquiryNo',
@@ -433,9 +532,14 @@ export function EnquiryPage() {
       header: 'Price',
       align: 'right' as const,
       render: (e) => (
-        <span className={styles.priceCell}>
-          {e.quotedPrice != null ? `₹${e.quotedPrice.toLocaleString('en-IN')}` : '—'}
-        </span>
+        <div className={styles.priceGroup}>
+          {e.quotedPrice != null
+            ? <span className={styles.priceCell}>₹{e.quotedPrice.toLocaleString('en-IN')}</span>
+            : <span className={styles.priceCell}>—</span>}
+          {e.priceBrand && (
+            <span className={styles.brandChip}>{e.priceBrand}</span>
+          )}
+        </div>
       ),
     },
     {
@@ -453,22 +557,14 @@ export function EnquiryPage() {
         <div className={styles.actionCell}>
           {e.status === 'pending' && (
             <>
-              <Button size="sm" onClick={() => setPriceTgt(e)}>
-                Confirm Price
-              </Button>
-              <Button size="sm" variant="ghost" onClick={() => setCloseTgt(e)}>
-                Close
-              </Button>
+              <Button size="sm" onClick={() => setPriceTgt(e)}>Confirm Price</Button>
+              <Button size="sm" variant="ghost" onClick={() => setCloseTgt(e)}>Close</Button>
             </>
           )}
           {e.status === 'price_confirmed' && (
             <>
-              <Button size="sm" variant="primary" onClick={() => handleConvert(e)}>
-                Convert to Job
-              </Button>
-              <Button size="sm" variant="ghost" onClick={() => setCloseTgt(e)}>
-                Close
-              </Button>
+              <Button size="sm" variant="primary" onClick={() => handleConvert(e)}>Convert to Job</Button>
+              <Button size="sm" variant="ghost" onClick={() => setCloseTgt(e)}>Close</Button>
             </>
           )}
           {e.status === 'converted' && (
@@ -487,58 +583,157 @@ export function EnquiryPage() {
     },
   ];
 
+  // ── Submission table columns ───────────────────────────────────────
+  const subColumns: TableColumn<CustomerSubmission>[] = [
+    {
+      key: 'submittedAt',
+      header: 'Received',
+      width: '100px',
+      render: (s) => <div className={styles.timeAgo}>{fmtDate(s.submittedAt)}</div>,
+    },
+    {
+      key: 'name',
+      header: 'Customer',
+      render: (s) => (
+        <div>
+          <div className={styles.cellBold}>{s.name}</div>
+          <div className={styles.cellMuted}>+91 {s.phone}</div>
+        </div>
+      ),
+    },
+    {
+      key: 'vehicleModel',
+      header: 'Vehicle',
+      render: (s) => (
+        <div>
+          <div className={styles.cellBold}>{s.vehicleMake} {s.vehicleModel} {s.vehicleYear}</div>
+          <div className={styles.cellMuted}>{s.vehicleNo}</div>
+        </div>
+      ),
+    },
+    { key: 'glassType', header: 'Glass' },
+    {
+      key: 'description',
+      header: 'Description',
+      render: (s) => (
+        <div className={styles.subDesc}>
+          <span>{s.description.slice(0, 70)}{s.description.length > 70 ? '…' : ''}</span>
+          {s.photoCount > 0 && (
+            <span className={styles.photoChip}><Image size={11} /> {s.photoCount} photos</span>
+          )}
+        </div>
+      ),
+    },
+    {
+      key: 'id',
+      header: 'Actions',
+      render: (s) => (
+        <div className={styles.actionCell}>
+          <Button size="sm" variant="secondary" leftIcon={<Eye size={13} />} onClick={() => setReviewSub(s)}>
+            Review
+          </Button>
+          <Button size="sm" onClick={() => handleCreateFromSubmission(s)}>
+            Create Enquiry
+          </Button>
+        </div>
+      ),
+    },
+  ];
+
   return (
     <PageShell
       heading="Enquiries"
       description="Manage customer enquiries — confirm prices, convert to jobs and close lost leads."
       actions={
-        <Button leftIcon={<Plus size={16} />} onClick={() => setCreate(true)}>
-          New Enquiry
-        </Button>
+        viewTab === 'enquiries' ? (
+          <Button leftIcon={<Plus size={16} />} onClick={() => setCreate(true)}>
+            New Enquiry
+          </Button>
+        ) : undefined
       }
     >
-      {/* Quick summary chips */}
-      <div className={styles.summaryRow}>
-        <div className={styles.summaryChip}>
-          <PhoneCall size={13} />
-          {pendingCount} pending
-        </div>
-        <div className={`${styles.summaryChip} ${styles.confirmedChip}`}>
-          <CheckCircle size={13} />
-          {confirmedCount} price confirmed
-        </div>
+      {/* View switcher */}
+      <div className={styles.viewTabs}>
+        <button
+          className={`${styles.viewTab} ${viewTab === 'enquiries' ? styles.viewTabActive : ''}`}
+          onClick={() => setViewTab('enquiries')}
+        >
+          Enquiries
+        </button>
+        <button
+          className={`${styles.viewTab} ${viewTab === 'submissions' ? styles.viewTabActive : ''}`}
+          onClick={() => setViewTab('submissions')}
+        >
+          <Inbox size={14} />
+          Customer Submissions
+          {submissions.length > 0 && (
+            <span className={styles.viewTabBadge}>{submissions.length}</span>
+          )}
+        </button>
       </div>
 
-      <SectionCard>
-        {/* Status filter tabs */}
-        <div className={styles.filterBar}>
-          {FILTER_TABS.map((tab) => {
-            const count = tab.id === 'all'
-              ? enquiries.length
-              : enquiries.filter((e) => e.status === tab.id).length;
-            return (
-              <button
-                key={tab.id}
-                className={`${styles.filterTab} ${filter === tab.id ? styles.filterActive : ''}`}
-                onClick={() => setFilter(tab.id)}
-              >
-                {tab.label}
-                <span className={styles.tabCount}>{count}</span>
-              </button>
-            );
-          })}
-        </div>
+      {viewTab === 'enquiries' ? (
+        <>
+          {/* Quick summary chips */}
+          <div className={styles.summaryRow}>
+            <div className={styles.summaryChip}>
+              <PhoneCall size={13} />
+              {pendingCount} pending
+            </div>
+            <div className={`${styles.summaryChip} ${styles.confirmedChip}`}>
+              <CheckCircle size={13} />
+              {confirmedCount} price confirmed
+            </div>
+          </div>
 
-        <DataTable
-          columns={columns}
-          data={filtered}
-          emptyMessage="No enquiries match the selected filter."
-        />
-      </SectionCard>
+          <SectionCard>
+            {/* Status filter tabs */}
+            <div className={styles.filterBar}>
+              {FILTER_TABS.map((tab) => {
+                const count = tab.id === 'all'
+                  ? enquiries.length
+                  : enquiries.filter((e) => e.status === tab.id).length;
+                return (
+                  <button
+                    key={tab.id}
+                    className={`${styles.filterTab} ${filter === tab.id ? styles.filterActive : ''}`}
+                    onClick={() => setFilter(tab.id)}
+                  >
+                    {tab.label}
+                    <span className={styles.tabCount}>{count}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            <DataTable
+              columns={columns}
+              data={filtered}
+              emptyMessage="No enquiries match the selected filter."
+            />
+          </SectionCard>
+        </>
+      ) : (
+        <SectionCard>
+          {submissions.length === 0 ? (
+            <div className={styles.subEmpty}>
+              <Inbox size={36} />
+              <p>No pending customer submissions.</p>
+            </div>
+          ) : (
+            <DataTable
+              columns={subColumns}
+              data={submissions}
+              emptyMessage="No submissions."
+            />
+          )}
+        </SectionCard>
+      )}
 
       <CreateEnquiryModal
         isOpen={createOpen}
-        onClose={() => setCreate(false)}
+        onClose={() => { setCreate(false); setPrefill(null); }}
+        prefill={prefill}
         onSave={handleCreate}
       />
       <ConfirmPriceModal
@@ -552,6 +747,13 @@ export function EnquiryPage() {
         onClose={() => setCloseTgt(null)}
         enquiry={closeTgt}
         onSave={handleClose}
+      />
+      <SubmissionReviewModal
+        submission={reviewSub}
+        isOpen={!!reviewSub}
+        onClose={() => setReviewSub(null)}
+        onConvert={handleCreateFromSubmission}
+        onDismiss={handleDismissSubmission}
       />
     </PageShell>
   );
