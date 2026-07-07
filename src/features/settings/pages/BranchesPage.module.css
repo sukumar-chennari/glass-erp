@@ -8,10 +8,7 @@
   margin-bottom: var(--space-3);
   transition: color var(--transition-fast);
 }
-
-.back:hover {
-  color: var(--color-primary);
-}
+.back:hover { color: var(--color-primary); }
 
 .tableHeader {
   display: flex;
@@ -30,13 +27,30 @@
   font-weight: 600;
   color: var(--color-text-primary);
 }
-
 .cellMuted {
   font-size: var(--font-size-xs);
   color: var(--color-text-muted);
   margin-top: 1px;
 }
 
+.hours {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.mapsLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
+  color: var(--color-primary);
+  text-decoration: none;
+  margin-top: 2px;
+}
+.mapsLink:hover { text-decoration: underline; }
+
+/* ── Form ── */
 .form {
   display: flex;
   flex-direction: column;
@@ -48,9 +62,72 @@
   grid-template-columns: 1fr 1fr;
   gap: var(--space-3);
 }
-
 @media (max-width: 480px) {
   .twoCol { grid-template-columns: 1fr; }
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+.req { color: var(--color-danger, #e53e3e); margin-left: 2px; }
+
+.textarea {
+  padding: var(--space-3);
+  font-size: var(--font-size-sm);
+  background: var(--color-bg-light);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text-primary);
+  outline: none;
+  resize: vertical;
+  font-family: inherit;
+  transition: border-color var(--transition-fast);
+  min-height: 60px;
+}
+.textarea:focus { border-color: var(--color-primary); }
+.textareaError  { border-color: var(--color-danger, #e53e3e); }
+.errMsg {
+  font-size: var(--font-size-xs);
+  color: var(--color-danger, #e53e3e);
+}
+
+/* ── Time inputs ── */
+.hoursRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.timeInput {
+  padding: 8px var(--space-3);
+  font-size: var(--font-size-sm);
+  background: var(--color-bg-light);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text-primary);
+  outline: none;
+  transition: border-color var(--transition-fast);
+  font-variant-numeric: tabular-nums;
+}
+.timeInput:focus { border-color: var(--color-primary); }
+.hoursSep {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+.emptyState {
+  padding: var(--space-5);
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
 }
 
 .modalFooter {

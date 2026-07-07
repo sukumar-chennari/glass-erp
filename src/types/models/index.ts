@@ -5,3 +5,6 @@ export type { Job, CreateJobDto, UpdateJobDto, PaymentType, DamageType } from '.
 export type { Claim, CreateClaimDto, UpdateClaimDto, ClaimTimelineStep, Insurer } from './claim';
 export type { Invoice, CreateInvoiceDto, UpdateInvoiceDto, InvoiceLineItem } from './invoice';
 export type { DashboardData, DashboardKpi, DashboardRecentCustomer, DashboardPendingClaim, DashboardRecentJob } from './dashboard';
+export type { Branch, BranchCreatePayload, BranchUpdatePayload, BranchStatus } from './branch';
+export type { AppUser, AppRole, UserStatus, InvitationStatus, UserCreatePayload, UserUpdateStatusPayload } from './appUser';
+export type { BranchPerformanceRow, AdminSummary } from './adminSummary';

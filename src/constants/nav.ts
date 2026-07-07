@@ -5,7 +5,7 @@
  * Omit `roles` to show the item to all roles (use sparingly — prefer explicit).
  *
  * Role matrix:
- *   super_admin    → system config: dashboard, reports, settings
+ *   super_admin    → head-office: dashboard, branches, users, pricing, reports, settings
  *   branch_manager → full branch access: all items
  *   operator       → day-to-day: jobs, customers, stock, invoices, claims, enquiry
  *   technician     → field work: jobs, customers only
@@ -141,6 +141,31 @@ export const NAV_ITEMS: NavItem[] = [
     section: 'management',
     roles:   ['super_admin', 'branch_manager'],
   },
+  // ── Super Admin direct links ────────────────────────────────────────────────
+  {
+    id:      'branches',
+    label:   'Branches',
+    icon:    'Building2',
+    path:    ROUTES.SETTINGS_BRANCHES,
+    section: 'management',
+    roles:   ['super_admin'],
+  },
+  {
+    id:      'users',
+    label:   'Users',
+    icon:    'Users',
+    path:    ROUTES.SETTINGS_USERS,
+    section: 'management',
+    roles:   ['super_admin'],
+  },
+  {
+    id:      'pricing',
+    label:   'Pricing',
+    icon:    'Tag',
+    path:    ROUTES.SETTINGS_PRICING,
+    section: 'management',
+    roles:   ['super_admin'],
+  },
   {
     id:      'settings',
     label:   'Settings',
@@ -148,7 +173,5 @@ export const NAV_ITEMS: NavItem[] = [
     path:    ROUTES.SETTINGS,
     section: 'management',
     roles:   ['super_admin', 'branch_manager'],
-    // TODO (super_admin): settings page needs a Users sub-section for account
-    // management (create/deactivate staff). Branch-level settings for branch_manager.
   },
 ];

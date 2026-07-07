@@ -4,6 +4,7 @@ import { PageShell }        from '@/components/layout/PageShell';
 import { KpiGrid }          from './components/KpiGrid';
 import { RecentActivity }   from './components/RecentActivity';
 import { BranchManagerDashboard } from './components/BranchManagerDashboard';
+import { SuperAdminDashboard }    from './components/SuperAdminDashboard';
 import { useGetDashboardQuery } from './services/dashboardApi';
 import { useAuth } from '@/context/AuthContext';
 import styles from './DashboardPage.module.css';
@@ -42,6 +43,7 @@ export function DashboardPage() {
       />
 
       {session?.role === 'branch_manager' && <BranchManagerDashboard />}
+      {session?.role === 'super_admin'    && <SuperAdminDashboard />}
     </PageShell>
   );
 }

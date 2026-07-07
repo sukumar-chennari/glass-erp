@@ -83,6 +83,8 @@ export function LoginPage() {
           setFormError(t('errors.accountLocked', { minutes: Math.ceil((until.getTime() - Date.now()) / 60_000) }));
         } else if (err.code === 'ACCOUNT_INACTIVE') {
           setFormError(t('errors.accountInactive'));
+        } else if (err.code === 'ACCOUNT_PENDING_SETUP') {
+          setFormError('Your account setup is incomplete. Please check your email for the setup link, or ask your administrator to resend the invite.');
         } else {
           setFormError(t('form.errors.invalidCredentials'));
         }

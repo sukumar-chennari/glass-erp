@@ -8,6 +8,7 @@ export const ROUTES = {
   FORGOT_PASSWORD: '/forgot-password',
   RESET_PASSWORD:  '/reset-password',   // ?token=<signed>&type=setup|reset
   VERIFY_OTP:      '/verify-otp',        // ?token=<otp-session-token>
+  SETUP_PASSWORD:  '/setup-password',   // ?token=<signed-invite-token>
   DASHBOARD:       '/dashboard',
   VENDORS:        '/vendors',
   PRODUCTS:       '/products',

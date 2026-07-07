@@ -13,6 +13,10 @@ export interface AuthUser {
   name:    string;
   email:   string;
   mobile?: string;
+  /** False only when a Super Admin has deactivated the account. */
+  isActive:              boolean;
+  /** False until the staff member completes the /setup-password invite flow. */
+  passwordSetupComplete: boolean;
 }
 
 /**
@@ -79,11 +83,12 @@ export interface VerifyOtpOptions {
 
 export type AuthErrorCode =
   | 'INVALID_CREDENTIALS'
-  | 'ACCOUNT_LOCKED'     // too many failed attempts — lockUntil is set
-  | 'ACCOUNT_INACTIVE'   // deactivated by admin
-  | 'OTP_REQUIRED'       // password verified — OTP challenge issued, otpToken is set
-  | 'TOKEN_EXPIRED'      // reset / invite / OTP link expired
-  | 'TOKEN_INVALID'      // link already used or malformed
+  | 'ACCOUNT_LOCKED'         // too many failed attempts — lockUntil is set
+  | 'ACCOUNT_INACTIVE'       // deactivated by admin
+  | 'ACCOUNT_PENDING_SETUP'  // account created, but staff has not set a password yet
+  | 'OTP_REQUIRED'           // password verified — OTP challenge issued, otpToken is set
+  | 'TOKEN_EXPIRED'          // reset / invite / OTP link expired
+  | 'TOKEN_INVALID'          // link already used or malformed
   | 'UNKNOWN';
 
 export class AuthError extends Error {

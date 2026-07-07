@@ -25,6 +25,7 @@ import type { AuthErrorCode } from './types';
 //    401:     { code: 'INVALID_CREDENTIALS' }
 //    403:     { code: 'ACCOUNT_LOCKED', lockUntil: ISO8601 }
 //    403:     { code: 'ACCOUNT_INACTIVE' }
+//    403:     { code: 'ACCOUNT_PENDING_SETUP' }  — invite sent but setup not completed
 //
 //  GET /api/auth/me
 //    Auth:    Bearer <token>
@@ -148,10 +149,12 @@ function mapSession(raw: Record<string, unknown>): Session {
   const branch = (raw.branch ?? null) as { id: string; name: string } | null;
   return {
     user: {
-      id:     user.id     as string,
-      name:   user.name   as string,
-      email:  user.email  as string,
-      mobile: user.mobile as string | undefined,
+      id:                    user.id     as string,
+      name:                  user.name   as string,
+      email:                 user.email  as string,
+      mobile:                user.mobile as string | undefined,
+      isActive:              (user.is_active              ?? true) as boolean,
+      passwordSetupComplete: (user.password_setup_complete ?? true) as boolean,
     },
     role:       raw.role                          as Session['role'],
     tenantId:   (raw.tenant_id   ?? raw.tenantId)   as string,

@@ -25,5 +25,13 @@ export function ProtectedRoute() {
     return <Navigate to={ROUTES.LOGIN} replace />;
   }
 
+  if (!session.user.isActive) {
+    return <Navigate to={ROUTES.LOGIN} replace />;
+  }
+
+  if (!session.user.passwordSetupComplete) {
+    return <Navigate to={ROUTES.SETUP_PASSWORD} replace />;
+  }
+
   return <Outlet />;
 }

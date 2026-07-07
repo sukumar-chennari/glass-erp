@@ -40,8 +40,8 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-// 30-minute inactivity timeout
-const INACTIVITY_MS = 30 * 60 * 1000;
+// 8-hour inactivity timeout (business requirement: staff shift length)
+const INACTIVITY_MS = 8 * 60 * 60 * 1000;
 
 // ── Provider ──────────────────────────────────────────────────────────────────
 

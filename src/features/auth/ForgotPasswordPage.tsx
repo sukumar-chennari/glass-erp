@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft } from 'lucide-react';
-import { authService } from '@/services/auth';
+import { useForgotPasswordMutation } from '@/services/auth/authApi';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { ROUTES } from '@/constants/routes';
@@ -13,11 +13,11 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export function ForgotPasswordPage() {
   const { t } = useTranslation('auth');
+  const [forgotPassword, { isLoading: isSubmitting }] = useForgotPasswordMutation();
 
-  const [email,        setEmail]        = useState('');
-  const [fieldError,   setFieldError]   = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitted,    setSubmitted]    = useState(false);
+  const [email,      setEmail]      = useState('');
+  const [fieldError, setFieldError] = useState('');
+  const [submitted,  setSubmitted]  = useState(false);
 
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,14 +30,10 @@ export function ForgotPasswordPage() {
       return;
     }
     setFieldError('');
-    setIsSubmitting(true);
-    try {
-      await authService.requestPasswordReset(email.trim());
-      setSubmitted(true);
-    } finally {
-      setIsSubmitting(false);
-    }
-  }, [email, t]);
+    // Always show success regardless of server response (security: never reveal if email exists)
+    await forgotPassword({ email: email.trim() });
+    setSubmitted(true);
+  }, [email, t, forgotPassword]);
 
   if (submitted) {
     return (

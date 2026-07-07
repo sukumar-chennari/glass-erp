@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Eye, EyeOff, ArrowLeft } from 'lucide-react';
-import { authService, AuthError } from '@/services/auth';
+import { useResetPasswordMutation } from '@/services/auth/authApi';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { ROUTES } from '@/constants/routes';
@@ -22,8 +22,9 @@ export function ResetPasswordPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [fieldErrors,  setFieldErrors]  = useState<{ password?: string; confirm?: string }>({});
   const [formError,    setFormError]    = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [success,      setSuccess]      = useState(false);
+
+  const [resetPassword, { isLoading: isSubmitting }] = useResetPasswordMutation();
 
   // Auto-redirect to login after showing the success state
   useEffect(() => {
@@ -44,20 +45,18 @@ export function ResetPasswordPage() {
 
     setFieldErrors({});
     setFormError('');
-    setIsSubmitting(true);
     try {
-      await authService.resetPassword({ token, password, type });
+      await resetPassword({ token, password, type }).unwrap();
       setSuccess(true);
     } catch (err) {
-      if (err instanceof AuthError && err.code === 'TOKEN_EXPIRED') {
+      const code = (err as { data?: { code?: string } })?.data?.code;
+      if (code === 'TOKEN_EXPIRED') {
         setFormError(t('resetPassword.form.errors.tokenExpired'));
       } else {
         setFormError(t('resetPassword.form.errors.tokenInvalid'));
       }
-    } finally {
-      setIsSubmitting(false);
     }
-  }, [password, confirm, token, type, t]);
+  }, [password, confirm, token, type, t, resetPassword]);
 
   // ── Success state ──────────────────────────────────────────────────────────
 
@@ -77,8 +76,6 @@ export function ResetPasswordPage() {
   }
 
   // ── Missing token ──────────────────────────────────────────────────────────
-  // Token is validated server-side on submit, but if the URL has no token
-  // at all there is nothing useful to show except a redirect.
 
   if (!token) {
     return (

@@ -24,6 +24,7 @@ import { LoginPage }            from '@/features/auth/LoginPage';
 import { ForgotPasswordPage }   from '@/features/auth/ForgotPasswordPage';
 import { ResetPasswordPage }    from '@/features/auth/ResetPasswordPage';
 import { VerifyOtpPage }        from '@/features/auth/VerifyOtpPage';
+import { SetupPasswordPage }   from '@/features/auth/SetupPasswordPage';
 import { DashboardPage }       from '@/features/dashboard/DashboardPage';
 import { VendorsPage }         from '@/features/vendors/VendorsPage';
 import { ProductsPage }        from '@/features/products/ProductsPage';
@@ -65,6 +66,11 @@ export const router = createBrowserRouter([
   {
     path:         ROUTES.VERIFY_OTP,
     element:      <VerifyOtpPage />,
+    errorElement: <RouterErrorPage />,
+  },
+  {
+    path:         ROUTES.SETUP_PASSWORD,
+    element:      <SetupPasswordPage />,
     errorElement: <RouterErrorPage />,
   },
   {

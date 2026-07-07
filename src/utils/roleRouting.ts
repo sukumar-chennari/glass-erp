@@ -17,15 +17,13 @@ import { NAV_ITEMS } from '@/constants/nav';
 /**
  * Default landing route after successful login/OTP for each role.
  *
- * TODO (post-backend): Land super_admin on Settings > Users once that
- * sub-page exists. For now Settings root is the closest equivalent.
- *
+ * Super Admin lands on /dashboard (head-office cross-branch view).
  * TODO (UX): Technician "My Jobs" filtered view (own assignments only)
  * once job filtering by assignee is available.
  */
 export function getRoleDefaultRoute(role: UserRole): string {
   switch (role) {
-    case 'super_admin':    return ROUTES.SETTINGS;
+    case 'super_admin':    return ROUTES.DASHBOARD;
     case 'branch_manager': return ROUTES.DASHBOARD;
     case 'operator':       return ROUTES.JOBS;
     case 'technician':     return ROUTES.JOBS;
