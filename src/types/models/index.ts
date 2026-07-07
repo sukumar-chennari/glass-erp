@@ -8,3 +8,6 @@ export type { DashboardData, DashboardKpi, DashboardRecentCustomer, DashboardPen
 export type { Branch, BranchCreatePayload, BranchUpdatePayload, BranchStatus } from './branch';
 export type { AppUser, AppRole, UserStatus, InvitationStatus, UserCreatePayload, UserUpdateStatusPayload } from './appUser';
 export type { BranchPerformanceRow, AdminSummary } from './adminSummary';
+export type { InsuranceRule, InsuranceRulePayload, InsuranceRuleUpdatePayload, BoardType, CCCondition } from './insuranceRule';
+export type { VehicleModel, VehicleModelPayload, VehicleModelUpdatePayload } from './vehicleModel';
+export { BRANDS, BRAND_MODEL_MAP } from './vehicleModel';

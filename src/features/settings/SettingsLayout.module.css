@@ -1,0 +1,90 @@
+/* Two-panel admin settings shell */
+.container {
+  display:    flex;
+  gap:        0;
+  min-height: calc(100vh - var(--header-height, 60px) - var(--space-10) * 2);
+  margin:     calc(-1 * var(--space-10));   /* bleed to edges of pageContent padding */
+}
+
+/* ── Left sub-navigation ──────────────────────────────────────────── */
+.subnav {
+  width:         220px;
+  min-width:     220px;
+  border-right:  1px solid var(--color-border);
+  padding:       var(--space-6) 0 var(--space-4);
+  background:    var(--color-bg-subtle);
+  display:       flex;
+  flex-direction: column;
+  gap:           0;
+}
+
+.subnavHeader {
+  padding:        0 var(--space-5) var(--space-3);
+  font-size:      var(--font-size-xs);
+  font-weight:    700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color:          var(--color-text-muted);
+}
+
+.subnavSection {
+  padding:        var(--space-3) var(--space-5) var(--space-1);
+  font-size:      var(--font-size-xs);
+  font-weight:    600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color:          var(--color-text-muted);
+}
+
+.subnavList {
+  display:        flex;
+  flex-direction: column;
+  gap:            1px;
+}
+
+.subnavItem {
+  display:         flex;
+  align-items:     center;
+  gap:             var(--space-2);
+  padding:         var(--space-2) var(--space-5);
+  font-size:       var(--font-size-sm);
+  color:           var(--color-text-secondary);
+  text-decoration: none;
+  transition:      background var(--transition-fast), color var(--transition-fast);
+  border-left:     3px solid transparent;
+}
+
+.subnavItem:hover {
+  background: var(--color-bg-light);
+  color:      var(--color-text-primary);
+}
+
+.subnavItemActive {
+  background:  color-mix(in srgb, var(--color-primary) 8%, transparent);
+  color:       var(--color-primary);
+  font-weight: 500;
+  border-left: 3px solid var(--color-primary);
+}
+
+.subnavDivider {
+  height:     1px;
+  background: var(--color-border);
+  margin:     var(--space-3) var(--space-4);
+}
+
+/* ── Content area ─────────────────────────────────────────────────── */
+.content {
+  flex:       1;
+  min-width:  0;
+  padding:    var(--space-8) var(--space-8);
+  overflow-y: auto;
+}
+
+@media (max-width: 768px) {
+  .container { flex-direction: column; margin: calc(-1 * var(--space-4)) calc(-1 * var(--space-3)); }
+  .subnav    { width: 100%; min-width: 0; border-right: none; border-bottom: 1px solid var(--color-border); padding: var(--space-3) 0; }
+  .subnavList { flex-direction: row; flex-wrap: wrap; gap: 0; }
+  .subnavItem { border-left: none; border-bottom: 3px solid transparent; padding: var(--space-2) var(--space-4); }
+  .subnavItemActive { border-left: none; border-bottom: 3px solid var(--color-primary); background: none; }
+  .content    { padding: var(--space-5) var(--space-4); }
+}

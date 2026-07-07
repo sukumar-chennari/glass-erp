@@ -62,6 +62,8 @@ export const baseApi = createApi({
     'Branch',
     'AppUser',
     'AdminSummary',
+    'InsuranceRule',
+    'VehicleModel',
   ],
   endpoints: () => ({}),
 });

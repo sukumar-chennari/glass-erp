@@ -1,0 +1,94 @@
+/* ── Backdrop ─────────────────────────────────────────────────────── */
+.overlay {
+  position:   fixed;
+  inset:      0;
+  background: rgba(0, 0, 0, 0);
+  z-index:    1000;
+  display:    flex;
+  justify-content: flex-end;
+  pointer-events: none;
+  transition: background 0.25s ease;
+}
+
+.overlayVisible {
+  background:     rgba(0, 0, 0, 0.35);
+  pointer-events: auto;
+  backdrop-filter: blur(1px);
+  -webkit-backdrop-filter: blur(1px);
+}
+
+/* ── Sliding panel ────────────────────────────────────────────────── */
+.panel {
+  width:          var(--drawer-width, 440px);
+  max-width:      100vw;
+  height:         100%;
+  background:     var(--color-bg-light);
+  display:        flex;
+  flex-direction: column;
+  transform:      translateX(100%);
+  transition:     transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow:     -6px 0 32px rgba(0, 0, 0, 0.12);
+  will-change:    transform;
+}
+
+.panelOpen {
+  transform: translateX(0);
+}
+
+/* ── Header ───────────────────────────────────────────────────────── */
+.header {
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+  padding:         var(--space-5) var(--space-6);
+  border-bottom:   1px solid var(--color-border);
+  flex-shrink:     0;
+}
+
+.title {
+  font-size:   var(--font-size-base);
+  font-weight: 600;
+  color:       var(--color-text-primary);
+  margin:      0;
+}
+
+.closeBtn {
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  width:           28px;
+  height:          28px;
+  border-radius:   var(--radius-md);
+  border:          none;
+  background:      none;
+  color:           var(--color-text-secondary);
+  cursor:          pointer;
+  flex-shrink:     0;
+  transition:      background var(--transition-fast), color var(--transition-fast);
+}
+.closeBtn:hover { background: var(--color-bg-subtle); color: var(--color-text-primary); }
+.closeBtn:focus-visible {
+  outline:        2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* ── Body ─────────────────────────────────────────────────────────── */
+.body {
+  flex:       1;
+  overflow-y: auto;
+  padding:    var(--space-6);
+  display:    flex;
+  flex-direction: column;
+  gap:        var(--space-4);
+}
+
+/* ── Footer ───────────────────────────────────────────────────────── */
+.footer {
+  flex-shrink:   0;
+  padding:       var(--space-4) var(--space-6);
+  border-top:    1px solid var(--color-border);
+  display:       flex;
+  justify-content: flex-end;
+  gap:           var(--space-3);
+  background:    var(--color-bg-light);
+}

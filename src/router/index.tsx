@@ -36,10 +36,12 @@ import { JobsPage }            from '@/features/jobs/JobsPage';
 import { InvoicesPage }        from '@/features/invoices/InvoicesPage';
 import { ClaimsPage }          from '@/features/claims/ClaimsPage';
 import { ReportsPage }         from '@/features/reports/ReportsPage';
-import { SettingsPage }        from '@/features/settings/SettingsPage';
-import { UsersPage }           from '@/features/settings/pages/UsersPage';
-import { BranchesPage }        from '@/features/settings/pages/BranchesPage';
-import { PricingPage }         from '@/features/settings/pages/PricingPage';
+import { SettingsLayout, SettingsIndexRedirect } from '@/features/settings/SettingsLayout';
+import { UsersPage }            from '@/features/settings/pages/UsersPage';
+import { BranchesPage }         from '@/features/settings/pages/BranchesPage';
+import { PricingPage }          from '@/features/settings/pages/PricingPage';
+import { InsuranceRulesPage }   from '@/features/settings/pages/InsuranceRulesPage';
+import { VehicleModelsPage }    from '@/features/settings/pages/VehicleModelsPage';
 import { EnquiryPage }         from '@/features/enquiry/EnquiryPage';
 import { CustomerSubmitPage }  from '@/features/customer/CustomerSubmitPage';
 import { CustomerTrackPage }   from '@/features/customer/CustomerTrackPage';
@@ -107,10 +109,18 @@ export const router = createBrowserRouter([
           { path: ROUTES.INVOICES,       element: <InvoicesPage /> },
           { path: ROUTES.CLAIMS,         element: <ClaimsPage /> },
           { path: ROUTES.REPORTS,        element: <ReportsPage /> },
-          { path: ROUTES.SETTINGS,          element: <SettingsPage /> },
-          { path: ROUTES.SETTINGS_USERS,    element: <UsersPage /> },
-          { path: ROUTES.SETTINGS_BRANCHES, element: <BranchesPage /> },
-          { path: ROUTES.SETTINGS_PRICING,  element: <PricingPage /> },
+          {
+            path:    ROUTES.SETTINGS,
+            element: <SettingsLayout />,
+            children: [
+              { index: true,                             element: <SettingsIndexRedirect /> },
+              { path: ROUTES.SETTINGS_INSURANCE_RULES,  element: <InsuranceRulesPage /> },
+              { path: ROUTES.SETTINGS_VEHICLE_MODELS,   element: <VehicleModelsPage /> },
+              { path: ROUTES.SETTINGS_USERS,            element: <UsersPage /> },
+              { path: ROUTES.SETTINGS_BRANCHES,         element: <BranchesPage /> },
+              { path: ROUTES.SETTINGS_PRICING,          element: <PricingPage /> },
+            ],
+          },
           { path: ROUTES.ENQUIRY,           element: <EnquiryPage /> },
         ],
       },
