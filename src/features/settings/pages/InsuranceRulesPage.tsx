@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback } from 'react';
 import { Plus, Pencil, Trash2, Shield } from 'lucide-react';
-import { SectionCard } from '@/components/layout/PageShell';
+import { PageShell, SectionCard } from '@/components/layout/PageShell';
 import { DataTable }   from '@/components/ui/DataTable';
 import { Badge }       from '@/components/ui/Badge';
 import { Button }      from '@/components/ui/Button';
@@ -102,7 +102,7 @@ export function InsuranceRulesPage() {
 
   function setField<K extends keyof RuleForm>(key: K, val: RuleForm[K]) {
     setForm((f) => ({ ...f, [key]: val }));
-    if (key in formErrors) setFormErrors((e) => ({ ...e, [key]: undefined }));
+    if (key in formErrors) setFormErrors((e) => { const n = { ...e }; delete n[key as keyof FormErrors]; return n; });
   }
 
   function validate(): boolean {
@@ -128,27 +128,28 @@ export function InsuranceRulesPage() {
       depreciation: Number(form.depreciation),
       isActive:     form.isActive,
     };
-    if (drawerMode === 'add') {
-      const result = await createRule(payload);
-      if ('data' in result) {
+    try {
+      if (drawerMode === 'add') {
+        await createRule(payload).unwrap();
         toast.success('Insurance rule added.');
-        closeDrawer();
-      }
-    } else if (editingId) {
-      const result = await updateRule({ id: editingId, ...payload });
-      if ('data' in result) {
+      } else if (editingId) {
+        await updateRule({ id: editingId, ...payload }).unwrap();
         toast.success('Insurance rule updated.');
-        closeDrawer();
       }
+      closeDrawer();
+    } catch {
+      toast.error('Failed to save rule. Please try again.');
     }
   }, [form, drawerMode, editingId, createRule, updateRule, toast, closeDrawer]);
 
   const handleDeleteConfirm = useCallback(async () => {
     if (!deleteTarget) return;
-    const result = await deleteRule(deleteTarget.id);
-    if ('data' in result) {
+    try {
+      await deleteRule(deleteTarget.id).unwrap();
       toast.success(`Rule for ${deleteTarget.boardType} / ${deleteTarget.ccCondition} deleted.`);
       setDeleteTarget(null);
+    } catch {
+      toast.error('Failed to delete rule. Please try again.');
     }
   }, [deleteTarget, deleteRule, toast]);
 
@@ -224,18 +225,11 @@ export function InsuranceRulesPage() {
 
   return (
     <>
-      {/* ── Page header ────────────────────────────────────────────── */}
-      <div className={styles.pageHeader}>
-        <div>
-          <h2 className={styles.pageTitle}>Insurance Rules</h2>
-          <p className={styles.pageDesc}>
-            Configure extra charges and depreciation rates by board type and engine size.
-          </p>
-        </div>
-        <Button leftIcon={<Plus size={15} />} onClick={openAdd}>Add Rule</Button>
-      </div>
-
-      {/* ── Table / empty state ────────────────────────────────────── */}
+      <PageShell
+        heading="Insurance Rules"
+        description="Configure extra charges and depreciation rates by board type and engine size."
+        actions={<Button leftIcon={<Plus size={15} />} onClick={openAdd}>Add Rule</Button>}
+      >
       <SectionCard>
         {isLoading && <div className={styles.state}>Loading rules…</div>}
         {isError   && <div className={styles.state}>Failed to load rules.</div>}
@@ -253,6 +247,7 @@ export function InsuranceRulesPage() {
           <DataTable columns={columns} data={rules} />
         )}
       </SectionCard>
+      </PageShell>
 
       {/* ── Add / Edit Drawer ──────────────────────────────────────── */}
       <Drawer

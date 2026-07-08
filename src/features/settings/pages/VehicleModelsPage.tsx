@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback } from 'react';
 import { Plus, Pencil, Trash2, Car } from 'lucide-react';
-import { SectionCard } from '@/components/layout/PageShell';
+import { PageShell, SectionCard } from '@/components/layout/PageShell';
 import { DataTable }   from '@/components/ui/DataTable';
 import { Button }      from '@/components/ui/Button';
 import { Input }       from '@/components/ui/Input';
@@ -94,7 +94,7 @@ export function VehicleModelsPage() {
 
   function setField<K extends keyof ModelForm>(key: K, val: string) {
     setForm((f) => ({ ...f, [key]: val }));
-    if (key in formErrors) setFormErrors((e) => ({ ...e, [key]: undefined }));
+    if (key in formErrors) setFormErrors((e) => { const n = { ...e }; delete n[key as keyof FormErrors]; return n; });
   }
 
   // When brand changes, reset model
@@ -122,27 +122,28 @@ export function VehicleModelsPage() {
       model:       form.model,
       marketPrice: Number(form.marketPrice),
     };
-    if (drawerMode === 'add') {
-      const result = await createModel(payload);
-      if ('data' in result) {
+    try {
+      if (drawerMode === 'add') {
+        await createModel(payload).unwrap();
         toast.success(`${form.brand} ${form.model} added.`);
-        closeDrawer();
-      }
-    } else if (editingId) {
-      const result = await updateModel({ id: editingId, ...payload });
-      if ('data' in result) {
+      } else if (editingId) {
+        await updateModel({ id: editingId, ...payload }).unwrap();
         toast.success(`${form.brand} ${form.model} updated.`);
-        closeDrawer();
       }
+      closeDrawer();
+    } catch {
+      toast.error('Failed to save model. Please try again.');
     }
   }, [form, drawerMode, editingId, createModel, updateModel, toast, closeDrawer]);
 
   const handleDeleteConfirm = useCallback(async () => {
     if (!deleteTarget) return;
-    const result = await deleteModel(deleteTarget.id);
-    if ('data' in result) {
+    try {
+      await deleteModel(deleteTarget.id).unwrap();
       toast.success(`${deleteTarget.brand} ${deleteTarget.model} removed.`);
       setDeleteTarget(null);
+    } catch {
+      toast.error('Failed to delete model. Please try again.');
     }
   }, [deleteTarget, deleteModel, toast]);
 
@@ -195,18 +196,11 @@ export function VehicleModelsPage() {
 
   return (
     <>
-      {/* ── Page header ────────────────────────────────────────────── */}
-      <div className={styles.pageHeader}>
-        <div>
-          <h2 className={styles.pageTitle}>Vehicle Models</h2>
-          <p className={styles.pageDesc}>
-            Maintain the list of vehicle brands, models, and their market prices for claim assessments.
-          </p>
-        </div>
-        <Button leftIcon={<Plus size={15} />} onClick={openAdd}>Add Model</Button>
-      </div>
-
-      {/* ── Table / empty state ────────────────────────────────────── */}
+      <PageShell
+        heading="Vehicle Models"
+        description="Maintain the list of vehicle brands, models, and their market prices for claim assessments."
+        actions={<Button leftIcon={<Plus size={15} />} onClick={openAdd}>Add Model</Button>}
+      >
       <SectionCard>
         {isLoading && <div className={styles.state}>Loading vehicle models…</div>}
         {isError   && <div className={styles.state}>Failed to load vehicle models.</div>}
@@ -224,6 +218,7 @@ export function VehicleModelsPage() {
           <DataTable columns={columns} data={models} />
         )}
       </SectionCard>
+      </PageShell>
 
       {/* ── Add / Edit Drawer ──────────────────────────────────────── */}
       <Drawer

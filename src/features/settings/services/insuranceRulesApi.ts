@@ -1,5 +1,6 @@
 import { baseApi } from '@/services/baseApi';
 import { mockableQuery, mockableMutation } from '@/services/mockUtils';
+import { ENDPOINTS } from '@/services/api';
 import { insuranceRuleMock } from '@/mocks/insuranceRules';
 import type { InsuranceRule, InsuranceRulePayload, InsuranceRuleUpdatePayload } from '@/types/models/insuranceRule';
 
@@ -8,7 +9,7 @@ export const insuranceRulesApi = baseApi.injectEndpoints({
     getInsuranceRules: builder.query<InsuranceRule[], void>({
       ...mockableQuery<InsuranceRule[], void>({
         mockFn: () => insuranceRuleMock.list(),
-        url:    '/settings/insurance-rules',
+        url:    ENDPOINTS.insuranceRules.list,
       }),
       providesTags: ['InsuranceRule'],
     }),
@@ -16,7 +17,7 @@ export const insuranceRulesApi = baseApi.injectEndpoints({
     createInsuranceRule: builder.mutation<InsuranceRule, InsuranceRulePayload>({
       ...mockableMutation<InsuranceRule, InsuranceRulePayload>({
         mockFn: (p) => insuranceRuleMock.create(p),
-        url:    '/settings/insurance-rules',
+        url:    ENDPOINTS.insuranceRules.create,
         method: 'POST',
       }),
       invalidatesTags: ['InsuranceRule'],
@@ -24,8 +25,8 @@ export const insuranceRulesApi = baseApi.injectEndpoints({
 
     updateInsuranceRule: builder.mutation<InsuranceRule, InsuranceRuleUpdatePayload>({
       ...mockableMutation<InsuranceRule, InsuranceRuleUpdatePayload>({
-        mockFn: (p)         => insuranceRuleMock.update(p),
-        url:    (arg)       => `/settings/insurance-rules/${arg.id}`,
+        mockFn: (p)   => insuranceRuleMock.update(p),
+        url:    (arg) => ENDPOINTS.insuranceRules.update(arg.id),
         method: 'PUT',
         body:   ({ id: _id, ...dto }) => dto,
       }),
@@ -35,7 +36,7 @@ export const insuranceRulesApi = baseApi.injectEndpoints({
     deleteInsuranceRule: builder.mutation<null, string>({
       ...mockableMutation<null, string>({
         mockFn: (id) => { insuranceRuleMock.remove(id); return null; },
-        url:    (id) => `/settings/insurance-rules/${id}`,
+        url:    (id) => ENDPOINTS.insuranceRules.remove(id),
         method: 'DELETE',
       }),
       invalidatesTags: ['InsuranceRule'],
