@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { ROUTES } from '@/constants/routes';
 import { getRoleDefaultRoute } from '@/utils/roleRouting';
+import { AlertBanner } from '@/components/ui/AlertBanner';
 import { AuthCard } from './AuthCard';
 import styles from './LoginPage.module.css';
 
@@ -137,7 +138,7 @@ export function LoginPage() {
           }
         />
 
-        {formError && <p className={styles.formError} role="alert">{formError}</p>}
+        {formError && <AlertBanner message={formError} />}
         {lockUntil && countdown && (
           <p className={styles.lockCountdown} role="status">
             Try again in <strong>{countdown}</strong>

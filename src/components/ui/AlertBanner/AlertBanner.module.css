@@ -1,0 +1,68 @@
+.banner {
+  display:     flex;
+  align-items: flex-start;
+  gap:         var(--space-2);
+  padding:     var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  border:      1px solid;
+  font-size:   var(--font-size-sm);
+  line-height: 1.5;
+}
+
+.icon {
+  flex-shrink: 0;
+  display:     flex;
+  margin-top:  1px;
+}
+
+.message {
+  flex: 1;
+}
+
+.close {
+  flex-shrink: 0;
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  width:   20px;
+  height:  20px;
+  border:     none;
+  background: transparent;
+  color:      inherit;
+  cursor:     pointer;
+  padding:    0;
+  opacity:    0.65;
+  border-radius: var(--radius-sm);
+  transition: opacity var(--transition-fast);
+}
+
+.close:hover { opacity: 1; }
+
+.close:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 1px;
+}
+
+.error {
+  background:   var(--color-danger-bg);
+  color:        var(--color-danger-text);
+  border-color: var(--color-danger-border);
+}
+
+.warning {
+  background:   var(--color-warning-bg);
+  color:        var(--color-warning-text);
+  border-color: var(--color-warning-border);
+}
+
+.info {
+  background:   var(--color-info-bg);
+  color:        var(--color-info-text);
+  border-color: var(--color-info-border);
+}
+
+.success {
+  background:   var(--color-success-bg);
+  color:        var(--color-success-text);
+  border-color: var(--color-success-border);
+}

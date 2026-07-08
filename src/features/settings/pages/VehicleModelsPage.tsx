@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback } from 'react';
-import { Plus, Pencil, Trash2, Car } from 'lucide-react';
+import { Plus, Pencil, Trash2, Car, AlertCircle } from 'lucide-react';
 import { PageShell, SectionCard } from '@/components/layout/PageShell';
 import { DataTable }   from '@/components/ui/DataTable';
 import { Button }      from '@/components/ui/Button';
@@ -18,6 +18,8 @@ import type { VehicleModel, VehicleModelPayload } from '@/types/models/vehicleMo
 import { BRANDS, BRAND_MODEL_MAP } from '@/types/models/vehicleModel';
 import type { TableColumn, SelectOption } from '@/types/ui';
 import { formatINR } from '@/services/mockUtils';
+import { AlertBanner }  from '@/components/ui/AlertBanner';
+import { TableSkeleton } from '@/components/ui/Skeleton';
 import styles from './VehicleModelsPage.module.css';
 
 // ── Dropdown options ────────────────────────────────────────────────
@@ -48,7 +50,7 @@ function vehicleToForm(v: VehicleModel): ModelForm {
 // ── Component ───────────────────────────────────────────────────────
 export function VehicleModelsPage() {
   const toast = useToast();
-  const { data: models = [], isLoading, isError } = useGetVehicleModelsQuery();
+  const { data: models = [], isLoading, isError, refetch } = useGetVehicleModelsQuery();
   const [createModel, { isLoading: creating }] = useCreateVehicleModelMutation();
   const [updateModel, { isLoading: updating }] = useUpdateVehicleModelMutation();
   const [deleteModel, { isLoading: deleting }] = useDeleteVehicleModelMutation();
@@ -62,6 +64,7 @@ export function VehicleModelsPage() {
 
   // ── Delete state ──────────────────────────────────────────────────
   const [deleteTarget, setDeleteTarget] = useState<VehicleModel | null>(null);
+  const [apiError,     setApiError]     = useState('');
 
   // ── Model options (dependent on brand) ───────────────────────────
   const modelOptions = useMemo<SelectOption[]>(() => {
@@ -90,7 +93,7 @@ export function VehicleModelsPage() {
     setDrawerOpen(true);
   }, []);
 
-  const closeDrawer = useCallback(() => setDrawerOpen(false), []);
+  const closeDrawer = useCallback(() => { setDrawerOpen(false); setApiError(''); }, []);
 
   function setField<K extends keyof ModelForm>(key: K, val: string) {
     setForm((f) => ({ ...f, [key]: val }));
@@ -132,7 +135,7 @@ export function VehicleModelsPage() {
       }
       closeDrawer();
     } catch {
-      toast.error('Failed to save model. Please try again.');
+      setApiError('Failed to save model. Please try again.');
     }
   }, [form, drawerMode, editingId, createModel, updateModel, toast, closeDrawer]);
 
@@ -202,8 +205,15 @@ export function VehicleModelsPage() {
         actions={<Button leftIcon={<Plus size={15} />} onClick={openAdd}>Add Model</Button>}
       >
       <SectionCard>
-        {isLoading && <div className={styles.state}>Loading vehicle models…</div>}
-        {isError   && <div className={styles.state}>Failed to load vehicle models.</div>}
+        {isLoading && <TableSkeleton rows={4} cols={4} />}
+        {isError && (
+          <div className={styles.emptyState}>
+            <AlertCircle className={styles.emptyIcon} size={36} strokeWidth={1.4} />
+            <p className={styles.emptyTitle}>Failed to load vehicle models</p>
+            <p className={styles.emptyDesc}>Could not fetch vehicle models. Please try again.</p>
+            <Button variant="secondary" size="sm" onClick={() => refetch()}>Retry</Button>
+          </div>
+        )}
         {!isLoading && !isError && models.length === 0 && (
           <div className={styles.emptyState}>
             <Car className={styles.emptyIcon} size={40} strokeWidth={1.2} />
@@ -232,6 +242,9 @@ export function VehicleModelsPage() {
           </>
         }
       >
+        {apiError && (
+          <AlertBanner message={apiError} onDismiss={() => setApiError('')} />
+        )}
         <Select
           label="Brand"
           options={BRAND_OPTIONS}

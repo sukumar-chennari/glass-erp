@@ -1,11 +1,4 @@
 /* ── States ───────────────────────────────────────────────────────── */
-.state {
-  padding:    var(--space-5);
-  text-align: center;
-  color:      var(--color-text-muted);
-  font-size:  var(--font-size-sm);
-}
-
 .emptyState {
   display:        flex;
   flex-direction: column;

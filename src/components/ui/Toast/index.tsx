@@ -6,11 +6,11 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import { CheckCircle, XCircle, Info } from 'lucide-react';
+import { CheckCircle, XCircle, Info, AlertTriangle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import styles from './Toast.module.css';
 
-type ToastType = 'success' | 'error' | 'info';
+type ToastType = 'success' | 'error' | 'info' | 'warning';
 
 interface ToastItem {
   id:      number;
@@ -22,17 +22,25 @@ interface ToastContextValue {
   success: (msg: string) => void;
   error:   (msg: string) => void;
   info:    (msg: string) => void;
+  warning: (msg: string) => void;
 }
 
 const ToastContext = createContext<ToastContextValue | null>(null);
 
 let _id = 0;
-const DURATION = 3500;
+
+const DURATIONS: Record<ToastType, number> = {
+  success: 3500,
+  info:    3500,
+  warning: 5000,
+  error:   7000,
+};
 
 const ICONS: Record<ToastType, ReactNode> = {
-  success: <CheckCircle size={16} />,
-  error:   <XCircle    size={16} />,
-  info:    <Info        size={16} />,
+  success: <CheckCircle   size={16} />,
+  error:   <XCircle       size={16} />,
+  info:    <Info          size={16} />,
+  warning: <AlertTriangle size={16} />,
 };
 
 export function ToastProvider({ children }: { children: ReactNode }) {
@@ -50,7 +58,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     (message: string, type: ToastType) => {
       const id = ++_id;
       setToasts((prev) => [...prev, { id, message, type }]);
-      timers.current[id] = setTimeout(() => dismiss(id), DURATION);
+      timers.current[id] = setTimeout(() => dismiss(id), DURATIONS[type]);
     },
     [dismiss],
   );
@@ -59,6 +67,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     success: (msg) => push(msg, 'success'),
     error:   (msg) => push(msg, 'error'),
     info:    (msg) => push(msg, 'info'),
+    warning: (msg) => push(msg, 'warning'),
   };
 
   return (

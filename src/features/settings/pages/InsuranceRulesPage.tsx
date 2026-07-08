@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback } from 'react';
-import { Plus, Pencil, Trash2, Shield } from 'lucide-react';
+import { Plus, Pencil, Trash2, Shield, AlertCircle } from 'lucide-react';
 import { PageShell, SectionCard } from '@/components/layout/PageShell';
 import { DataTable }   from '@/components/ui/DataTable';
 import { Badge }       from '@/components/ui/Badge';
@@ -18,6 +18,8 @@ import {
 import type { InsuranceRule, InsuranceRulePayload, BoardType, CCCondition } from '@/types/models/insuranceRule';
 import type { TableColumn, SelectOption } from '@/types/ui';
 import { formatINR } from '@/services/mockUtils';
+import { AlertBanner }  from '@/components/ui/AlertBanner';
+import { TableSkeleton } from '@/components/ui/Skeleton';
 import styles from './InsuranceRulesPage.module.css';
 
 // ── Dropdown options ────────────────────────────────────────────────
@@ -66,7 +68,7 @@ function ruleToForm(r: InsuranceRule): RuleForm {
 // ── Component ───────────────────────────────────────────────────────
 export function InsuranceRulesPage() {
   const toast = useToast();
-  const { data: rules = [], isLoading, isError } = useGetInsuranceRulesQuery();
+  const { data: rules = [], isLoading, isError, refetch } = useGetInsuranceRulesQuery();
   const [createRule,  { isLoading: creating }]  = useCreateInsuranceRuleMutation();
   const [updateRule,  { isLoading: updating }]  = useUpdateInsuranceRuleMutation();
   const [deleteRule,  { isLoading: deleting }]  = useDeleteInsuranceRuleMutation();
@@ -80,6 +82,7 @@ export function InsuranceRulesPage() {
 
   // ── Delete state ──────────────────────────────────────────────────
   const [deleteTarget, setDeleteTarget] = useState<InsuranceRule | null>(null);
+  const [apiError,     setApiError]     = useState('');
 
   // ── Handlers ──────────────────────────────────────────────────────
   const openAdd = useCallback(() => {
@@ -98,7 +101,7 @@ export function InsuranceRulesPage() {
     setDrawerOpen(true);
   }, []);
 
-  const closeDrawer = useCallback(() => setDrawerOpen(false), []);
+  const closeDrawer = useCallback(() => { setDrawerOpen(false); setApiError(''); }, []);
 
   function setField<K extends keyof RuleForm>(key: K, val: RuleForm[K]) {
     setForm((f) => ({ ...f, [key]: val }));
@@ -138,7 +141,7 @@ export function InsuranceRulesPage() {
       }
       closeDrawer();
     } catch {
-      toast.error('Failed to save rule. Please try again.');
+      setApiError('Failed to save rule. Please try again.');
     }
   }, [form, drawerMode, editingId, createRule, updateRule, toast, closeDrawer]);
 
@@ -231,8 +234,15 @@ export function InsuranceRulesPage() {
         actions={<Button leftIcon={<Plus size={15} />} onClick={openAdd}>Add Rule</Button>}
       >
       <SectionCard>
-        {isLoading && <div className={styles.state}>Loading rules…</div>}
-        {isError   && <div className={styles.state}>Failed to load rules.</div>}
+        {isLoading && <TableSkeleton rows={4} cols={5} />}
+        {isError && (
+          <div className={styles.emptyState}>
+            <AlertCircle className={styles.emptyIcon} size={36} strokeWidth={1.4} />
+            <p className={styles.emptyTitle}>Failed to load rules</p>
+            <p className={styles.emptyDesc}>Could not fetch insurance rules. Please try again.</p>
+            <Button variant="secondary" size="sm" onClick={() => refetch()}>Retry</Button>
+          </div>
+        )}
         {!isLoading && !isError && rules.length === 0 && (
           <div className={styles.emptyState}>
             <Shield className={styles.emptyIcon} size={40} strokeWidth={1.2} />
@@ -261,6 +271,9 @@ export function InsuranceRulesPage() {
           </>
         }
       >
+        {apiError && (
+          <AlertBanner message={apiError} onDismiss={() => setApiError('')} />
+        )}
         <Select
           label="Board Type"
           options={BOARD_OPTIONS}
