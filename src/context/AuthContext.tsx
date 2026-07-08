@@ -9,7 +9,8 @@
 
 import { createContext, useContext, useEffect, useRef, useState, useCallback, type ReactNode } from 'react';
 import { authService } from '@/services/auth';
-import type { Session, LoginCredentials, VerifyOtpOptions } from '@/services/auth';
+import type { Session, LoginCredentials, VerifyOtpOptions, OtpSendResult, BackendAuthResponse } from '@/services/auth';
+import { mapSession, storeAuth } from '@/services/auth/http';
 
 // Re-export types so existing imports from '@/context/AuthContext' keep working.
 export type { AuthUser, UserRole, Session, AuthBranch } from '@/services/auth';
@@ -22,19 +23,30 @@ interface AuthContextValue {
   isLoading:        boolean;
   isSessionExpired: boolean;
   /**
-   * Authenticate with identifier + password.
-   * Returns the Session on success (OTP skipped).
-   * Throws AuthError(OTP_REQUIRED) when OTP is required — callers navigate to /verify-otp.
+   * Called after a successful useLoginEmailMutation / useOtpVerifyMutation.
+   * Maps the raw BackendAuthResponse → Session, persists token + session to
+   * localStorage, and updates React state in one call.
+   */
+  acceptLoginResponse: (response: BackendAuthResponse) => Session;
+  /**
+   * Authenticate with email + password via authService (non-RTK path).
+   * Kept for backward compatibility and non-UI callers.
    */
   login:     (credentials: LoginCredentials) => Promise<Session>;
   /** Optimistic: clears local state immediately, calls server best-effort. */
   logout:    () => void;
   /**
-   * Complete OTP challenge after a successful password auth.
+   * Send OTP to a phone number via authService (non-RTK path).
+   * LoginPage uses useOtpSendMutation directly — this is kept for
+   * VerifyOtpPage's resend flow which uses the service layer.
+   */
+  sendOtp:   (phone: string) => Promise<OtpSendResult>;
+  /**
+   * Complete OTP verify step via authService.
    * Returns the final Session so callers can navigate to the role default route.
    */
   verifyOtp: (opts: VerifyOtpOptions) => Promise<Session>;
-  /** Resend OTP to the user's registered contact using the challenge token. */
+  /** Resend OTP using the challenge token (legacy / email-OTP flow). */
   resendOtp: (otpToken: string) => Promise<void>;
 }
 
@@ -58,6 +70,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .finally(() => setIsLoading(false));
   }, []);
 
+  const acceptLoginResponse = useCallback((response: BackendAuthResponse): Session => {
+    const newSession = mapSession(response as unknown as Record<string, unknown>);
+    storeAuth(response.accessToken, newSession);
+    setSession(newSession);
+    setIsSessionExpired(false);
+    return newSession;
+  }, []);
+
   const login = async (credentials: LoginCredentials): Promise<Session> => {
     const newSession = await authService.login(credentials);
     setSession(newSession);
@@ -72,9 +92,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     void authService.logout();
   }, []);
 
+  const sendOtp = async (phone: string): Promise<OtpSendResult> => {
+    return authService.sendOtp(phone);
+  };
+
   const verifyOtp = async (opts: VerifyOtpOptions): Promise<Session> => {
     const newSession = await authService.verifyOtp(opts);
     setSession(newSession);
+    setIsSessionExpired(false);
     return newSession;
   };
 
@@ -107,7 +132,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   return (
     <AuthContext.Provider value={{
       session, isLoading, isSessionExpired,
-      login, logout, verifyOtp, resendOtp,
+      acceptLoginResponse,
+      login, logout, sendOtp, verifyOtp, resendOtp,
     }}>
       {children}
     </AuthContext.Provider>

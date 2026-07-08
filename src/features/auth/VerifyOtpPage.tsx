@@ -11,22 +11,25 @@ import { getRoleDefaultRoute } from '@/utils/roleRouting';
 import { AuthCard } from './AuthCard';
 import styles from './VerifyOtpPage.module.css';
 
-const OTP_LENGTH             = 6;
+const OTP_LENGTH              = 6;
 const RESEND_COOLDOWN_SECONDS = 30;
 
 export function VerifyOtpPage() {
-  const { t }                   = useTranslation('auth');
-  const { verifyOtp, resendOtp } = useAuth();
-  const navigate                = useNavigate();
-  const [params]                = useSearchParams();
-  const otpToken                = params.get('token');
+  const { t }                             = useTranslation('auth');
+  const { verifyOtp, resendOtp, sendOtp } = useAuth();
+  const navigate                          = useNavigate();
+  const [params]                          = useSearchParams();
+
+  // otpToken lives in state (not URL) so resend can update it without navigation.
+  const [currentOtpToken, setCurrentOtpToken] = useState(params.get('token') ?? '');
+  // phone is present only for the Mobile OTP login flow.
+  const phone = decodeURIComponent(params.get('phone') ?? '');
 
   const [otp,          setOtp]          = useState('');
   const [formError,    setFormError]    = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [cooldown,     setCooldown]     = useState(0);
 
-  // Tick the resend cooldown timer down every second
   useEffect(() => {
     if (cooldown <= 0) return;
     const id = setTimeout(() => setCooldown((c) => c - 1), 1000);
@@ -35,11 +38,11 @@ export function VerifyOtpPage() {
 
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!otpToken || otp.length !== OTP_LENGTH) return;
+    if (!currentOtpToken || otp.length !== OTP_LENGTH) return;
     setFormError('');
     setIsSubmitting(true);
     try {
-      const session = await verifyOtp({ otpToken, otp });
+      const session = await verifyOtp({ otpToken: currentOtpToken, otp });
       navigate(getRoleDefaultRoute(session.role), { replace: true });
     } catch (err) {
       if (err instanceof AuthError) {
@@ -54,19 +57,26 @@ export function VerifyOtpPage() {
     } finally {
       setIsSubmitting(false);
     }
-  }, [otpToken, otp, verifyOtp, navigate, t]);
+  }, [currentOtpToken, otp, verifyOtp, navigate, t]);
 
   const handleResend = useCallback(async () => {
-    if (!otpToken || cooldown > 0) return;
+    if (cooldown > 0) return;
     try {
-      await resendOtp(otpToken);
+      if (phone) {
+        // Phone OTP flow — re-send to the same number; refresh the token in state.
+        const result = await sendOtp(phone);
+        setCurrentOtpToken(result.otpToken);
+      } else {
+        // Legacy / email-OTP flow — backend resends using the existing token.
+        await resendOtp(currentOtpToken);
+      }
       setCooldown(RESEND_COOLDOWN_SECONDS);
       setOtp('');
       setFormError('');
     } catch {
-      // Silent — user can retry; server errors here are non-critical
+      // Silent — cooldown not set on failure so the user can retry immediately.
     }
-  }, [otpToken, cooldown, resendOtp]);
+  }, [phone, currentOtpToken, sendOtp, resendOtp, cooldown]);
 
   const handleOtpChange = (value: string) => {
     const digits = value.replace(/\D/g, '').slice(0, OTP_LENGTH);
@@ -74,64 +84,46 @@ export function VerifyOtpPage() {
     if (formError) setFormError('');
   };
 
-  // No token in URL — link is invalid or navigated to directly
-  if (!otpToken) {
+  if (!currentOtpToken) {
     return (
       <AuthCard title={t('verifyOtp.invalidTitle')}>
         <Link to={ROUTES.LOGIN} className={styles.backLink}>
-          <ArrowLeft size={14} />
-          {t('verifyOtp.backToLogin')}
+          <ArrowLeft size={14} />{t('verifyOtp.backToLogin')}
         </Link>
       </AuthCard>
     );
   }
 
+  const subtitle = phone
+    ? `A 6-digit OTP has been sent to ${phone}`
+    : t('verifyOtp.subtitle');
+
   return (
-    <AuthCard title={t('verifyOtp.title')} subtitle={t('verifyOtp.subtitle')}>
+    <AuthCard title={t('verifyOtp.title')} subtitle={subtitle}>
       <form className={styles.form} onSubmit={handleSubmit} noValidate>
         <Input
           label={t('verifyOtp.form.otp')}
           placeholder={t('verifyOtp.form.otpPlaceholder')}
-          type="text"
-          inputMode="numeric"
-          pattern="[0-9]*"
-          maxLength={OTP_LENGTH}
-          value={otp}
-          onChange={(e) => handleOtpChange(e.target.value)}
-          autoComplete="one-time-code"
-          autoFocus
-          fullWidth
+          type="text" inputMode="numeric" pattern="[0-9]*" maxLength={OTP_LENGTH}
+          value={otp} onChange={(e) => handleOtpChange(e.target.value)}
+          autoComplete="one-time-code" autoFocus fullWidth
         />
-
         {formError && <AlertBanner message={formError} />}
-
-        <Button
-          type="submit"
-          variant="primary"
-          size="lg"
-          fullWidth
-          loading={isSubmitting}
-          disabled={otp.length !== OTP_LENGTH}
-        >
+        <Button type="submit" variant="primary" size="lg" fullWidth loading={isSubmitting} disabled={otp.length !== OTP_LENGTH}>
           {isSubmitting ? t('verifyOtp.form.submitting') : t('verifyOtp.form.submit')}
         </Button>
       </form>
-
       <div className={styles.resend}>
         {cooldown > 0 ? (
-          <span className={styles.cooldown}>
-            {t('verifyOtp.resendIn', { seconds: cooldown })}
-          </span>
+          <span className={styles.cooldown}>{t('verifyOtp.resendIn', { seconds: cooldown })}</span>
         ) : (
           <button type="button" className={styles.resendBtn} onClick={handleResend}>
             {t('verifyOtp.resend')}
           </button>
         )}
       </div>
-
       <Link to={ROUTES.LOGIN} className={styles.backLink}>
-        <ArrowLeft size={14} />
-        {t('verifyOtp.backToLogin')}
+        <ArrowLeft size={14} />{t('verifyOtp.backToLogin')}
       </Link>
     </AuthCard>
   );

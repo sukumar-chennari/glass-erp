@@ -1,5 +1,36 @@
 /* LoginPage-specific styles only — the glass card shell is in AuthCard.module.css */
 
+/* ── Mode toggle (Email / Mobile OTP tab strip) ── */
+
+.modeToggle {
+  display:               grid;
+  grid-template-columns: 1fr 1fr;
+  gap:                   var(--space-1);
+  background:            var(--color-bg-inset);
+  border-radius:         var(--radius-md);
+  padding:               var(--space-1);
+  margin-bottom:         var(--space-2);
+}
+
+.modeBtn {
+  padding:       var(--space-2) var(--space-3);
+  border:        none;
+  border-radius: var(--radius-sm);
+  font-size:     var(--font-size-sm);
+  font-weight:   500;
+  line-height:   1.4;
+  cursor:        pointer;
+  background:    transparent;
+  color:         var(--color-text-secondary);
+  transition:    background var(--transition-fast), color var(--transition-fast),
+                 box-shadow var(--transition-fast);
+}
+.modeBtn:hover         { color: var(--color-text-primary); background: var(--color-bg-surface); }
+.modeBtnActive         { background: var(--color-bg-surface); color: var(--color-text-primary); box-shadow: var(--shadow-sm); }
+.modeBtn:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+
+/* ── Forms ── */
+
 .form {
   display:        flex;
   flex-direction: column;

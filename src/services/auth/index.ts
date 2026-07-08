@@ -12,7 +12,7 @@
 // relying on this file.
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { authServiceMock as authService } from './mock';
+import { authServiceHttp as authService } from './http';
 
 export { authService };
 
@@ -26,6 +26,10 @@ export type {
   VerifyOtpOptions,
   UserRole,
   AuthErrorCode,
+  OtpSendResult,
+  BackendRole,
+  BackendAuthResponse,
+  ApiErrorResponse,
 } from './types';
 
 export { AuthError } from './types';

@@ -163,6 +163,60 @@ export interface AuthService {
    */
   resendOtp(otpToken: string): Promise<void>;
 
+  /**
+   * Send OTP to a phone number (OPERATOR / TECHNICIAN login flow).
+   * Returns an otpToken the caller must pass to verifyOtp().
+   */
+  sendOtp(phone: string): Promise<OtpSendResult>;
+
   // ── Future: token refresh ─────────────────────────────────────────────────
   // refresh(): Promise<Session>;
+}
+
+// ── Backend contract types (raw API shapes) ───────────────────────────────────
+//
+// These mirror the Swagger spec. Only the HTTP adapter (http.ts) ever
+// references them — components and context always use the canonical
+// frontend types above.
+
+/** Role strings returned by the backend API (uppercase enum values). */
+export type BackendRole = 'SUPER_ADMIN' | 'ADMIN' | 'OPERATOR' | 'TECHNICIAN';
+
+export interface BackendUser {
+  id:                     string;
+  name:                   string;
+  email?:                 string;
+  phone?:                 string;
+  role:                   BackendRole;
+  isActive:               boolean;
+  passwordSetupComplete?: boolean;
+  branch?:                { id: string; name: string } | null;
+}
+
+export interface BackendTenant {
+  id:   string;
+  name: string;
+}
+
+/** Returned by POST /auth/login/email and POST /auth/otp/verify */
+export interface BackendAuthResponse {
+  accessToken: string;
+  user:        BackendUser;
+  tenant:      BackendTenant | null;
+}
+
+/** Returned by POST /auth/otp/send */
+export interface OtpSendResult {
+  otpToken: string;
+  message?: string;
+}
+
+/** Standard error envelope from the backend. */
+export interface ApiErrorResponse {
+  statusCode: number;
+  message:    string;
+  path:       string;
+  timestamp:  string;
+  /** Legacy code string — some endpoints still include this. */
+  code?:      string;
 }

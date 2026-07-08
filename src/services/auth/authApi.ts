@@ -1,29 +1,24 @@
 // ── Auth API (RTK Query) ─────────────────────────────────────────────────────
 //
-// Covers auth operations that fit the standard RTK Query mutation/query pattern.
+// loginEmail / otpSend / otpVerify / logout use direct query: (no mock wrapper).
+// These are the first backend-integrated endpoints — they always hit the real API.
+// Other endpoints (me, refresh, forgotPassword, etc.) remain mockable until
+// their backend counterparts are confirmed active.
 //
-// WHY login/logout/verifyOtp/resendOtp stay in authService (not here):
-//   • Session management ops (login, getSession) run before React mounts and must
-//     manage the token that baseApi reads — using RTK Query creates a circular dep.
-//   • verifyOtp/resendOtp complete/extend the session established by login, so they
-//     belong in the same service layer for consistency.
-//
-// What lives here:
-//   GET  /auth/me             — current session for profile display and re-validation
-//   POST /auth/refresh        — silent token refresh (httpOnly cookie flow)
-//   POST /auth/forgot-password
-//   POST /auth/reset-password
-//   PATCH /auth/password      — change password (authenticated user, Security settings)
-//   POST /settings/users/:id/resend-invite
+// On successful loginEmail / otpVerify, call AuthContext.acceptLoginResponse()
+// to store the token and update React session state.
 
 import { baseApi } from '@/services/baseApi';
 import { mockableQuery, mockableMutation, MOCK_DELAY } from '@/services/mockUtils';
 import { ENDPOINTS } from '@/services/api';
 import { userMock } from '@/mocks/adminUsers';
-import type { Session } from './types';
+import type { Session, BackendAuthResponse, OtpSendResult } from './types';
 
 // ── Payload types ─────────────────────────────────────────────────────────────
 
+export interface LoginEmailPayload    { email: string; password: string }
+export interface OtpSendPayload       { phone: string }
+export interface OtpVerifyPayload     { otpToken: string; otp: string }
 export interface ForgotPasswordPayload  { email: string }
 export interface ResetPasswordPayload {
   token:    string;
@@ -56,6 +51,44 @@ const delay = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 
 export const authApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
+
+    // ── Active auth endpoints — always real HTTP, no mock wrapper ────────────
+
+    loginEmail: builder.mutation<BackendAuthResponse, LoginEmailPayload>({
+      query: (body) => ({
+        url:    ENDPOINTS.auth.loginEmail,
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: ['AuthSession'],
+    }),
+
+    otpSend: builder.mutation<OtpSendResult, OtpSendPayload>({
+      query: (body) => ({
+        url:    ENDPOINTS.auth.otpSend,
+        method: 'POST',
+        body,
+      }),
+    }),
+
+    otpVerify: builder.mutation<BackendAuthResponse, OtpVerifyPayload>({
+      query: (body) => ({
+        url:    ENDPOINTS.auth.otpVerify,
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: ['AuthSession'],
+    }),
+
+    logout: builder.mutation<null, void>({
+      query: () => ({
+        url:    ENDPOINTS.auth.logout,
+        method: 'POST',
+      }),
+      invalidatesTags: ['AuthSession'],
+    }),
+
+    // ── Stub endpoints (backend not yet active) ───────────────────────────────
 
     me: builder.query<Session, void>({
       ...mockableQuery<Session, void>({
@@ -124,6 +157,10 @@ export const authApi = baseApi.injectEndpoints({
 });
 
 export const {
+  useLoginEmailMutation,
+  useOtpSendMutation,
+  useOtpVerifyMutation,
+  useLogoutMutation,
   useMeQuery,
   useRefreshMutation,
   useForgotPasswordMutation,

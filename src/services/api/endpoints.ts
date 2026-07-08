@@ -28,15 +28,21 @@
 export const ENDPOINTS = {
   // ── Authentication ─────────────────────────────────────────────────
   auth: {
-    login:          '/auth/login',
-    me:             '/auth/me',
-    refresh:        '/auth/refresh',
-    logout:         '/auth/logout',
-    verifyOtp:      '/auth/verify-otp',
-    resendOtp:      '/auth/resend-otp',
+    // ── Active endpoints ────────────────────────────────────────────────
+    loginEmail:     '/auth/login/email',  // POST — email + password (SUPER_ADMIN, ADMIN)
+    otpSend:        '/auth/otp/send',     // POST — send OTP to phone (OPERATOR, TECHNICIAN)
+    otpVerify:      '/auth/otp/verify',   // POST — verify OTP code
+    logout:         '/auth/logout',       // POST
     forgotPassword: '/auth/forgot-password',
     resetPassword:  '/auth/reset-password',
-    changePassword: '/auth/password',
+    changePassword: '/auth/password',     // PATCH — authenticated change
+    resendOtp:      '/auth/resend-otp',
+    // ── Not yet active on backend ───────────────────────────────────────
+    me:             '/auth/me',           // GET — stub ready; activate in http.ts getSession
+    refresh:        '/auth/refresh',      // POST — stub ready; activate in http.ts getSession
+    // ── Legacy (kept for mock compatibility) ────────────────────────────
+    login:          '/auth/login',
+    verifyOtp:      '/auth/verify-otp',
   },
 
   // ── Settings — Master Data ──────────────────────────────────────────

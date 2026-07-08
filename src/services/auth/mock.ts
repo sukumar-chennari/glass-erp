@@ -22,7 +22,7 @@
 
 import { MOCK_DELAY } from '@/services/mockUtils';
 import { AuthError } from './types';
-import type { AuthService, AuthBranch, LoginCredentials, ResetPasswordOptions, VerifyOtpOptions, Session, UserRole } from './types';
+import type { AuthService, AuthBranch, LoginCredentials, ResetPasswordOptions, VerifyOtpOptions, Session, UserRole, OtpSendResult } from './types';
 import { userMock, BRANCH_NAME_TO_ID } from '@/mocks/adminUsers';
 
 const SESSION_KEY         = 'erp-session-v2';
@@ -35,7 +35,6 @@ const VALID_ROLES: UserRole[] = ['super_admin', 'branch_manager', 'operator', 't
 const MOCK_ROLE = VALID_ROLES.includes(import.meta.env.VITE_MOCK_ROLE as UserRole)
   ? (import.meta.env.VITE_MOCK_ROLE as UserRole)
   : 'branch_manager';
-const SKIP_OTP = import.meta.env.VITE_MOCK_SKIP_OTP === 'true';
 
 const MOCK_USER_STATE_VALUES = ['active', 'pending_setup', 'inactive', 'locked'] as const;
 type MockUserState = typeof MOCK_USER_STATE_VALUES[number];
@@ -163,12 +162,8 @@ export const authServiceMock: AuthService = {
       session = buildMockSession(identifier);
     }
 
-    // ── 4. OTP gate ──────────────────────────────────────────────────────────────────────
-    if (!SKIP_OTP) {
-      sessionStorage.setItem(PENDING_SESSION_KEY, JSON.stringify(session));
-      throw new AuthError('OTP_REQUIRED', undefined, undefined, MOCK_OTP_TOKEN);
-    }
-
+    // Email login completes directly — OPERATOR / TECHNICIAN use sendOtp() instead.
+    // (VITE_MOCK_SKIP_OTP kept for legacy compatibility but no longer gates this flow.)
     localStorage.setItem(SESSION_KEY, JSON.stringify(session));
     localStorage.setItem(TOKEN_KEY, `mock-jwt-${session.user.id}`);
     return session;
@@ -232,5 +227,14 @@ export const authServiceMock: AuthService = {
     if (otpToken !== MOCK_OTP_TOKEN) {
       throw new AuthError('TOKEN_INVALID');
     }
+  },
+
+  async sendOtp(phone: string): Promise<OtpSendResult> {
+    await delay(MOCK_DELAY);
+    // Build a pending session for the phone number using the current mock role.
+    // In dev, set VITE_MOCK_ROLE=operator or VITE_MOCK_ROLE=technician to test this path.
+    const session = buildMockSession(phone);
+    sessionStorage.setItem(PENDING_SESSION_KEY, JSON.stringify(session));
+    return { otpToken: MOCK_OTP_TOKEN, message: 'OTP sent to ' + phone };
   },
 };
