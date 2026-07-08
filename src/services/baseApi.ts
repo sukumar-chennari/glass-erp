@@ -15,7 +15,8 @@ import type { BaseQueryFn, FetchArgs, FetchBaseQueryError } from '@reduxjs/toolk
 
 // Raw fetch base
 const rawBaseQuery = fetchBaseQuery({
-  baseUrl: import.meta.env.VITE_API_BASE_URL ?? '/api',
+  baseUrl:     import.meta.env.VITE_API_BASE_URL ?? '/api',
+  credentials: 'include',
   prepareHeaders: (headers) => {
     const token = localStorage.getItem('glass_erp_token');
     if (token) headers.set('Authorization', `Bearer ${token}`);
@@ -64,6 +65,7 @@ export const baseApi = createApi({
     'AdminSummary',
     'InsuranceRule',
     'VehicleModel',
+    'AuthSession',
   ],
   endpoints: () => ({}),
 });

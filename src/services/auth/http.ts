@@ -30,7 +30,7 @@ import type { AuthErrorCode } from './types';
 //  GET /api/auth/me
 //    Auth:    Bearer <token>
 //    200:     { session: BackendSession }
-//    401:     token expired or missing → call logout() + redirect /login
+//    401:     token expired → attempt POST /auth/refresh, then retry me
 //
 //  POST /api/auth/logout
 //    Auth:    Bearer <token>
@@ -52,11 +52,10 @@ import type { AuthErrorCode } from './types';
 //    401:     { code: 'INVALID_CREDENTIALS' }
 //    410:     { code: 'TOKEN_EXPIRED' }
 //
-//  POST /api/auth/refresh        (FUTURE — token refresh)
-//    Body:    { refreshToken: string }   (bearer flow)
-//    Cookie:  __Host-refresh-token       (cookie flow, preferred)
+//  POST /api/auth/refresh
+//    Cookie:  __Host-refresh-token (httpOnly, set on login)
 //    200:     { token: string, session: BackendSession }
-//    401:     refresh expired → logout()
+//    401:     refresh expired → clearAuth()
 //
 // ─────────────────────────────────────────────────────────────────────────────
 //  EXPECTED BackendSession SHAPE
@@ -194,15 +193,39 @@ export const authServiceHttp: AuthService = {
   async getSession(): Promise<Session | null> {
     const token = localStorage.getItem(TOKEN_KEY);
     if (!token) return null;
+
+    // Try with stored access token
     try {
       const res = await apiFetch('/auth/me');
-      if (!res.ok) { clearAuth(); return null; }
-      const { session: raw } = await res.json() as { session: Record<string, unknown> };
+      if (res.ok) {
+        const { session: raw } = await res.json() as { session: Record<string, unknown> };
+        const session = mapSession(raw);
+        localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+        return session;
+      }
+      if (res.status !== 401) { clearAuth(); return null; }
+    } catch {
+      return null;
+    }
+
+    // Access token expired (401) — attempt silent refresh via httpOnly cookie
+    try {
+      const refreshRes = await fetch(`${getBaseUrl()}/auth/refresh`, {
+        method:      'POST',
+        credentials: 'include',
+        headers:     { 'Content-Type': 'application/json' },
+      });
+      if (!refreshRes.ok) { clearAuth(); return null; }
+      const { token: newToken, session: raw } = await refreshRes.json() as {
+        token:   string;
+        session: Record<string, unknown>;
+      };
       const session = mapSession(raw);
-      localStorage.setItem(SESSION_KEY, JSON.stringify(session)); // refresh cached copy
+      storeAuth(newToken, session);
       return session;
     } catch {
-      return null; // network error — return null, let UI decide
+      clearAuth();
+      return null;
     }
   },
 

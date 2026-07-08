@@ -29,12 +29,14 @@ export const ENDPOINTS = {
   // ── Authentication ─────────────────────────────────────────────────
   auth: {
     login:          '/auth/login',
+    me:             '/auth/me',
+    refresh:        '/auth/refresh',
     logout:         '/auth/logout',
     verifyOtp:      '/auth/verify-otp',
-    session:        '/auth/session',
+    resendOtp:      '/auth/resend-otp',
     forgotPassword: '/auth/forgot-password',
     resetPassword:  '/auth/reset-password',
-    setupPassword:  '/auth/setup-password',
+    changePassword: '/auth/password',
   },
 
   // ── Settings — Master Data ──────────────────────────────────────────

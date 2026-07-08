@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { ROUTES } from '@/constants/routes';
 import { useResetPasswordMutation } from '@/services/auth/authApi';
+import { AlertBanner } from '@/components/ui/AlertBanner';
 import { AuthCard } from './AuthCard';
 import styles from './SetupPasswordPage.module.css';
 
@@ -67,10 +68,7 @@ export function SetupPasswordPage() {
   if (!token) {
     return (
       <AuthCard title="Invalid Setup Link">
-        <p className={styles.formError} role="alert">
-          This link is missing a setup token. Please use the link from your welcome email,
-          or ask your administrator to resend the invite.
-        </p>
+        <AlertBanner message="This link is missing a setup token. Please use the link from your welcome email, or ask your administrator to resend the invite." />
         <Link to={ROUTES.LOGIN} className={styles.backLink}>Back to Login</Link>
       </AuthCard>
     );
@@ -115,7 +113,7 @@ export function SetupPasswordPage() {
           fullWidth
         />
 
-        {formError && <p className={styles.formError} role="alert">{formError}</p>}
+        {formError && <AlertBanner message={formError} />}
 
         <Button type="submit" variant="primary" size="lg" fullWidth loading={isSubmitting}>
           Activate My Account

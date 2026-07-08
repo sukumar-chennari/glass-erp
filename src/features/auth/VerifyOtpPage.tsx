@@ -3,6 +3,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft } from 'lucide-react';
 import { useAuth, AuthError } from '@/context/AuthContext';
+import { AlertBanner } from '@/components/ui/AlertBanner';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { ROUTES } from '@/constants/routes';
@@ -102,7 +103,7 @@ export function VerifyOtpPage() {
           fullWidth
         />
 
-        {formError && <p className={styles.formError} role="alert">{formError}</p>}
+        {formError && <AlertBanner message={formError} />}
 
         <Button
           type="submit"

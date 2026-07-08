@@ -3,6 +3,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Eye, EyeOff, ArrowLeft } from 'lucide-react';
 import { useResetPasswordMutation } from '@/services/auth/authApi';
+import { AlertBanner } from '@/components/ui/AlertBanner';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { ROUTES } from '@/constants/routes';
@@ -128,7 +129,7 @@ export function ResetPasswordPage() {
           fullWidth
         />
 
-        {formError && <p className={styles.formError} role="alert">{formError}</p>}
+        {formError && <AlertBanner message={formError} />}
 
         <Button type="submit" variant="primary" size="lg" fullWidth loading={isSubmitting}>
           {t('resetPassword.form.submit')}

@@ -7,16 +7,6 @@
   gap:            var(--space-4);
 }
 
-.formError {
-  font-size:     var(--font-size-sm);
-  color:         var(--color-danger-text);
-  margin:        0;
-  padding:       var(--space-3) var(--space-4);
-  background:    color-mix(in srgb, var(--color-danger-text) 10%, transparent);
-  border:        1px solid color-mix(in srgb, var(--color-danger-text) 25%, transparent);
-  border-radius: var(--radius-md);
-}
-
 .resend {
   display:         flex;
   justify-content: center;
