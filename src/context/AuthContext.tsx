@@ -10,7 +10,7 @@
 import { createContext, useContext, useEffect, useRef, useState, useCallback, type ReactNode } from 'react';
 import { authService } from '@/services/auth';
 import type { Session, LoginCredentials, VerifyOtpOptions, OtpSendResult, BackendAuthResponse } from '@/services/auth';
-import { mapSession, storeAuth } from '@/services/auth/http';
+import { mapSession, storeAuth, clearAuth } from '@/services/auth/http';
 
 // Re-export types so existing imports from '@/context/AuthContext' keep working.
 export type { AuthUser, UserRole, Session, AuthBranch } from '@/services/auth';
@@ -24,8 +24,8 @@ interface AuthContextValue {
   isSessionExpired: boolean;
   /**
    * Called after a successful useLoginEmailMutation / useOtpVerifyMutation.
-   * Maps the raw BackendAuthResponse → Session, persists token + session to
-   * localStorage, and updates React state in one call.
+   * Maps the raw BackendAuthResponse → Session, stores the access token
+   * in-memory (http.ts module variable), and updates React state in one call.
    */
   acceptLoginResponse: (response: BackendAuthResponse) => Session;
   /**
@@ -86,10 +86,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const logout = useCallback(() => {
+    clearAuth();                 // synchronously clear in-memory token + localStorage cleanup
     setSession(null);
     setIsSessionExpired(false);
     if (timerRef.current) clearTimeout(timerRef.current);
-    void authService.logout();
+    void authService.logout();   // best-effort: tells server to expire the HttpOnly cookie
   }, []);
 
   const sendOtp = async (phone: string): Promise<OtpSendResult> => {

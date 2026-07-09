@@ -1,8 +1,10 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft } from 'lucide-react';
-import { useAuth, AuthError } from '@/context/AuthContext';
+import { useAuth } from '@/context/AuthContext';
+import { useOtpVerifyMutation, useOtpSendMutation } from '@/services/auth/authApi';
+import { useToast } from '@/components/ui/Toast';
 import { AlertBanner } from '@/components/ui/AlertBanner';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -15,10 +17,14 @@ const OTP_LENGTH              = 6;
 const RESEND_COOLDOWN_SECONDS = 30;
 
 export function VerifyOtpPage() {
-  const { t }                             = useTranslation('auth');
-  const { verifyOtp, resendOtp, sendOtp } = useAuth();
-  const navigate                          = useNavigate();
-  const [params]                          = useSearchParams();
+  const { t }                              = useTranslation('auth');
+  const { acceptLoginResponse, resendOtp } = useAuth();
+  const navigate                           = useNavigate();
+  const toast                              = useToast();
+  const [params]                           = useSearchParams();
+
+  const [otpVerify] = useOtpVerifyMutation();
+  const [otpSend]   = useOtpSendMutation();
 
   // otpToken lives in state (not URL) so resend can update it without navigation.
   const [currentOtpToken, setCurrentOtpToken] = useState(params.get('token') ?? '');
@@ -27,8 +33,16 @@ export function VerifyOtpPage() {
 
   const [otp,          setOtp]          = useState('');
   const [formError,    setFormError]    = useState('');
+  const [resendError,  setResendError]  = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isResending,  setIsResending]  = useState(false);
   const [cooldown,     setCooldown]     = useState(0);
+  // Synchronous guards — prevent duplicate calls before React re-renders.
+  const submitInFlightRef = useRef(false);
+  const resendInFlightRef = useRef(false);
+  // Tracks whether the user has successfully resent at least once;
+  // used to show the "use the most recent code" hint during cooldown.
+  const [hasResentOnce, setHasResentOnce] = useState(false);
 
   useEffect(() => {
     if (cooldown <= 0) return;
@@ -38,45 +52,64 @@ export function VerifyOtpPage() {
 
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!currentOtpToken || otp.length !== OTP_LENGTH) return;
+    // Ref guard fires synchronously — prevents duplicate calls before React
+    // re-renders and the button's `disabled` attribute takes effect.
+    if (submitInFlightRef.current || !currentOtpToken || otp.length !== OTP_LENGTH) return;
+    submitInFlightRef.current = true;
     setFormError('');
     setIsSubmitting(true);
     try {
-      const session = await verifyOtp({ otpToken: currentOtpToken, otp });
+      const data    = await otpVerify({ otpToken: currentOtpToken, otp }).unwrap();
+      const session = acceptLoginResponse(data);
       navigate(getRoleDefaultRoute(session.role), { replace: true });
     } catch (err) {
-      if (err instanceof AuthError) {
-        if (err.code === 'TOKEN_EXPIRED') {
-          setFormError(t('verifyOtp.errors.expired'));
-        } else {
-          setFormError(t('verifyOtp.errors.invalid'));
-        }
+      const e   = err as { status?: number; data?: { message?: string; code?: string } };
+      const msg = ((e.data?.message ?? e.data?.code ?? '') as string).toUpperCase();
+
+      if (msg.includes('EXPIRED') || msg.includes('TOKEN_EXPIRED')) {
+        setFormError(t('verifyOtp.errors.expired'));
       } else {
         setFormError(t('verifyOtp.errors.invalid'));
       }
     } finally {
+      submitInFlightRef.current = false;
       setIsSubmitting(false);
     }
-  }, [currentOtpToken, otp, verifyOtp, navigate, t]);
+  }, [currentOtpToken, otp, otpVerify, acceptLoginResponse, navigate, t]);
 
   const handleResend = useCallback(async () => {
-    if (cooldown > 0) return;
+    if (resendInFlightRef.current || cooldown > 0 || isResending) return;
+    resendInFlightRef.current = true;
+    setIsResending(true);
+    setResendError('');
     try {
       if (phone) {
         // Phone OTP flow — re-send to the same number; refresh the token in state.
-        const result = await sendOtp(phone);
+        const result = await otpSend({ phone }).unwrap();
         setCurrentOtpToken(result.otpToken);
       } else {
         // Legacy / email-OTP flow — backend resends using the existing token.
         await resendOtp(currentOtpToken);
       }
+      toast.info(t('verifyOtp.resendSuccess'));
       setCooldown(RESEND_COOLDOWN_SECONDS);
+      setHasResentOnce(true);
       setOtp('');
       setFormError('');
-    } catch {
-      // Silent — cooldown not set on failure so the user can retry immediately.
+    } catch (err) {
+      const e        = err as { status?: number; data?: { message?: string } };
+      const isRateLimit = e.status === 429 ||
+        ((e.data?.message ?? '') as string).toUpperCase().includes('RATE');
+      setResendError(
+        isRateLimit
+          ? t('verifyOtp.errors.rateLimited')
+          : t('verifyOtp.errors.resendFailed'),
+      );
+    } finally {
+      resendInFlightRef.current = false;
+      setIsResending(false);
     }
-  }, [phone, currentOtpToken, sendOtp, resendOtp, cooldown]);
+  }, [cooldown, isResending, phone, currentOtpToken, otpSend, resendOtp, toast, t]);
 
   const handleOtpChange = (value: string) => {
     const digits = value.replace(/\D/g, '').slice(0, OTP_LENGTH);
@@ -109,19 +142,43 @@ export function VerifyOtpPage() {
           autoComplete="one-time-code" autoFocus fullWidth
         />
         {formError && <AlertBanner message={formError} />}
-        <Button type="submit" variant="primary" size="lg" fullWidth loading={isSubmitting} disabled={otp.length !== OTP_LENGTH}>
+        <Button
+          type="submit" variant="primary" size="lg" fullWidth
+          loading={isSubmitting}
+          disabled={otp.length !== OTP_LENGTH || isSubmitting}
+          aria-busy={isSubmitting}
+        >
           {isSubmitting ? t('verifyOtp.form.submitting') : t('verifyOtp.form.submit')}
         </Button>
       </form>
+
       <div className={styles.resend}>
         {cooldown > 0 ? (
-          <span className={styles.cooldown}>{t('verifyOtp.resendIn', { seconds: cooldown })}</span>
+          <>
+            <span className={styles.cooldown} role="status" aria-live="polite">
+              {t('verifyOtp.resendIn', { seconds: cooldown })}
+            </span>
+            {hasResentOnce && (
+              <p className={styles.latestOtpNote}>{t('verifyOtp.latestOtpNote')}</p>
+            )}
+          </>
         ) : (
-          <button type="button" className={styles.resendBtn} onClick={handleResend}>
-            {t('verifyOtp.resend')}
+          <button
+            type="button"
+            className={styles.resendBtn}
+            onClick={handleResend}
+            disabled={isResending}
+            aria-busy={isResending}
+          >
+            {isResending ? t('verifyOtp.resending') : t('verifyOtp.resend')}
           </button>
         )}
       </div>
+
+      {resendError && (
+        <AlertBanner message={resendError} onDismiss={() => setResendError('')} />
+      )}
+
       <Link to={ROUTES.LOGIN} className={styles.backLink}>
         <ArrowLeft size={14} />{t('verifyOtp.backToLogin')}
       </Link>

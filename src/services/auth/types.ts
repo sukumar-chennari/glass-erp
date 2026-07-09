@@ -47,11 +47,10 @@ export interface AuthBranch {
 export interface Session {
   user:        AuthUser;
   role:        UserRole;
-  tenantId:    string;
-  tenantName:  string;
   /**
    * The branch this session is scoped to.
    * null for super_admin (operates across all branches).
+   * branch.id is the authoritative branch identifier for all API calls.
    */
   branch:      AuthBranch | null;
   permissions: string[];
@@ -190,19 +189,36 @@ export interface BackendUser {
   role:                   BackendRole;
   isActive:               boolean;
   passwordSetupComplete?: boolean;
+  /** Direct branch reference on the user object (new backend contract). */
+  branchId?:              string;
+  /** Full branch object when embedded in the user (legacy shape). */
   branch?:                { id: string; name: string } | null;
 }
 
-export interface BackendTenant {
+/** Branch returned at the root of the auth response (replaces BackendTenant). */
+export interface BackendBranch {
   id:   string;
   name: string;
 }
 
 /** Returned by POST /auth/login/email and POST /auth/otp/verify */
 export interface BackendAuthResponse {
-  accessToken: string;
-  user:        BackendUser;
-  tenant:      BackendTenant | null;
+  accessToken:  string;
+  /**
+   * Refresh token issued by the backend.
+   *
+   * In the production model the backend sets this as an HttpOnly cookie
+   * (Set-Cookie: ...; HttpOnly; Secure; SameSite=Strict) and does NOT include
+   * it in the JSON body. The frontend never stores or reads this value —
+   * the browser sends the cookie automatically on credentialed requests.
+   *
+   * Typed optional so both legacy (body-included) and cookie-only backend
+   * shapes compile without error. See TODO_ACTIVATE_ME_REFRESH in http.ts.
+   */
+  refreshToken?: string;
+  user:          BackendUser;
+  /** Branch context for this session (replaces the old `tenant` field). */
+  branch:        BackendBranch | null;
 }
 
 /** Returned by POST /auth/otp/send */

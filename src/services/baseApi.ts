@@ -1,5 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import type { BaseQueryFn, FetchArgs, FetchBaseQueryError } from '@reduxjs/toolkit/query/react';
+import { getToken, setToken, clearAuth } from '@/services/auth/http';
 
 /**
  * Base RTK Query API instance.
@@ -13,33 +14,72 @@ import type { BaseQueryFn, FetchArgs, FetchBaseQueryError } from '@reduxjs/toolk
  * `fetchBaseQuery`. Components are never aware of the difference.
  */
 
-// Raw fetch base
+function getBaseUrl(): string {
+  return import.meta.env.VITE_API_BASE_URL ?? '/api';
+}
+
 const rawBaseQuery = fetchBaseQuery({
-  baseUrl:     import.meta.env.VITE_API_BASE_URL ?? '/api',
+  baseUrl:     getBaseUrl(),
   credentials: 'include',
   prepareHeaders: (headers) => {
-    const token = localStorage.getItem('glass_erp_token');
+    const token = getToken();  // reads from in-memory module variable (http.ts)
     if (token) headers.set('Authorization', `Bearer ${token}`);
     return headers;
   },
 });
 
-// TODO (backend): wrap rawBaseQuery once real API endpoints are active.
-// When the server returns 401 or 403, clear the token and redirect to the
-// login page with ?reason=session_expired so LoginPage can show the right message.
+// Promise-based mutex: if multiple RTK queries 401 at the same moment (e.g. on
+// page load with an expired token), only one /auth/refresh call is made.
+// All concurrent callers share the same promise and get the same result.
+let refreshPromise: Promise<boolean> | null = null;
+
+async function tryRefreshToken(): Promise<boolean> {
+  if (refreshPromise) return refreshPromise;
+  refreshPromise = (async (): Promise<boolean> => {
+    try {
+      const res = await fetch(`${getBaseUrl()}/auth/refresh`, {
+        method:      'POST',
+        credentials: 'include',
+        headers:     { 'Content-Type': 'application/json' },
+      });
+      if (res.ok) {
+        const data = await res.json() as { accessToken: string };
+        setToken(data.accessToken);
+        return true;
+      }
+    } catch { /* network error — treat as failed refresh */ }
+    return false;
+  })().finally(() => { refreshPromise = null; });
+  return refreshPromise;
+}
+
+function forceLogout(): void {
+  clearAuth();  // clears in-memory token + pre-13B.8 localStorage cleanup
+  if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/login')) {
+    window.location.href = '/login?reason=session_expired';
+  }
+}
+
 const baseQueryWithAuth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError> = async (
   args,
   api,
   extraOptions,
 ) => {
-  const result = await rawBaseQuery(args, api, extraOptions);
+  let result = await rawBaseQuery(args, api, extraOptions);
 
-  if (result.error && (result.error.status === 401 || result.error.status === 403)) {
-    localStorage.removeItem('glass_erp_token');
-    // Guard: only redirect in browser; avoid redirect loops on the login page itself
-    if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/login')) {
-      window.location.href = '/login?reason=session_expired';
+  if (result.error?.status === 401) {
+    // Attempt silent refresh using the HttpOnly cookie.
+    // tryRefreshToken() is mutex-guarded so concurrent 401s share one refresh call.
+    const refreshed = await tryRefreshToken();
+    if (refreshed) {
+      // Retry the original request — prepareHeaders will use the new token.
+      result = await rawBaseQuery(args, api, extraOptions);
+    } else {
+      forceLogout();
     }
+  } else if (result.error?.status === 403) {
+    // 403 = deactivated account or role mismatch — refresh cannot recover this.
+    forceLogout();
   }
 
   return result;

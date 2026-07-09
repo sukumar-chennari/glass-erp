@@ -52,9 +52,7 @@ function isValidSession(data: unknown): data is Session {
   if (!data || typeof data !== 'object') return false;
   const d = data as Record<string, unknown>;
   return (
-    typeof d.tenantId   === 'string' &&
-    typeof d.tenantName === 'string' &&
-    typeof d.role       === 'string' &&
+    typeof d.role === 'string' &&
     d.user !== null &&
     typeof d.user === 'object' &&
     typeof (d.user as Record<string, unknown>).id   === 'string' &&
@@ -75,9 +73,7 @@ function buildMockSession(identifier: string): Session {
       isActive:              true,
       passwordSetupComplete: true,
     },
-    role:       MOCK_ROLE,
-    tenantId:   'tenant-001',
-    tenantName: 'WindX Glass ERP',
+    role:   MOCK_ROLE,
     branch: MOCK_ROLE === 'super_admin'
       ? null
       : { id: 'branch-001', name: 'Main Branch' },
@@ -152,8 +148,6 @@ export const authServiceMock: AuthService = {
           passwordSetupComplete: true,
         },
         role,
-        tenantId:    'tenant-001',
-        tenantName:  'WindX Glass ERP',
         branch,
         permissions: mockPermissions(role),
       };

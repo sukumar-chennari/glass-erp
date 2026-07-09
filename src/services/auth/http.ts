@@ -24,7 +24,8 @@ import type { AuthErrorCode } from './types';
 //
 //  POST /api/v1/auth/login/email
 //    Body:    { email: string, password: string }
-//    200:     BackendAuthResponse  { accessToken, user: BackendUser, tenant }
+//    200:     BackendAuthResponse  { accessToken, user: BackendUser, branch }
+//             Refresh token → HttpOnly cookie (Set-Cookie), NOT in body.
 //    400/401: ApiErrorResponse     { statusCode, message, path, timestamp }
 //
 //  POST /api/v1/auth/otp/send
@@ -34,7 +35,8 @@ import type { AuthErrorCode } from './types';
 //
 //  POST /api/v1/auth/otp/verify
 //    Body:    { otpToken: string, otp: string }
-//    200:     BackendAuthResponse  { accessToken, user: BackendUser, tenant }
+//    200:     BackendAuthResponse  { accessToken, user: BackendUser, branch }
+//             Refresh token → HttpOnly cookie (Set-Cookie), NOT in body.
 //    400/401: ApiErrorResponse
 //
 //  POST /api/v1/auth/logout
@@ -54,17 +56,40 @@ import type { AuthErrorCode } from './types';
 //    Body:    { otpToken: string }
 //    200:     (best-effort; errors ignored by caller)
 //
-//  ── NOT YET ACTIVE ───────────────────────────────────────────────────────────
-//
-//  GET /api/v1/auth/me
+//  GET /api/v1/auth/me                               [ACTIVE — Phase 13B.8]
 //    Auth:    Bearer <accessToken>
 //    200:     BackendAuthResponse
-//    → Activate in getSession() when backend confirms availability.
+//    → Bootstrap call; on 401, falls through to /auth/refresh.
 //
-//  POST /api/v1/auth/refresh
-//    Cookie:  httpOnly refresh token
-//    200:     BackendAuthResponse
-//    → Activate in getSession() alongside /auth/me.
+//  POST /api/v1/auth/refresh                          [ACTIVE — Phase 13B.8]
+//    Cookie:  httpOnly refresh token (credentials:'include')
+//    200:     BackendAuthResponse  (new accessToken; backend rotates cookie)
+//    → Called by getSession() after /auth/me 401 and by tryRefreshToken() in baseApi.ts.
+//
+//  ── AUTH LIFECYCLE — verified Phase 13B.9 ────────────────────────────────────
+//
+//  Bootstrap (app start):
+//    /auth/me 200  → authenticated (token stored in memory)
+//    /auth/me 401  → /auth/refresh 200 → authenticated (silent refresh)
+//    /auth/me 401  → /auth/refresh non-2xx → clearAuth() → /login
+//    network error → null → /login (clearAuth not called — may be transient)
+//
+//  Mid-session 401 (RTK Query, baseApi.ts):
+//    tryRefreshToken() mutex → single /auth/refresh even if multiple concurrent 401s
+//    refresh 200 → retry original request with new in-memory token
+//    refresh fails → forceLogout() → /login?reason=session_expired
+//
+//  403 (deactivated account): forceLogout() immediately — refresh cannot recover.
+//
+//  Logout: clearAuth() (sync, clears memory) + POST /auth/logout (async, expires cookie)
+//
+//  Backend dependencies (all require CORS Access-Control-Allow-Credentials: true):
+//    GET  /auth/me      — BackendAuthResponse for valid bearer token
+//    POST /auth/refresh — BackendAuthResponse + rotates HttpOnly cookie
+//    POST /auth/logout  — expires refresh cookie (Set-Cookie; Max-Age=0)
+//
+//  StrictMode note: React 18 StrictMode double-invokes useEffect in dev mode,
+//  so /auth/me and /auth/refresh each run twice on load. Production: once each.
 //
 //  ── BACKEND ROLE MAPPING ─────────────────────────────────────────────────────
 //
@@ -76,9 +101,17 @@ import type { AuthErrorCode } from './types';
 //
 // ─────────────────────────────────────────────────────────────────────────────
 
-// Exported so AuthContext can store/read sessions after RTK mutations complete.
+// Kept for clearAuth() cleanup of pre-13B.8 localStorage entries.
 export const SESSION_KEY = 'erp-session-v1';
 export const TOKEN_KEY   = 'glass_erp_token';
+
+// ── In-memory access token ─────────────────────────────────────────────────
+// The access token lives in this module variable only — never written to storage.
+// Exported so baseApi.ts can update it after a mid-session token refresh.
+let _accessToken: string | null = null;
+export const getToken   = (): string | null => _accessToken;
+export const setToken   = (t: string): void  => { _accessToken = t; };
+export const clearToken = (): void           => { _accessToken = null; };
 
 // ── Role mapping ──────────────────────────────────────────────────────────────
 
@@ -127,9 +160,13 @@ function getBaseUrl(): string {
 }
 
 async function apiFetch(path: string, init?: RequestInit): Promise<Response> {
-  const token = localStorage.getItem(TOKEN_KEY);
+  const token = getToken();
   return fetch(`${getBaseUrl()}${path}`, {
     ...init,
+    // credentials: 'include' is required so the browser sends the HttpOnly
+    // refresh-token cookie on every auth request. This also allows the backend
+    // to rotate the cookie on POST /auth/refresh without extra frontend work.
+    credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -160,30 +197,48 @@ async function throwAuthError(res: Response): Promise<never> {
   throw new AuthError(code, body.message as string | undefined, lockUntil);
 }
 
-export function storeAuth(token: string, session: Session): void {
-  localStorage.setItem(TOKEN_KEY,   token);
-  localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+// ── MIGRATION NOTES ───────────────────────────────────────────────────────────
+//
+// 13B.7 — Refresh token moved to HttpOnly cookie:
+//   - REFRESH_TOKEN_KEY / glass_erp_refresh_token localStorage entry removed
+//   - Frontend never stores, reads, or clears the refresh token value
+//   - Backend sets it via Set-Cookie (HttpOnly; Secure; SameSite=Strict)
+//
+// 13B.8 — Access token moved to module memory (/auth/me activated):
+//   - TOKEN_KEY / glass_erp_token no longer written to localStorage
+//   - storeAuth() stores the access token in _accessToken (module variable) only
+//   - clearAuth() removes pre-13B.8 localStorage entries as cleanup
+//   - getSession() bootstraps via GET /auth/me → POST /auth/refresh (cookie)
+//   - baseApi.ts tryRefreshToken() handles mid-session 401s silently
+//
+// No persistent auth storage remains in the browser after logout.
+//
+// ─────────────────────────────────────────────────────────────────────────────
+
+export function storeAuth(token: string, _session: Session): void {
+  setToken(token);  // in-memory only — backend is authoritative via /auth/me
 }
 
 export function clearAuth(): void {
-  localStorage.removeItem(TOKEN_KEY);
-  localStorage.removeItem(SESSION_KEY);
+  clearToken();
+  localStorage.removeItem(SESSION_KEY);  // cleanup of pre-13B.8 cached sessions
+  localStorage.removeItem(TOKEN_KEY);    // cleanup of pre-13B.8 stored access tokens
+  // Refresh token: HttpOnly cookie — JS cannot clear it.
+  // POST /auth/logout asks the server to expire it (Set-Cookie; Max-Age=0).
 }
 
 /**
  * Maps a backend auth response to the canonical frontend Session.
- *
- * Handles the new shape  { accessToken, user: { role, branch }, tenant }
- * as well as stored Session objects  { role (frontend), tenantId, branch, ... }
- * so the same function works for both login responses and cached session reads.
+ * Handles the live /auth/me and login shapes { accessToken, user, branch }.
+ * Also accepts legacy localStorage-cached objects { role, branch, user, ... }
+ * from pre-13B.8 sessions for backward-compatible reads.
  */
 export function mapSession(raw: Record<string, unknown>): Session {
-  const user   = (raw.user   ?? {}) as Record<string, unknown>;
-  const tenant = (raw.tenant ?? null) as { id: string; name: string } | null;
-  const role   = mapRole(user.role ?? raw.role);
+  const user = (raw.user ?? {}) as Record<string, unknown>;
+  const role = mapRole(user.role ?? raw.role);
 
-  // Branch may be in user (new backend shape) or at root (legacy / stored session)
-  const branchRaw = ((user.branch ?? raw.branch) ?? null) as { id: string; name: string } | null;
+  // Branch may be at response root (live login) or cached directly in the stored session.
+  const branchRaw = ((raw.branch ?? user.branch) ?? null) as { id: string; name: string } | null;
 
   return {
     user: {
@@ -198,9 +253,7 @@ export function mapSession(raw: Record<string, unknown>): Session {
         : ((user.password_setup_complete ?? user.passwordSetupComplete ?? true) as boolean),
     },
     role,
-    tenantId:   tenant ? tenant.id   : ((raw.tenant_id   ?? raw.tenantId   ?? '') as string),
-    tenantName: tenant ? tenant.name : ((raw.tenant_name ?? raw.tenantName ?? '') as string),
-    branch:     branchRaw ? { id: branchRaw.id, name: branchRaw.name } : null,
+    branch:      branchRaw ? { id: branchRaw.id, name: branchRaw.name } : null,
     permissions: ((raw.permissions ?? user.permissions) as string[] | undefined)
       ?? derivePermissions(role),
   };
@@ -252,44 +305,28 @@ export const authServiceHttp: AuthService = {
   },
 
   async getSession(): Promise<Session | null> {
-    const token = localStorage.getItem(TOKEN_KEY);
-    if (!token) return null;
-
-    // /auth/me and /auth/refresh are not yet active on backend.
-    // For now, serve the cached session from localStorage.
-    // When me/refresh are ready, replace this block with the two-phase
-    // bootstrap below (uncomment and remove the early return).
-    const cached = localStorage.getItem(SESSION_KEY);
-    if (!cached) return null;
+    // Bootstrap via the server. The HttpOnly refresh cookie is sent automatically
+    // because apiFetch uses credentials:'include'.
     try {
-      const raw = JSON.parse(cached) as Record<string, unknown>;
-      if (raw && typeof raw.user === 'object') return mapSession(raw);
-    } catch { /* ignore */ }
-    clearAuth();
-    return null;
-
-    // ── ACTIVATE when /auth/me + /auth/refresh are live ──────────────────────
-    // try {
-    //   const res = await apiFetch('/auth/me');
-    //   if (res.ok) {
-    //     const data = await res.json() as BackendAuthResponse;
-    //     const session = mapSession(data as unknown as Record<string, unknown>);
-    //     storeAuth(data.accessToken, session);
-    //     return session;
-    //   }
-    //   if (res.status !== 401) { clearAuth(); return null; }
-    // } catch { return null; }
-    // try {
-    //   const refreshRes = await fetch(`${getBaseUrl()}/auth/refresh`, {
-    //     method: 'POST', credentials: 'include',
-    //     headers: { 'Content-Type': 'application/json' },
-    //   });
-    //   if (!refreshRes.ok) { clearAuth(); return null; }
-    //   const data = await refreshRes.json() as BackendAuthResponse;
-    //   const session = mapSession(data as unknown as Record<string, unknown>);
-    //   storeAuth(data.accessToken, session);
-    //   return session;
-    // } catch { clearAuth(); return null; }
+      const res = await apiFetch('/auth/me');
+      if (res.ok) {
+        const data = await res.json() as BackendAuthResponse;
+        const session = mapSession(data as unknown as Record<string, unknown>);
+        storeAuth(data.accessToken, session);
+        return session;
+      }
+      // Non-401 (server error, network issue) — don't clear local state, just bail.
+      if (res.status !== 401) return null;
+    } catch { return null; }
+    // /auth/me returned 401 — access token expired; attempt silent refresh.
+    try {
+      const refreshRes = await apiFetch('/auth/refresh', { method: 'POST' });
+      if (!refreshRes.ok) { clearAuth(); return null; }
+      const data = await refreshRes.json() as BackendAuthResponse;
+      const session = mapSession(data as unknown as Record<string, unknown>);
+      storeAuth(data.accessToken, session);
+      return session;
+    } catch { clearAuth(); return null; }
   },
 
   async requestPasswordReset(email: string): Promise<void> {

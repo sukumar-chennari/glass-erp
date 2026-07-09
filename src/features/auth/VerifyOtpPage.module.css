@@ -35,6 +35,14 @@
   color: var(--color-text-secondary);
 }
 
+.latestOtpNote {
+  margin:      var(--space-2) 0 0;
+  font-size:   var(--font-size-xs, 0.75rem);
+  color:       var(--color-text-muted);
+  text-align:  center;
+  line-height: 1.5;
+}
+
 .backLink {
   display:         flex;
   align-items:     center;

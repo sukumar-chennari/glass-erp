@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
@@ -17,7 +17,11 @@ type LoginMode = 'email' | 'phone';
 export function LoginPage() {
   const { t } = useTranslation('auth');
   const { acceptLoginResponse, session, isLoading } = useAuth();
-  const navigate = useNavigate();
+  const navigate    = useNavigate();
+  const [urlParams] = useSearchParams();
+  const sessionExpiredBanner = urlParams.get('reason') === 'session_expired'
+    ? 'Your session expired. Please sign in again.'
+    : null;
 
   const [loginEmail]  = useLoginEmailMutation();
   const [otpSend]     = useOtpSendMutation();
@@ -142,6 +146,7 @@ export function LoginPage() {
 
   return (
     <AuthCard title={t('title')} subtitle={subtitle}>
+      {sessionExpiredBanner && <AlertBanner message={sessionExpiredBanner} />}
       <div className={styles.modeToggle} role="tablist" aria-label="Login method">
         <button
           type="button" role="tab" aria-selected={mode === 'email'}
