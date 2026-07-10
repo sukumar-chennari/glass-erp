@@ -21,12 +21,43 @@ export const branchesApi = baseApi.injectEndpoints({
 
     createBranch: builder.mutation<BranchCreateResponse, BranchCreatePayload>({
       ...mockableMutation<BranchCreateResponse, BranchCreatePayload>({
-        // Inline mock — avoids updating adminBranches.ts for the new payload shape.
-        mockFn: (payload) => ({
-          id:   mockId('br-'),
-          name: payload.name,
-          code: payload.code,
-        }),
+        mockFn: (payload) => {
+          const branchId = mockId('br-');
+          const now = new Date().toISOString();
+          return {
+            branch: {
+              id:                     branchId,
+              code:                   payload.code,
+              name:                   payload.name,
+              state:                  payload.state,
+              district:               payload.district,
+              address:                payload.address,
+              pincode:                payload.pincode,
+              latitude:               payload.latitude,
+              longitude:              payload.longitude,
+              contactNumber:          payload.contactNumber,
+              alternateContactNumber: payload.alternateContactNumber,
+              email:                  payload.email,
+              openingTime:            payload.openingTime,
+              closingTime:            payload.closingTime,
+              status:                 payload.status,
+              createdById:            'mock-user',
+              createdAt:              now,
+              updatedAt:              now,
+            },
+            admin: {
+              id:        mockId('usr-'),
+              name:      payload.adminName,
+              email:     payload.adminEmail,
+              phone:     payload.adminPhone,
+              role:      'ADMIN',
+              branchId,
+              isActive:  true,
+              createdAt: now,
+              updatedAt: now,
+            },
+          };
+        },
         url: '/branches',
         method: 'POST',
       }),

@@ -41,12 +41,44 @@ export interface BranchCreatePayload {
   adminPhone:             string;
 }
 
-// Minimal 201 response from POST /branches.
-// Branch (list shape) is kept separate for the GET endpoint.
+// 201 response from POST /branches — matches live API exactly.
+// Branch list shape (GET /settings/branches) is intentionally separate.
+export interface BranchCreatedRecord {
+  id:                      string;
+  code:                    string;
+  name:                    string;
+  state:                   string;
+  district:                string;
+  address:                 string;
+  pincode:                 string;
+  latitude:                number;
+  longitude:               number;
+  contactNumber:           string;
+  alternateContactNumber:  string;
+  email:                   string;
+  openingTime:             string;
+  closingTime:             string;
+  status:                  BranchCreateStatus;
+  createdById:             string;
+  createdAt:               string;
+  updatedAt:               string;
+}
+
+export interface BranchCreatedAdmin {
+  id:        string;
+  name:      string;
+  email:     string;
+  phone:     string;
+  role:      string;
+  branchId:  string;
+  isActive:  boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface BranchCreateResponse {
-  id:   string;
-  name: string;
-  code: string;
+  branch: BranchCreatedRecord;
+  admin:  BranchCreatedAdmin;
 }
 
 // Decoupled from BranchCreatePayload to prevent the updated create shape
