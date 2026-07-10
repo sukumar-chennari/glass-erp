@@ -1,5 +1,5 @@
 import { baseApi } from '@/services/baseApi';
-import { mockableQuery, mockableMutation } from '@/services/mockUtils';
+import { mockableQuery, mockableMutation, normalizeArray } from '@/services/mockUtils';
 import { userMock } from '@/mocks/adminUsers';
 import type { AppUser, UserCreatePayload, UserUpdateStatusPayload } from '@/types/models/appUser';
 
@@ -9,6 +9,7 @@ export const usersApi = baseApi.injectEndpoints({
       ...mockableQuery<AppUser[], void>({
         mockFn: () => userMock.list(),
         url: '/settings/users',
+        transformResponse: (raw) => normalizeArray<AppUser>(raw, 'users'),
       }),
       providesTags: ['AppUser'],
     }),

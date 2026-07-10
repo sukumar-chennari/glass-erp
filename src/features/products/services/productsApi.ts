@@ -1,5 +1,5 @@
 import { baseApi } from '@/services/baseApi';
-import { mockableQuery, mockableMutation } from '@/services/mockUtils';
+import { mockableQuery, mockableMutation, normalizeArray } from '@/services/mockUtils';
 import { productMock } from '@/mocks/products';
 import type { Product, CreateProductDto } from '@/types/models/product';
 
@@ -13,6 +13,7 @@ export const productsApi = baseApi.injectEndpoints({
       ...mockableQuery<Product[], void>({
         mockFn: () => productMock.list(),
         url: '/products',
+        transformResponse: (raw) => normalizeArray<Product>(raw, 'products'),
       }),
       providesTags: ['Product'],
     }),

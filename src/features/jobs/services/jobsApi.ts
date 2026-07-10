@@ -1,5 +1,5 @@
 import { baseApi } from '@/services/baseApi';
-import { mockableQuery, mockableMutation } from '@/services/mockUtils';
+import { mockableQuery, mockableMutation, normalizeArray } from '@/services/mockUtils';
 import { jobMock } from '@/mocks/jobs';
 import { customerMock } from '@/mocks/customers';
 import { technicianMock } from '@/mocks/technicians';
@@ -25,6 +25,7 @@ export const jobsApi = baseApi.injectEndpoints({
       ...mockableQuery<Job[], void>({
         mockFn: () => jobMock.list(),
         url: '/jobs',
+        transformResponse: (raw) => normalizeArray<Job>(raw, 'jobs'),
       }),
       providesTags: ['Job'],
     }),

@@ -1,5 +1,5 @@
 import { baseApi } from '@/services/baseApi';
-import { mockableQuery, mockableMutation } from '@/services/mockUtils';
+import { mockableQuery, mockableMutation, normalizeArray } from '@/services/mockUtils';
 import { technicianMock } from '@/mocks/technicians';
 import type { Technician, CreateTechnicianDto, UpdateTechnicianDto } from '@/types/models/technician';
 
@@ -13,6 +13,7 @@ export const techniciansApi = baseApi.injectEndpoints({
       ...mockableQuery<Technician[], void>({
         mockFn: () => technicianMock.list(),
         url: '/technicians',
+        transformResponse: (raw) => normalizeArray<Technician>(raw, 'technicians'),
       }),
       providesTags: ['Technician'],
     }),

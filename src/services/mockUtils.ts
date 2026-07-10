@@ -27,11 +27,13 @@ interface MockableQueryOptions<R, A> {
   mockFn: (arg: A) => R | Promise<R>;
   url:    string | ((arg: A) => string);
   params?: (arg: A) => Record<string, unknown>;
+  // Only applied in real (query) mode — RTK skips transformResponse for queryFn.
+  transformResponse?: (raw: unknown) => R;
 }
 
 type MockableQueryResult<R, A> =
   | { queryFn: (arg: A) => Promise<{ data: R }> }
-  | { query:   (arg: A) => { url: string; params?: Record<string, unknown> } };
+  | { query: (arg: A) => { url: string; params?: Record<string, unknown> }; transformResponse?: (raw: unknown) => R };
 
 export function mockableQuery<R, A = void>(
   options: MockableQueryOptions<R, A>,
@@ -50,6 +52,7 @@ export function mockableQuery<R, A = void>(
       url:    typeof options.url === 'function' ? options.url(arg) : options.url,
       params: options.params?.(arg),
     }),
+    ...(options.transformResponse ? { transformResponse: options.transformResponse } : {}),
   };
 }
 
@@ -92,6 +95,27 @@ export function mockableMutation<R, A = void>(
 /** Generate a predictable-looking fake ID for mock creates. */
 export function mockId(prefix = ''): string {
   return `${prefix}${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+}
+
+/**
+ * RTK Query transformResponse helper for list endpoints.
+ * Only runs in real (query) mode — RTK skips transformResponse for queryFn.
+ *
+ * Handles backends that return a plain array OR an envelope like
+ * { data: [], items: [], <resourceKey>: [] }.
+ */
+export function normalizeArray<T>(
+  raw: unknown,
+  ...resourceKeys: string[]
+): T[] {
+  if (Array.isArray(raw)) return raw as T[];
+  if (raw && typeof raw === 'object') {
+    const r = raw as Record<string, unknown>;
+    for (const key of ['data', 'items', ...resourceKeys]) {
+      if (Array.isArray(r[key])) return r[key] as T[];
+    }
+  }
+  return [];
 }
 
 /** Format Indian currency. */

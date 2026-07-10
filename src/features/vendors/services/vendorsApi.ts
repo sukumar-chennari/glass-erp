@@ -1,5 +1,5 @@
 import { baseApi } from '@/services/baseApi';
-import { mockableQuery, mockableMutation } from '@/services/mockUtils';
+import { mockableQuery, mockableMutation, normalizeArray } from '@/services/mockUtils';
 import { vendorMock } from '@/mocks/vendors';
 import type { Vendor, CreateVendorDto, UpdateVendorDto } from '@/types/models/vendor';
 
@@ -13,6 +13,7 @@ export const vendorsApi = baseApi.injectEndpoints({
       ...mockableQuery<Vendor[], void>({
         mockFn: () => vendorMock.list(),
         url: '/vendors',
+        transformResponse: (raw) => normalizeArray<Vendor>(raw, 'vendors'),
       }),
       providesTags: ['Vendor'],
     }),

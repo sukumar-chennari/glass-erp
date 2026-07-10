@@ -1,5 +1,5 @@
 import { baseApi } from '@/services/baseApi';
-import { mockableQuery, mockableMutation, mockId } from '@/services/mockUtils';
+import { mockableQuery, mockableMutation, mockId, normalizeArray } from '@/services/mockUtils';
 import { branchMock } from '@/mocks/adminBranches';
 import type {
   Branch,
@@ -14,6 +14,7 @@ export const branchesApi = baseApi.injectEndpoints({
       ...mockableQuery<Branch[], void>({
         mockFn: () => branchMock.list(),
         url: '/settings/branches',
+        transformResponse: (raw) => normalizeArray<Branch>(raw, 'branches'),
       }),
       providesTags: ['Branch'],
     }),

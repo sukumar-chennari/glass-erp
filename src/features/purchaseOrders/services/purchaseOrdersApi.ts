@@ -1,5 +1,5 @@
 import { baseApi } from '@/services/baseApi';
-import { mockableQuery, mockableMutation } from '@/services/mockUtils';
+import { mockableQuery, mockableMutation, normalizeArray } from '@/services/mockUtils';
 import { purchaseOrderMock } from '@/mocks/purchaseOrders';
 import { vendorMock } from '@/mocks/vendors';
 import type {
@@ -18,6 +18,7 @@ export const purchaseOrdersApi = baseApi.injectEndpoints({
       ...mockableQuery<PurchaseOrder[], void>({
         mockFn: () => purchaseOrderMock.list(),
         url: '/purchase-orders',
+        transformResponse: (raw) => normalizeArray<PurchaseOrder>(raw, 'purchaseOrders'),
       }),
       providesTags: ['PurchaseOrder'],
     }),

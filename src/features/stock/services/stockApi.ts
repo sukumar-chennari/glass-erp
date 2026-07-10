@@ -1,5 +1,5 @@
 import { baseApi } from '@/services/baseApi';
-import { mockableQuery, mockableMutation } from '@/services/mockUtils';
+import { mockableQuery, mockableMutation, normalizeArray } from '@/services/mockUtils';
 import { stockMock } from '@/mocks/stock';
 import type { StockEntry, AdjustStockDto } from '@/types/models/stock';
 
@@ -9,6 +9,7 @@ export const stockApi = baseApi.injectEndpoints({
       ...mockableQuery<StockEntry[], void>({
         mockFn: () => stockMock.list(),
         url: '/stock',
+        transformResponse: (raw) => normalizeArray<StockEntry>(raw, 'stock'),
       }),
       providesTags: ['Stock'],
     }),

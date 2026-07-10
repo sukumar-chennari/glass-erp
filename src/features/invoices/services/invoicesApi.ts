@@ -1,5 +1,5 @@
 import { baseApi } from '@/services/baseApi';
-import { mockableQuery, mockableMutation } from '@/services/mockUtils';
+import { mockableQuery, mockableMutation, normalizeArray } from '@/services/mockUtils';
 import { invoiceMock } from '@/mocks/invoices';
 import { customerMock } from '@/mocks/customers';
 import type { Invoice, CreateInvoiceDto, UpdateInvoiceDto } from '@/types/models/invoice';
@@ -14,6 +14,7 @@ export const invoicesApi = baseApi.injectEndpoints({
       ...mockableQuery<Invoice[], void>({
         mockFn: () => invoiceMock.list(),
         url: '/invoices',
+        transformResponse: (raw) => normalizeArray<Invoice>(raw, 'invoices'),
       }),
       providesTags: ['Invoice'],
     }),

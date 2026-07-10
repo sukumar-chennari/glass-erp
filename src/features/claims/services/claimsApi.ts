@@ -1,5 +1,5 @@
 import { baseApi } from '@/services/baseApi';
-import { mockableQuery, mockableMutation } from '@/services/mockUtils';
+import { mockableQuery, mockableMutation, normalizeArray } from '@/services/mockUtils';
 import { claimMock } from '@/mocks/claims';
 import { customerMock } from '@/mocks/customers';
 import type { Claim, CreateClaimDto } from '@/types/models/claim';
@@ -18,6 +18,7 @@ export const claimsApi = baseApi.injectEndpoints({
       ...mockableQuery<Claim[], void>({
         mockFn: () => claimMock.list(),
         url: '/insurance-claims',
+        transformResponse: (raw) => normalizeArray<Claim>(raw, 'claims'),
       }),
       providesTags: ['Claim'],
     }),

@@ -1,5 +1,5 @@
 import { baseApi } from '@/services/baseApi';
-import { mockableQuery, mockableMutation } from '@/services/mockUtils';
+import { mockableQuery, mockableMutation, normalizeArray } from '@/services/mockUtils';
 import { customerMock } from '@/mocks/customers';
 import type { Customer, CreateCustomerDto } from '@/types/models/customer';
 
@@ -13,6 +13,7 @@ export const customersApi = baseApi.injectEndpoints({
       ...mockableQuery<Customer[], void>({
         mockFn: () => customerMock.list(),
         url: '/customers',
+        transformResponse: (raw) => normalizeArray<Customer>(raw, 'customers'),
       }),
       providesTags: ['Customer'],
     }),

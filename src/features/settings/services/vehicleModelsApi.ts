@@ -1,5 +1,5 @@
 import { baseApi } from '@/services/baseApi';
-import { mockableQuery, mockableMutation } from '@/services/mockUtils';
+import { mockableQuery, mockableMutation, normalizeArray } from '@/services/mockUtils';
 import { ENDPOINTS } from '@/services/api';
 import { vehicleModelMock } from '@/mocks/vehicleModels';
 import type { VehicleModel, VehicleModelPayload, VehicleModelUpdatePayload } from '@/types/models/vehicleModel';
@@ -10,6 +10,7 @@ export const vehicleModelsApi = baseApi.injectEndpoints({
       ...mockableQuery<VehicleModel[], void>({
         mockFn: () => vehicleModelMock.list(),
         url:    ENDPOINTS.vehicleModels.list,
+        transformResponse: (raw) => normalizeArray<VehicleModel>(raw, 'models'),
       }),
       providesTags: ['VehicleModel'],
     }),

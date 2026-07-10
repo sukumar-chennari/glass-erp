@@ -1,5 +1,5 @@
 import { baseApi } from '@/services/baseApi';
-import { mockableQuery, mockableMutation } from '@/services/mockUtils';
+import { mockableQuery, mockableMutation, normalizeArray } from '@/services/mockUtils';
 import { ENDPOINTS } from '@/services/api';
 import { insuranceRuleMock } from '@/mocks/insuranceRules';
 import type { InsuranceRule, InsuranceRulePayload, InsuranceRuleUpdatePayload } from '@/types/models/insuranceRule';
@@ -10,6 +10,7 @@ export const insuranceRulesApi = baseApi.injectEndpoints({
       ...mockableQuery<InsuranceRule[], void>({
         mockFn: () => insuranceRuleMock.list(),
         url:    ENDPOINTS.insuranceRules.list,
+        transformResponse: (raw) => normalizeArray<InsuranceRule>(raw, 'rules'),
       }),
       providesTags: ['InsuranceRule'],
     }),

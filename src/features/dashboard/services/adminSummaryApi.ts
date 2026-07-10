@@ -1,5 +1,5 @@
 import { baseApi } from '@/services/baseApi';
-import { mockableQuery } from '@/services/mockUtils';
+import { mockableQuery, normalizeArray } from '@/services/mockUtils';
 import { adminSummaryMock } from '@/mocks/adminSummary';
 import type { AdminSummary, BranchPerformanceRow } from '@/types/models/adminSummary';
 
@@ -18,6 +18,7 @@ export const adminSummaryApi = baseApi.injectEndpoints({
         mockFn: () => adminSummaryMock.getBranchPerformance(),
         url: '/reports/branch-summary',
         params: () => ({ period: 'today' }),
+        transformResponse: (raw) => normalizeArray<BranchPerformanceRow>(raw, 'branches'),
       }),
       providesTags: ['AdminSummary'],
     }),
