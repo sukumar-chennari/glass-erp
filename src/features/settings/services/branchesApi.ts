@@ -1,7 +1,12 @@
 import { baseApi } from '@/services/baseApi';
-import { mockableQuery, mockableMutation } from '@/services/mockUtils';
+import { mockableQuery, mockableMutation, mockId } from '@/services/mockUtils';
 import { branchMock } from '@/mocks/adminBranches';
-import type { Branch, BranchCreatePayload, BranchUpdatePayload } from '@/types/models/branch';
+import type {
+  Branch,
+  BranchCreatePayload,
+  BranchCreateResponse,
+  BranchUpdatePayload,
+} from '@/types/models/branch';
 
 export const branchesApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -13,10 +18,15 @@ export const branchesApi = baseApi.injectEndpoints({
       providesTags: ['Branch'],
     }),
 
-    createBranch: builder.mutation<Branch, BranchCreatePayload>({
-      ...mockableMutation<Branch, BranchCreatePayload>({
-        mockFn: (payload) => branchMock.create(payload),
-        url: '/settings/branches',
+    createBranch: builder.mutation<BranchCreateResponse, BranchCreatePayload>({
+      ...mockableMutation<BranchCreateResponse, BranchCreatePayload>({
+        // Inline mock — avoids updating adminBranches.ts for the new payload shape.
+        mockFn: (payload) => ({
+          id:   mockId('br-'),
+          name: payload.name,
+          code: payload.code,
+        }),
+        url: '/branches',
         method: 'POST',
       }),
       invalidatesTags: ['Branch'],

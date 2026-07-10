@@ -71,8 +71,21 @@ export const branchMock = {
   list: (): Branch[] => [...store],
 
   create: (payload: BranchCreatePayload): Branch => {
-    const manager = MANAGER_MAP[payload.managerId] ?? '—';
-    const branch: Branch = { ...payload, id: mockId('br-'), manager, staff: 0, status: 'Active' };
+    const branch: Branch = {
+      id:           mockId('br-'),
+      name:         payload.name,
+      address:      payload.address,
+      phone:        payload.contactNumber,
+      mapsUrl:      '',
+      openTime:     payload.openingTime,
+      closeTime:    payload.closingTime,
+      serviceAreas: '',
+      pincodes:     payload.pincode,
+      managerId:    '',
+      manager:      payload.adminName,
+      staff:        0,
+      status:       'Active',
+    };
     store = [...store, branch];
     return branch;
   },
