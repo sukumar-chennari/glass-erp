@@ -3,6 +3,8 @@ import { mockableQuery, mockableMutation, mockId, normalizeArray } from '@/servi
 import { branchMock } from '@/mocks/adminBranches';
 import type {
   Branch,
+  BranchListItem,
+  BranchListStatus,
   BranchCreatePayload,
   BranchCreateResponse,
   BranchUpdatePayload,
@@ -10,11 +12,12 @@ import type {
 
 export const branchesApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getBranches: builder.query<Branch[], void>({
-      ...mockableQuery<Branch[], void>({
-        mockFn: () => branchMock.list(),
-        url: '/settings/branches',
-        transformResponse: (raw) => normalizeArray<Branch>(raw, 'branches'),
+    getBranches: builder.query<BranchListItem[], BranchListStatus | undefined>({
+      ...mockableQuery<BranchListItem[], BranchListStatus | undefined>({
+        mockFn: () => branchMock.list() as unknown as BranchListItem[],
+        url: '/branches',
+        params: (status) => (status ? { status } : {}),
+        transformResponse: (raw) => normalizeArray<BranchListItem>(raw, 'branches'),
       }),
       providesTags: ['Branch'],
     }),

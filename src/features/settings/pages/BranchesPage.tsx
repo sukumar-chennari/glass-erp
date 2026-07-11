@@ -1,6 +1,6 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Building2, ArrowLeft, MapPin, LocateFixed, Loader2 } from 'lucide-react';
+import { Building2, ArrowLeft, LocateFixed, Loader2 } from 'lucide-react';
 import type { FetchBaseQueryError } from '@reduxjs/toolkit/query/react';
 import { PageShell, SectionCard } from '@/components/layout/PageShell';
 import { Button } from '@/components/ui/Button';
@@ -12,23 +12,34 @@ import { Modal } from '@/components/ui/Modal';
 import { useToast } from '@/components/ui/Toast';
 import { useHasPermission } from '@/context/AuthContext';
 import { useGetBranchesQuery, useCreateBranchMutation } from '@/features/settings/services/branchesApi';
-import type { Branch, BranchCreatePayload, BranchStatus } from '@/types/models/branch';
+import type { BranchListItem, BranchListStatus, BranchCreatePayload } from '@/types/models/branch';
 import type { TableColumn, SelectOption } from '@/types/ui';
 import { ROUTES } from '@/constants/routes';
 import styles from './BranchesPage.module.css';
 
-const BRANCH_STATUS_MAP: Record<BranchStatus, { label: string; variant: 'success' | 'neutral' }> = {
-  Active:   { label: 'Active',   variant: 'success' },
-  Inactive: { label: 'Inactive', variant: 'neutral' },
+// Matches backend uppercase status enum including SUSPENDED
+const BRANCH_STATUS_MAP: Record<BranchListStatus, { label: string; variant: 'success' | 'warning' | 'neutral' }> = {
+  ACTIVE:    { label: 'Active',    variant: 'success' },
+  INACTIVE:  { label: 'Inactive',  variant: 'neutral' },
+  SUSPENDED: { label: 'Suspended', variant: 'warning' },
 };
 
+// Used in the create form status select (SUSPENDED not allowed at create time)
 const STATUS_OPTIONS: SelectOption[] = [
   { value: 'ACTIVE',   label: 'Active' },
   { value: 'INACTIVE', label: 'Inactive' },
 ];
 
+const FILTER_OPTIONS: SelectOption[] = [
+  { value: '',          label: 'All statuses' },
+  { value: 'ACTIVE',    label: 'Active' },
+  { value: 'INACTIVE',  label: 'Inactive' },
+  { value: 'SUSPENDED', label: 'Suspended' },
+];
+
 // ── Table Columns ──────────────────────────────────────────────────────
-const COLUMNS: TableColumn<Branch>[] = [
+// Uses real backend field names: contactNumber, openingTime, closingTime.
+const COLUMNS: TableColumn<BranchListItem>[] = [
   {
     key: 'name',
     header: 'Branch',
@@ -36,35 +47,19 @@ const COLUMNS: TableColumn<Branch>[] = [
       <div>
         <div className={styles.cellPrimary}>{b.name}</div>
         <div className={styles.cellMuted}>{b.address}</div>
-        {b.mapsUrl && (
-          <a
-            href={b.mapsUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.mapsLink}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <MapPin size={10} /> View on Maps
-          </a>
-        )}
+        <div className={styles.cellMuted}>{b.district}, {b.state}</div>
       </div>
     ),
   },
   {
-    key: 'openTime',
+    key: 'openingTime',
     header: 'Hours',
     render: (b) => (
-      <span className={styles.hours}>{b.openTime} – {b.closeTime}</span>
+      <span className={styles.hours}>{b.openingTime} – {b.closingTime}</span>
     ),
   },
-  { key: 'phone',   header: 'Phone'   },
-  { key: 'manager', header: 'Manager' },
-  {
-    key: 'staff',
-    header: 'Staff',
-    align: 'center' as const,
-    render: (b) => <span>{b.staff}</span>,
-  },
+  { key: 'contactNumber', header: 'Phone' },
+  { key: 'email',         header: 'Email' },
   {
     key: 'status',
     header: 'Status',
@@ -143,7 +138,11 @@ export function BranchesPage() {
   const toast      = useToast();
   const canCreate  = useHasPermission('branches:write');
 
-  const { data: branches = [], isLoading, isError } = useGetBranchesQuery();
+  const [statusFilter, setStatusFilter] = useState<BranchListStatus | ''>('');
+
+  const { data: branches = [], isLoading, isError, error } = useGetBranchesQuery(
+    statusFilter || undefined,
+  );
   const [createBranch, { isLoading: saving }] = useCreateBranchMutation();
 
   const [modalOpen,   setModal]     = useState(false);
@@ -152,7 +151,8 @@ export function BranchesPage() {
   const [geoLoading,  setGeoLoad]   = useState(false);
   const [geoError,    setGeoError]  = useState<string | null>(null);
 
-  const totalStaff = useMemo(() => branches.reduce((a, b) => a + b.staff, 0), [branches]);
+  const isUnauthorized = isError &&
+    (error as FetchBaseQueryError | undefined)?.status === 401;
 
   function set(key: keyof BranchForm, val: string) {
     setForm((f) => ({ ...f, [key]: val }));
@@ -325,11 +325,33 @@ export function BranchesPage() {
 
       <SectionCard>
         <div className={styles.tableHeader}>
-          <span className={styles.count}>{branches.length} branches · {totalStaff} staff</span>
+          <span className={styles.count}>
+            {isLoading ? 'Loading…' : `${branches.length} branch${branches.length !== 1 ? 'es' : ''}`}
+          </span>
+          <Select
+            options={FILTER_OPTIONS}
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value as BranchListStatus | '')}
+            aria-label="Filter by status"
+          />
         </div>
         {isLoading && <div className={styles.emptyState}>Loading branches…</div>}
-        {isError   && <div className={styles.emptyState}>Failed to load branches.</div>}
-        {!isLoading && !isError && <DataTable columns={COLUMNS} data={branches} />}
+        {isUnauthorized && (
+          <div className={styles.emptyState}>
+            Session expired or insufficient permissions. Please log in again.
+          </div>
+        )}
+        {isError && !isUnauthorized && (
+          <div className={styles.emptyState}>Failed to load branches. Please try again.</div>
+        )}
+        {!isLoading && !isError && branches.length === 0 && (
+          <div className={styles.emptyState}>
+            {statusFilter ? `No ${statusFilter.toLowerCase()} branches found.` : 'No branches found.'}
+          </div>
+        )}
+        {!isLoading && !isError && branches.length > 0 && (
+          <DataTable columns={COLUMNS} data={branches} />
+        )}
       </SectionCard>
 
       <Modal

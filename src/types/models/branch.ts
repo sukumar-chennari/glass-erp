@@ -1,7 +1,31 @@
 export type BranchStatus = 'Active' | 'Inactive';
 
-// Separate backend enum used in POST /branches payload
+// Backend enum used in POST /branches and GET /branches ?status filter
 export type BranchCreateStatus = 'ACTIVE' | 'INACTIVE';
+export type BranchListStatus   = 'ACTIVE' | 'INACTIVE' | 'SUSPENDED';
+
+// Shape returned by GET /api/v1/branches list items.
+// Field names match the live backend (contactNumber, openingTime, closingTime).
+// Intentionally separate from the legacy mock Branch type used by the edit flow.
+export interface BranchListItem {
+  id:                      string;
+  code:                    string;
+  name:                    string;
+  state:                   string;
+  district:                string;
+  address:                 string;
+  pincode:                 string;
+  latitude:                number;
+  longitude:               number;
+  contactNumber:           string;
+  alternateContactNumber:  string;
+  email:                   string;
+  openingTime:             string;
+  closingTime:             string;
+  status:                  BranchListStatus;
+  createdAt:               string;
+  updatedAt:               string;
+}
 
 export interface Branch {
   id:           string;
