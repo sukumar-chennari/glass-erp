@@ -23,8 +23,18 @@ export interface BranchListItem {
   openingTime:             string;
   closingTime:             string;
   status:                  BranchListStatus;
+  createdById:             string;
   createdAt:               string;
   updatedAt:               string;
+}
+
+// Paginated envelope returned by GET /api/v1/branches.
+// data is the item array; total/page/limit ready for pagination controls.
+export interface BranchListResponse {
+  data:  BranchListItem[];
+  total: number;
+  page:  number;
+  limit: number;
 }
 
 export interface Branch {

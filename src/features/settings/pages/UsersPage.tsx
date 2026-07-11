@@ -31,10 +31,10 @@ const ROLE_VARIANT: Record<AppRole, 'primary' | 'info' | 'success' | 'warning'> 
   technician:     'warning',
 };
 
+// Only roles with a confirmed backend mapping (FRONTEND_TO_BACKEND_ROLE) are offered.
+// branch_manager and operator are excluded until backend confirms their equivalents.
 const ROLE_OPTIONS: SelectOption[] = [
-  { value: 'branch_manager', label: 'Branch Manager' },
-  { value: 'operator',       label: 'Operator'       },
-  { value: 'technician',     label: 'Technician'     },
+  { value: 'technician', label: 'Technician' },
 ];
 
 const ROLE_FILTER_OPTIONS: SelectOption[] = [
@@ -135,7 +135,7 @@ const EMPTY_FORM: UserForm = {
   name:   '',
   email:  '',
   phone:  '',
-  role:   'operator',
+  role:   'technician',
   branch: 'br-001',
 };
 
@@ -148,7 +148,8 @@ interface FormErrors {
 // ── Component ──────────────────────────────────────────────────────────
 export function UsersPage() {
   const toast = useToast();
-  const { data: users = [], isLoading, isError } = useGetUsersQuery();
+  const { data: staffRes, isLoading, isError } = useGetUsersQuery();
+  const users = staffRes?.data ?? [];
   const [createUser,    { isLoading: saving    }] = useCreateUserMutation();
   const [resendInvite,  { isLoading: resending }] = useResendInviteMutation();
 
@@ -383,6 +384,9 @@ export function UsersPage() {
             value={form.role}
             onChange={(e) => setField('role', e.target.value)}
           />
+          <p className={styles.roleNote}>
+            Only <strong>Technician</strong> is available — other roles are pending backend role alignment.
+          </p>
           <Select
             label="Branch"
             options={BRANCH_OPTIONS}

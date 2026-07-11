@@ -1,9 +1,10 @@
 import { baseApi } from '@/services/baseApi';
-import { mockableQuery, mockableMutation, mockId, normalizeArray } from '@/services/mockUtils';
+import { mockableQuery, mockableMutation, mockId } from '@/services/mockUtils';
 import { branchMock } from '@/mocks/adminBranches';
 import type {
   Branch,
   BranchListItem,
+  BranchListResponse,
   BranchListStatus,
   BranchCreatePayload,
   BranchCreateResponse,
@@ -12,12 +13,23 @@ import type {
 
 export const branchesApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getBranches: builder.query<BranchListItem[], BranchListStatus | undefined>({
-      ...mockableQuery<BranchListItem[], BranchListStatus | undefined>({
-        mockFn: () => branchMock.list() as unknown as BranchListItem[],
+    getBranches: builder.query<BranchListResponse, BranchListStatus | undefined>({
+      ...mockableQuery<BranchListResponse, BranchListStatus | undefined>({
+        mockFn: () => {
+          const items = branchMock.list() as unknown as BranchListItem[];
+          return { data: items, total: items.length, page: 1, limit: 20 };
+        },
         url: '/branches',
         params: (status) => (status ? { status } : {}),
-        transformResponse: (raw) => normalizeArray<BranchListItem>(raw, 'branches'),
+        transformResponse: (raw: unknown): BranchListResponse => {
+          const r = raw as { data?: unknown; total?: number; page?: number; limit?: number };
+          return {
+            data:  Array.isArray(r.data) ? (r.data as BranchListItem[]) : [],
+            total: r.total  ?? 0,
+            page:  r.page   ?? 1,
+            limit: r.limit  ?? 20,
+          };
+        },
       }),
       providesTags: ['Branch'],
     }),

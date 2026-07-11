@@ -140,9 +140,10 @@ export function BranchesPage() {
 
   const [statusFilter, setStatusFilter] = useState<BranchListStatus | ''>('');
 
-  const { data: branches = [], isLoading, isError, error } = useGetBranchesQuery(
+  const { data: branchRes, isLoading, isError, error } = useGetBranchesQuery(
     statusFilter || undefined,
   );
+  const branches = branchRes?.data ?? [];
   const [createBranch, { isLoading: saving }] = useCreateBranchMutation();
 
   const [modalOpen,   setModal]     = useState(false);
