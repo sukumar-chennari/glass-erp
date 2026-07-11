@@ -261,7 +261,42 @@
   border-color: var(--color-danger-text) !important;
 }
 
-/* ── Branch row ── */
+/* ── District search row (text input + search button + GPS button) ── */
+.districtRow {
+  display: flex;
+  gap: var(--space-2);
+  align-items: stretch;
+  margin-bottom: var(--space-2);
+}
+
+.districtInput {
+  flex: 1;
+  min-width: 0;
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--font-size-base);
+  background: var(--color-bg-input);
+  border: 1px solid var(--color-border-input);
+  border-radius: var(--radius-lg);
+  color: var(--color-text-primary);
+  outline: none;
+  transition: border-color var(--transition-fast);
+}
+
+.districtInput:focus {
+  border-color: var(--color-primary);
+}
+
+.districtInput:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+.districtInput::placeholder {
+  color: var(--color-text-disabled);
+  font-size: var(--font-size-sm);
+}
+
+/* ── Branch row (kept for layout reference — select now sits below districtRow) ── */
 .branchRow {
   display: flex;
   gap: var(--space-2);

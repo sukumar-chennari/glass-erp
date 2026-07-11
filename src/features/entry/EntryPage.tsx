@@ -1,16 +1,16 @@
 import { useState } from 'react';
 import { Navigate, Link } from 'react-router-dom';
-import { MapPin, Phone, Car, ChevronRight, Locate, CheckCircle } from 'lucide-react';
+import { MapPin, Phone, Car, ChevronRight, Locate, CheckCircle, Search } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
-import { useGetBranchesQuery } from '@/features/settings/services/branchesApi';
+import { useLazyGetNearbyBranchesQuery } from './nearbyBranchesApi';
+import type { NearbyBranch } from './nearbyBranchesApi';
 import { BRANDS, BRAND_MODEL_MAP } from '@/types/models/vehicleModel';
 import { useCreateEnquiryMutation } from './enquiryApi';
 import { getRoleDefaultRoute } from '@/utils/roleRouting';
 import { ROUTES } from '@/constants/routes';
-import type { BranchListItem } from '@/types/models/branch';
 import styles from './EntryPage.module.css';
 
-// ── Types ───────────────────────────────────────────────────
+// ── Types ────────────────────────────────────────────────────
 
 interface Confirmation {
   jobNumber:    string;
@@ -25,18 +25,6 @@ interface FormErrors {
   vehicleBrand?: string;
   vehicleModel?: string;
   phone?:        string;
-}
-
-// ── Haversine (km) ───────────────────────────────────────────
-
-function distanceKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
-  const R = 6371;
-  const dLat = (lat2 - lat1) * (Math.PI / 180);
-  const dLon = (lon2 - lon1) * (Math.PI / 180);
-  const a =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) * Math.sin(dLon / 2) ** 2;
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
 // ── Top bar ──────────────────────────────────────────────────
@@ -140,31 +128,48 @@ function ConfirmationView({ confirmation, onReset }: ConfirmationViewProps) {
   );
 }
 
+// ── Branch option label ───────────────────────────────────────
+
+function branchLabel(b: NearbyBranch): string {
+  let label = b.name;
+  if (b.district) label += ` — ${b.district}`;
+  if (b.distanceKm != null && b.distanceKm > 0) {
+    label += ` (${b.distanceKm.toFixed(1)} km)`;
+  }
+  return label;
+}
+
 // ── Main component ───────────────────────────────────────────
 
 export function EntryPage() {
   const { session, isLoading: authLoading } = useAuth();
-  const { data: branchRes, isLoading: branchesLoading } = useGetBranchesQuery('ACTIVE');
+
+  // Public lazy query — fires only when GPS or district search is triggered.
+  // No auth header is attached for anonymous visitors (getToken() returns null).
+  const [fetchNearby, { data: nearbyBranches, isFetching: loadingBranches }] =
+    useLazyGetNearbyBranchesQuery();
+
   const [createEnquiry, { isLoading: submitting }] = useCreateEnquiryMutation();
 
-  const [branchId,      setBranchId]      = useState('');
-  const [vehicleBrand,  setVehicleBrand]  = useState('');
-  const [vehicleModel,  setVehicleModel]  = useState('');
-  const [phone,         setPhone]         = useState('');
-  const [errors,        setErrors]        = useState<FormErrors>({});
-  const [confirmation,  setConfirmation]  = useState<Confirmation | null>(null);
-  const [locating,      setLocating]      = useState(false);
+  const [branchId,       setBranchId]       = useState('');
+  const [districtSearch, setDistrictSearch] = useState('');
+  const [vehicleBrand,   setVehicleBrand]   = useState('');
+  const [vehicleModel,   setVehicleModel]   = useState('');
+  const [phone,          setPhone]          = useState('');
+  const [errors,         setErrors]         = useState<FormErrors>({});
+  const [confirmation,   setConfirmation]   = useState<Confirmation | null>(null);
+  const [locating,       setLocating]       = useState(false);
 
-  // While AuthProvider bootstraps, render nothing (avoids flash of the form before redirect).
+  // Wait for auth bootstrap — avoids a flash of the form before the session redirect.
   if (authLoading) return null;
 
-  // Authenticated users bypass the form and go straight to their dashboard.
+  // Authenticated users go straight to their role dashboard.
   if (session) return <Navigate to={getRoleDefaultRoute(session.role)} replace />;
 
-  const branches: BranchListItem[] = branchRes?.data ?? [];
+  const branches: NearbyBranch[] = nearbyBranches ?? [];
   const models: string[] = vehicleBrand ? (BRAND_MODEL_MAP[vehicleBrand] ?? []) : [];
 
-  // ── Handlers ──────────────────────────────────────────────
+  // ── Helpers ──────────────────────────────────────────────
 
   function clearError(key: keyof FormErrors) {
     setErrors((e) => ({ ...e, [key]: undefined }));
@@ -176,28 +181,45 @@ export function EntryPage() {
     setErrors((e) => ({ ...e, vehicleBrand: undefined, vehicleModel: undefined }));
   }
 
+  // GPS mode: GET /branches/nearby?lat=...&lng=...
+  // Server returns branches sorted by distanceKm ascending.
+  // Auto-select the nearest (first) result.
   function handleLocate() {
-    if (!navigator.geolocation || branches.length === 0) return;
+    if (!navigator.geolocation) return;
     setLocating(true);
     navigator.geolocation.getCurrentPosition(
       ({ coords: { latitude, longitude } }) => {
-        let nearest = branches[0];
-        let minDist = Infinity;
-        for (const branch of branches) {
-          const d = distanceKm(latitude, longitude, branch.latitude, branch.longitude);
-          if (d < minDist) { minDist = d; nearest = branch; }
-        }
-        setBranchId(nearest.id);
-        clearError('branchId');
-        setLocating(false);
+        void (async () => {
+          try {
+            const results = await fetchNearby({ lat: latitude, lng: longitude }).unwrap();
+            if (results.length > 0) {
+              setBranchId(results[0].id);
+              setErrors((e) => ({ ...e, branchId: undefined }));
+            }
+          } finally {
+            setLocating(false);
+          }
+        })();
       },
       () => setLocating(false),
     );
   }
 
+  // District mode: GET /branches/nearby?district=...
+  // No lat/lng sent. No auto-selection — user picks from the list.
+  function handleDistrictSearch(e?: React.FormEvent) {
+    e?.preventDefault();
+    const term = districtSearch.trim();
+    if (!term) return;
+    setBranchId('');
+    void fetchNearby({ district: term });
+  }
+
+  // ── Validation & submit ──────────────────────────────────
+
   function validate(): boolean {
     const errs: FormErrors = {};
-    if (!branchId)    errs.branchId    = 'Please select a branch';
+    if (!branchId)     errs.branchId    = 'Please select a branch';
     if (!vehicleBrand) errs.vehicleBrand = 'Please select your car brand';
     if (!vehicleModel) errs.vehicleModel = 'Please select your car model';
     if (!phone)        errs.phone       = 'Mobile number is required';
@@ -241,42 +263,69 @@ export function EntryPage() {
               <p className={styles.formSub}>Fill in 3 quick details to get started</p>
             </div>
 
-            {/* Branch */}
+            {/* Branch — district search + GPS, then branch select */}
             <div className={styles.fieldGroup}>
-              <label className={styles.label} htmlFor="entry-branch">
+              <label className={styles.label} htmlFor="entry-district">
                 <MapPin size={13} />
                 Nearest Branch
               </label>
-              <div className={styles.branchRow}>
-                <select
-                  id="entry-branch"
-                  className={`${styles.select} ${errors.branchId ? styles.selectError : ''}`}
-                  value={branchId}
-                  onChange={(e) => { setBranchId(e.target.value); clearError('branchId'); }}
-                  disabled={branchesLoading}
-                  aria-invalid={!!errors.branchId}
-                  aria-describedby={errors.branchId ? 'err-branch' : undefined}
+
+              {/* Search row: district input + search button + GPS button */}
+              <div className={styles.districtRow}>
+                <input
+                  id="entry-district"
+                  type="search"
+                  className={styles.districtInput}
+                  placeholder="Type your city or district…"
+                  value={districtSearch}
+                  onChange={(e) => setDistrictSearch(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter') handleDistrictSearch(e); }}
+                  aria-label="Search branches by city or district"
+                />
+                <button
+                  type="button"
+                  className={styles.locateBtn}
+                  onClick={() => handleDistrictSearch()}
+                  disabled={!districtSearch.trim() || loadingBranches}
+                  title="Search branches in this district"
+                  aria-label="Search branches"
                 >
-                  <option value="">
-                    {branchesLoading ? 'Loading branches…' : 'Select a branch'}
-                  </option>
-                  {branches.map((b) => (
-                    <option key={b.id} value={b.id}>
-                      {b.name}{b.district ? ` — ${b.district}` : ''}
-                    </option>
-                  ))}
-                </select>
+                  <Search size={15} />
+                </button>
                 <button
                   type="button"
                   className={styles.locateBtn}
                   onClick={handleLocate}
-                  disabled={locating || branchesLoading}
-                  title="Auto-detect nearest branch"
+                  disabled={locating || loadingBranches}
+                  title="Auto-detect nearest branch using GPS"
                   aria-label="Detect nearest branch using GPS"
                 >
-                  <Locate size={16} />
+                  <Locate size={15} />
                 </button>
               </div>
+
+              {/* Branch select — shown once a search or GPS has fired */}
+              <select
+                id="entry-branch"
+                className={`${styles.select} ${errors.branchId ? styles.selectError : ''}`}
+                value={branchId}
+                onChange={(e) => { setBranchId(e.target.value); clearError('branchId'); }}
+                disabled={loadingBranches || locating || branches.length === 0}
+                aria-invalid={!!errors.branchId}
+                aria-describedby={errors.branchId ? 'err-branch' : undefined}
+              >
+                <option value="">
+                  {loadingBranches || locating
+                    ? 'Finding branches…'
+                    : branches.length === 0
+                      ? 'Search above or use GPS ↑'
+                      : 'Select a branch'}
+                </option>
+                {branches.map((b) => (
+                  <option key={b.id} value={b.id}>{branchLabel(b)}</option>
+                ))}
+              </select>
+
               {errors.branchId && (
                 <span id="err-branch" role="alert" className={styles.error}>{errors.branchId}</span>
               )}
@@ -346,7 +395,10 @@ export function EntryPage() {
                   placeholder="10-digit mobile number"
                   value={phone}
                   maxLength={10}
-                  onChange={(e) => { setPhone(e.target.value.replace(/\D/g, '').slice(0, 10)); clearError('phone'); }}
+                  onChange={(e) => {
+                    setPhone(e.target.value.replace(/\D/g, '').slice(0, 10));
+                    clearError('phone');
+                  }}
                   aria-invalid={!!errors.phone}
                   aria-describedby={errors.phone ? 'err-phone' : undefined}
                 />
