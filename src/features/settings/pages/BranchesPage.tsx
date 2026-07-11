@@ -536,7 +536,7 @@ export function BranchesPage() {
 
           {/* ── Branch Admin Account ─────────────────────────────── */}
           <div className={styles.field}>
-            <span className={styles.label} style={{ fontWeight: 600 }}>Branch Admin Account</span>
+            <span className={styles.sectionLabel}>Branch Admin Account</span>
           </div>
 
           <Input

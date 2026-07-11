@@ -1,12 +1,12 @@
-import { NavLink, Outlet, Navigate } from 'react-router-dom';
+import { NavLink, Outlet, useMatch } from 'react-router-dom';
 import type { LucideIcon } from 'lucide-react';
-import { Shield, Car, Building2, Users, Tag } from 'lucide-react';
+import { Shield, Car } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { ROUTES } from '@/constants/routes';
 import { SettingsPage } from './SettingsPage';
+import { AdminSettingsLanding } from './components/AdminSettingsLanding';
 import styles from './SettingsLayout.module.css';
 
-// Unified nav item shape for both sections
 interface SubNavItem {
   path:  string;
   label: string;
@@ -16,12 +16,6 @@ interface SubNavItem {
 const MASTER_DATA_NAV: SubNavItem[] = [
   { path: ROUTES.SETTINGS_INSURANCE_RULES, label: 'Insurance Rules', Icon: Shield },
   { path: ROUTES.SETTINGS_VEHICLE_MODELS,  label: 'Vehicle Models',  Icon: Car    },
-];
-
-const ADMIN_NAV: SubNavItem[] = [
-  { path: ROUTES.SETTINGS_BRANCHES, label: 'Branches', Icon: Building2 },
-  { path: ROUTES.SETTINGS_USERS,    label: 'Users',    Icon: Users      },
-  { path: ROUTES.SETTINGS_PRICING,  label: 'Pricing',  Icon: Tag        },
 ];
 
 function NavItems({ items }: { items: SubNavItem[] }) {
@@ -44,10 +38,14 @@ function NavItems({ items }: { items: SubNavItem[] }) {
 }
 
 export function SettingsLayout() {
-  const { session } = useAuth();
+  const { session }       = useAuth();
+  const onInsuranceRules  = useMatch(ROUTES.SETTINGS_INSURANCE_RULES);
+  const onVehicleModels   = useMatch(ROUTES.SETTINGS_VEHICLE_MODELS);
 
-  if (session?.role !== 'super_admin') {
-    // Non-admin: pass through to the child route via Outlet (no subnav)
+  // Subnav only for the two master-data sub-pages; landing + direct sidebar items render full-width
+  const showSubnav = !!(onInsuranceRules || onVehicleModels);
+
+  if (session?.role !== 'super_admin' || !showSubnav) {
     return <Outlet />;
   }
 
@@ -55,13 +53,9 @@ export function SettingsLayout() {
     <div className={styles.container}>
       <aside className={styles.subnav}>
         <div className={styles.subnavHeader}>Settings</div>
+        <div className={styles.subnavSection}>Master Data</div>
         <nav className={styles.subnavList} aria-label="Master data settings">
           <NavItems items={MASTER_DATA_NAV} />
-        </nav>
-        <div className={styles.subnavDivider} />
-        <div className={styles.subnavSection}>Admin</div>
-        <nav aria-label="Admin settings">
-          <NavItems items={ADMIN_NAV} />
         </nav>
       </aside>
       <div className={styles.content}>
@@ -71,11 +65,11 @@ export function SettingsLayout() {
   );
 }
 
-// Index route: super_admin → Insurance Rules; others → personal settings page
+// Index route: super_admin → Settings landing; others → personal settings page
 export function SettingsIndexRedirect() {
   const { session } = useAuth();
   if (session?.role === 'super_admin') {
-    return <Navigate to={ROUTES.SETTINGS_INSURANCE_RULES} replace />;
+    return <AdminSettingsLanding />;
   }
   return <SettingsPage />;
 }

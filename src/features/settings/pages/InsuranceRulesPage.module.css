@@ -107,7 +107,7 @@
 .slider {
   position:      absolute;
   inset:         0;
-  border-radius: 22px;
+  border-radius: var(--radius-full);
   background:    var(--color-border);
   transition:    background var(--transition-fast);
 }

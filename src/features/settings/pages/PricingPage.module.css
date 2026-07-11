@@ -1,3 +1,21 @@
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  text-decoration: none;
+  margin-bottom: var(--space-3);
+  transition: color var(--transition-fast);
+}
+.back:hover { color: var(--color-primary); }
+
+.actionsGroup {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
 .tableWrap { overflow-x: auto; }
 
 .table {
@@ -44,11 +62,15 @@
   padding: 6px 10px;
   font-size: var(--font-size-sm);
   border: 1.5px solid var(--color-primary);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
   background: var(--color-bg-light);
   color: var(--color-text-primary);
   outline: none;
   font-variant-numeric: tabular-nums;
+  transition: box-shadow var(--transition-fast);
+}
+.priceInput:focus {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 20%, transparent);
 }
 
 .hint {

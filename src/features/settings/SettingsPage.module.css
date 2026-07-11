@@ -76,7 +76,7 @@
   position: absolute;
   inset: 0;
   background: var(--color-border);
-  border-radius: 20px;
+  border-radius: var(--radius-full);
   cursor: pointer;
   transition: background var(--transition-fast);
 }
@@ -99,6 +99,16 @@
 
 .toggle input:checked + .slider::before {
   transform: translateX(16px);
+}
+
+.sectionDesc {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.secSubTitleSpaced {
+  margin-top: var(--space-5);
 }
 
 .saveBtn {

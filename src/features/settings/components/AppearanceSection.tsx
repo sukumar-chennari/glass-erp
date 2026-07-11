@@ -88,7 +88,7 @@ export function AppearanceSection() {
               </div>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div className={styles.presetMeta}>
               <div
                 className={styles.swatchPrimary}
                 style={{ background: p.swatch.primary }}

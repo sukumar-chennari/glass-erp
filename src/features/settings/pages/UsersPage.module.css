@@ -65,6 +65,7 @@
   transition: border-color var(--transition-fast);
 }
 .searchInput:focus { border-color: var(--color-primary); background: var(--color-bg-light); }
+.searchInput:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 1px; }
 
 .filterSelect {
   padding: 7px var(--space-3);
@@ -83,6 +84,7 @@
   background-position: right 8px center;
 }
 .filterSelect:focus { border-color: var(--color-primary); }
+.filterSelect:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 1px; }
 
 .filterBanner {
   padding: var(--space-2) var(--space-5);
@@ -161,4 +163,8 @@
 .resendBtn:disabled {
   opacity: 0.5;
   cursor:  default;
+}
+.resendBtn:focus-visible {
+  outline:        2px solid var(--color-primary);
+  outline-offset: 2px;
 }

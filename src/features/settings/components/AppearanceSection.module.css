@@ -70,6 +70,13 @@
   margin-top: var(--space-1);
 }
 
+/* ── Preset meta row (primary swatch + label) ── */
+.presetMeta {
+  display:     flex;
+  align-items: center;
+  gap:         var(--space-2);
+}
+
 /* ── Labels ── */
 .presetLabel {
   font-size:   var(--font-size-sm);

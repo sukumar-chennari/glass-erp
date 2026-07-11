@@ -199,7 +199,7 @@ export function SettingsPage() {
       <SectionCard>
         <div className={styles.section}>
           <h3 className={styles.sectionTitle}>{t('sections.appearance')}</h3>
-          <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-muted)', marginBottom: 'var(--space-4)' }}>
+          <p className={styles.sectionDesc}>
             {t('appearance.description')}
           </p>
           <AppearanceSection />
@@ -296,7 +296,7 @@ function SecuritySection() {
       </Button>
 
       {/* Login activity */}
-      <div className={styles.secSubTitle} style={{ marginTop: 'var(--space-5)' }}>
+      <div className={`${styles.secSubTitle} ${styles.secSubTitleSpaced}`}>
         <Clock size={14} />
         Recent Login Activity
       </div>

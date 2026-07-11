@@ -1,8 +1,10 @@
 import { useState } from 'react';
-import { Pencil, Check, X } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { ArrowLeft, Pencil, Check, X } from 'lucide-react';
 import { PageShell, SectionCard } from '@/components/layout/PageShell';
 import { Button } from '@/components/ui/Button';
 import { useToast } from '@/components/ui/Toast';
+import { ROUTES } from '@/constants/routes';
 import styles from './PricingPage.module.css';
 
 // Base pricing per glass type × quality grade
@@ -103,7 +105,7 @@ export function PricingPage() {
       description="Configure base glass prices and labour rates. These are used in quote generation."
       actions={
         editMode ? (
-          <div style={{ display: 'flex', gap: '8px' }}>
+          <div className={styles.actionsGroup}>
             <Button variant="ghost" leftIcon={<X size={14} />} onClick={cancelEdit} disabled={saving}>
               Cancel
             </Button>
@@ -118,6 +120,11 @@ export function PricingPage() {
         )
       }
     >
+      <Link to={ROUTES.SETTINGS} className={styles.back}>
+        <ArrowLeft size={13} />
+        Back to Settings
+      </Link>
+
       <SectionCard>
         <div className={styles.tableWrap}>
           <table className={styles.table}>

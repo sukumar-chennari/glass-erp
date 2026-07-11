@@ -78,6 +78,11 @@
   font-weight: 500;
   color: var(--color-text-primary);
 }
+.sectionLabel {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
 .req { color: var(--color-danger, #e53e3e); margin-left: 2px; }
 
 .textarea {
@@ -154,6 +159,7 @@
 }
 .geoBtn:hover:not(:disabled) { opacity: 0.7; }
 .geoBtn:disabled { opacity: 0.45; cursor: not-allowed; }
+.geoBtn:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; border-radius: var(--radius-sm); }
 
 .geoError {
   font-size: var(--font-size-xs);
