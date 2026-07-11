@@ -19,7 +19,6 @@ function RouterErrorPage() {
 
 import { AppLayout }             from '@/components/layout/AppLayout';
 import { ProtectedRoute }         from '@/components/auth/ProtectedRoute';
-import { RoleDefaultRedirect }    from '@/components/auth/RoleDefaultRedirect';
 import { LoginPage }            from '@/features/auth/LoginPage';
 import { ForgotPasswordPage }   from '@/features/auth/ForgotPasswordPage';
 import { ResetPasswordPage }    from '@/features/auth/ResetPasswordPage';
@@ -45,10 +44,19 @@ import { VehicleModelsPage }    from '@/features/settings/pages/VehicleModelsPag
 import { EnquiryPage }         from '@/features/enquiry/EnquiryPage';
 import { CustomerSubmitPage }  from '@/features/customer/CustomerSubmitPage';
 import { CustomerTrackPage }   from '@/features/customer/CustomerTrackPage';
+import { EntryPage }           from '@/features/entry/EntryPage';
 
 import { ROUTES }              from '@/constants/routes';
 
 export const router = createBrowserRouter([
+  // Public: customer entry page — unauthenticated users land here first.
+  // EntryPage redirects authenticated users to their role dashboard via getRoleDefaultRoute.
+  {
+    path:         ROUTES.ROOT,
+    element:      <EntryPage />,
+    errorElement: <RouterErrorPage />,
+  },
+
   // Public: auth flow (no authentication required)
   {
     path:         ROUTES.LOGIN,
@@ -95,8 +103,6 @@ export const router = createBrowserRouter([
       {
         element: <AppLayout />,
         children: [
-          { index: true, element: <RoleDefaultRedirect /> },
-
           { path: ROUTES.DASHBOARD,      element: <DashboardPage /> },
 
           { path: ROUTES.VENDORS,        element: <VendorsPage /> },

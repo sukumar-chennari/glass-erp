@@ -53,9 +53,25 @@ async function tryRefreshToken(): Promise<boolean> {
   return refreshPromise;
 }
 
+// Paths where an invalid/missing session is expected and handled by the page itself.
+// A 401 on these routes must NOT trigger a hard redirect to /login — the page
+// renders its own unauthenticated state (e.g. EntryPage shows the booking form).
+const PUBLIC_PATHS = ['/', '/submit', '/track'];
+
+function isPublicPath(pathname: string): boolean {
+  return (
+    PUBLIC_PATHS.includes(pathname) ||
+    pathname.startsWith('/login') ||
+    pathname.startsWith('/forgot-password') ||
+    pathname.startsWith('/reset-password') ||
+    pathname.startsWith('/verify-otp') ||
+    pathname.startsWith('/setup-password')
+  );
+}
+
 function forceLogout(): void {
   clearAuth();  // clears in-memory token + pre-13B.8 localStorage cleanup
-  if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/login')) {
+  if (typeof window !== 'undefined' && !isPublicPath(window.location.pathname)) {
     window.location.href = '/login?reason=session_expired';
   }
 }
