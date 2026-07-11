@@ -41,6 +41,8 @@ import { BranchesPage }         from '@/features/settings/pages/BranchesPage';
 import { PricingPage }          from '@/features/settings/pages/PricingPage';
 import { InsuranceRulesPage }   from '@/features/settings/pages/InsuranceRulesPage';
 import { VehicleModelsPage }    from '@/features/settings/pages/VehicleModelsPage';
+import { CarBrandsPage }        from '@/features/settings/pages/CarBrandsPage';
+import { CarModelsPage }        from '@/features/settings/pages/CarModelsPage';
 import { EnquiryPage }         from '@/features/enquiry/EnquiryPage';
 import { CustomerSubmitPage }  from '@/features/customer/CustomerSubmitPage';
 import { CustomerTrackPage }   from '@/features/customer/CustomerTrackPage';
@@ -122,6 +124,8 @@ export const router = createBrowserRouter([
               { index: true,                             element: <SettingsIndexRedirect /> },
               { path: ROUTES.SETTINGS_INSURANCE_RULES,  element: <InsuranceRulesPage /> },
               { path: ROUTES.SETTINGS_VEHICLE_MODELS,   element: <VehicleModelsPage /> },
+              { path: ROUTES.SETTINGS_CAR_BRANDS,       element: <CarBrandsPage /> },
+              { path: ROUTES.SETTINGS_CAR_MODELS,       element: <CarModelsPage /> },
               { path: ROUTES.SETTINGS_USERS,            element: <UsersPage /> },
               { path: ROUTES.SETTINGS_BRANCHES,         element: <BranchesPage /> },
               { path: ROUTES.SETTINGS_PRICING,          element: <PricingPage /> },

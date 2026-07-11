@@ -27,6 +27,8 @@ export const ROUTES = {
   SETTINGS_PRICING:          '/settings/pricing',
   SETTINGS_INSURANCE_RULES:  '/settings/insurance-rules',
   SETTINGS_VEHICLE_MODELS:   '/settings/vehicle-models',
+  SETTINGS_CAR_BRANDS:       '/settings/car-brands',
+  SETTINGS_CAR_MODELS:       '/settings/car-models',
   SUBMIT:            '/submit',
   TRACK:             '/track',
 } as const;

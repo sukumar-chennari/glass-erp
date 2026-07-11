@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Shield, Car, type LucideIcon } from 'lucide-react';
+import { Shield, Car, Layers, type LucideIcon } from 'lucide-react';
 import { ROUTES } from '@/constants/routes';
 import styles from './AdminSettingsLanding.module.css';
 
@@ -22,6 +22,12 @@ const MASTER_DATA: EntryCard[] = [
     title: 'Vehicle Models',
     desc:  'Manage the vehicle brands and models supported across job cards and insurance claims.',
     href:  ROUTES.SETTINGS_VEHICLE_MODELS,
+  },
+  {
+    icon:  Layers,
+    title: 'Car Brands',
+    desc:  'Onboard car brands and their models with status management for use across all workflows.',
+    href:  ROUTES.SETTINGS_CAR_BRANDS,
   },
 ];
 
