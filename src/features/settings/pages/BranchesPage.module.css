@@ -130,6 +130,39 @@
   font-size: var(--font-size-sm);
 }
 
+/* ── Geolocation detect ── */
+.coordHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.geoBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--font-size-xs);
+  font-family: inherit;
+  font-weight: 500;
+  color: var(--color-primary);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: opacity var(--transition-fast);
+}
+.geoBtn:hover:not(:disabled) { opacity: 0.7; }
+.geoBtn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.geoError {
+  font-size: var(--font-size-xs);
+  color: var(--color-danger, #e53e3e);
+  margin-top: 2px;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+.spin { animation: spin 0.9s linear infinite; }
+
 .modalFooter {
   display: flex;
   justify-content: flex-end;

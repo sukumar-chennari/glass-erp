@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { Building2, ArrowLeft, MapPin } from 'lucide-react';
+import { Building2, ArrowLeft, MapPin, LocateFixed, Loader2 } from 'lucide-react';
 import type { FetchBaseQueryError } from '@reduxjs/toolkit/query/react';
 import { PageShell, SectionCard } from '@/components/layout/PageShell';
 import { Button } from '@/components/ui/Button';
@@ -146,9 +146,11 @@ export function BranchesPage() {
   const { data: branches = [], isLoading, isError } = useGetBranchesQuery();
   const [createBranch, { isLoading: saving }] = useCreateBranchMutation();
 
-  const [modalOpen, setModal]  = useState(false);
-  const [form,      setForm]   = useState<BranchForm>(EMPTY_FORM);
-  const [errors,    setErrors] = useState<FormErrors>({});
+  const [modalOpen,   setModal]     = useState(false);
+  const [form,        setForm]      = useState<BranchForm>(EMPTY_FORM);
+  const [errors,      setErrors]    = useState<FormErrors>({});
+  const [geoLoading,  setGeoLoad]   = useState(false);
+  const [geoError,    setGeoError]  = useState<string | null>(null);
 
   const totalStaff = useMemo(() => branches.reduce((a, b) => a + b.staff, 0), [branches]);
 
@@ -217,15 +219,44 @@ export function BranchesPage() {
     return Object.keys(errs).length === 0;
   }
 
+  function detectLocation() {
+    if (!navigator.geolocation) {
+      setGeoError('Geolocation is not supported by your browser. Enter coordinates manually.');
+      return;
+    }
+    setGeoLoad(true);
+    setGeoError(null);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        set('latitude',  pos.coords.latitude.toFixed(6));
+        set('longitude', pos.coords.longitude.toFixed(6));
+        setGeoLoad(false);
+      },
+      (err) => {
+        setGeoLoad(false);
+        if (err.code === err.PERMISSION_DENIED) {
+          setGeoError('Location access denied. Allow location in your browser settings, or enter manually.');
+        } else if (err.code === err.POSITION_UNAVAILABLE) {
+          setGeoError('Location unavailable. Enter coordinates manually.');
+        } else {
+          setGeoError('Could not detect location. Enter coordinates manually.');
+        }
+      },
+      { timeout: 10000, maximumAge: 0 },
+    );
+  }
+
   function openModal() {
     setForm(EMPTY_FORM);
     setErrors({});
+    setGeoError(null);
     setModal(true);
   }
 
   function closeModal() {
     setModal(false);
     setErrors({});
+    setGeoError(null);
   }
 
   async function handleAdd() {
@@ -383,23 +414,42 @@ export function BranchesPage() {
             <div />
           </div>
 
-          <div className={styles.twoCol}>
-            <Input
-              label="Latitude"
-              value={form.latitude}
-              onChange={(e) => set('latitude', e.target.value)}
-              placeholder="e.g. 17.385"
-              error={errors.latitude}
-              required
-            />
-            <Input
-              label="Longitude"
-              value={form.longitude}
-              onChange={(e) => set('longitude', e.target.value)}
-              placeholder="e.g. 78.4867"
-              error={errors.longitude}
-              required
-            />
+          <div className={styles.field}>
+            <div className={styles.coordHeader}>
+              <span className={styles.label}>
+                Coordinates <span className={styles.req}>*</span>
+              </span>
+              <button
+                type="button"
+                className={styles.geoBtn}
+                onClick={detectLocation}
+                disabled={geoLoading}
+              >
+                {geoLoading
+                  ? <Loader2 size={12} className={styles.spin} />
+                  : <LocateFixed size={12} />}
+                {geoLoading ? 'Detecting…' : 'Detect my location'}
+              </button>
+            </div>
+            <div className={styles.twoCol}>
+              <Input
+                label="Latitude"
+                value={form.latitude}
+                onChange={(e) => set('latitude', e.target.value)}
+                placeholder="e.g. 17.385"
+                error={errors.latitude}
+                required
+              />
+              <Input
+                label="Longitude"
+                value={form.longitude}
+                onChange={(e) => set('longitude', e.target.value)}
+                placeholder="e.g. 78.4867"
+                error={errors.longitude}
+                required
+              />
+            </div>
+            {geoError && <span className={styles.geoError}>{geoError}</span>}
           </div>
 
           {/* ── Contact ──────────────────────────────────────────── */}
