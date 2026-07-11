@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { Building2, ArrowLeft, LocateFixed, Loader2 } from 'lucide-react';
+import { Building2, ArrowLeft, LocateFixed, Loader2, Pencil } from 'lucide-react';
 import type { FetchBaseQueryError } from '@reduxjs/toolkit/query/react';
 import { PageShell, SectionCard } from '@/components/layout/PageShell';
 import { Button } from '@/components/ui/Button';
@@ -11,8 +11,8 @@ import { StatusBadge } from '@/components/ui/Badge';
 import { Modal } from '@/components/ui/Modal';
 import { useToast } from '@/components/ui/Toast';
 import { useHasPermission } from '@/context/AuthContext';
-import { useGetBranchesQuery, useCreateBranchMutation } from '@/features/settings/services/branchesApi';
-import type { BranchListItem, BranchListStatus, BranchCreatePayload } from '@/types/models/branch';
+import { useGetBranchesQuery, useCreateBranchMutation, useUpdateBranchMutation, useDeactivateBranchMutation } from '@/features/settings/services/branchesApi';
+import type { BranchListItem, BranchListStatus, BranchCreatePayload, BranchPatchPayload } from '@/types/models/branch';
 import type { TableColumn, SelectOption } from '@/types/ui';
 import { ROUTES } from '@/constants/routes';
 import styles from './BranchesPage.module.css';
@@ -30,6 +30,13 @@ const STATUS_OPTIONS: SelectOption[] = [
   { value: 'INACTIVE', label: 'Inactive' },
 ];
 
+// Edit form may set any status including SUSPENDED
+const EDIT_STATUS_OPTIONS: SelectOption[] = [
+  { value: 'ACTIVE',    label: 'Active' },
+  { value: 'INACTIVE',  label: 'Inactive' },
+  { value: 'SUSPENDED', label: 'Suspended' },
+];
+
 const FILTER_OPTIONS: SelectOption[] = [
   { value: '',          label: 'All statuses' },
   { value: 'ACTIVE',    label: 'Active' },
@@ -39,7 +46,8 @@ const FILTER_OPTIONS: SelectOption[] = [
 
 // ── Table Columns ──────────────────────────────────────────────────────
 // Uses real backend field names: contactNumber, openingTime, closingTime.
-const COLUMNS: TableColumn<BranchListItem>[] = [
+// Edit action column is added dynamically inside the component via useMemo.
+const BASE_COLUMNS: TableColumn<BranchListItem>[] = [
   {
     key: 'name',
     header: 'Branch',
@@ -135,8 +143,8 @@ const PHONE_LONG = /^\d{10,13}$/;  // admin phone: with or without country code
 
 // ── Component ──────────────────────────────────────────────────────────
 export function BranchesPage() {
-  const toast      = useToast();
-  const canCreate  = useHasPermission('branches:write');
+  const toast     = useToast();
+  const canWrite  = useHasPermission('branches:write');
 
   const [statusFilter, setStatusFilter] = useState<BranchListStatus | ''>('');
 
@@ -144,22 +152,236 @@ export function BranchesPage() {
     statusFilter || undefined,
   );
   const branches = branchRes?.data ?? [];
-  const [createBranch, { isLoading: saving }] = useCreateBranchMutation();
+  const [createBranch,     { isLoading: saving }]       = useCreateBranchMutation();
+  const [updateBranch,     { isLoading: updating }]     = useUpdateBranchMutation();
+  const [deactivateBranch, { isLoading: deactivating }] = useDeactivateBranchMutation();
 
+  // ── Create modal state ───────────────────────────────────────────────
   const [modalOpen,   setModal]     = useState(false);
   const [form,        setForm]      = useState<BranchForm>(EMPTY_FORM);
   const [errors,      setErrors]    = useState<FormErrors>({});
   const [geoLoading,  setGeoLoad]   = useState(false);
   const [geoError,    setGeoError]  = useState<string | null>(null);
 
+  // ── Edit modal state ─────────────────────────────────────────────────
+  const [editingBranch, setEditingBranch] = useState<BranchListItem | null>(null);
+  const [editForm,      setEditForm]      = useState<BranchForm>(EMPTY_FORM);
+  const [editErrors,    setEditErrors]    = useState<FormErrors>({});
+  const [editGeoLoad,   setEditGeoLoad]   = useState(false);
+  const [editGeoError,  setEditGeoError]  = useState<string | null>(null);
+
+  // ── Deactivate confirmation state ─────────────────────────────────────
+  const [confirmBranch, setConfirmBranch] = useState<BranchListItem | null>(null);
+
   const isUnauthorized = isError &&
     (error as FetchBaseQueryError | undefined)?.status === 401;
 
+  // ── Dynamic columns (action handlers captured by closure) ────────────
+  const columns = useMemo<TableColumn<BranchListItem>[]>(() => [
+    ...BASE_COLUMNS,
+    ...(canWrite ? [{
+      key:    'id' as const,
+      header: '',
+      render: (b: BranchListItem) => (
+        <div className={styles.rowActions}>
+          <button
+            className={styles.editBtn}
+            onClick={() => openEdit(b)}
+            title={`Edit ${b.name}`}
+            aria-label={`Edit ${b.name}`}
+          >
+            <Pencil size={13} />
+            Edit
+          </button>
+          {b.status !== 'INACTIVE' && (
+            <button
+              className={styles.deactivateBtn}
+              onClick={() => setConfirmBranch(b)}
+              title={`Deactivate ${b.name}`}
+              aria-label={`Deactivate ${b.name}`}
+            >
+              Deactivate
+            </button>
+          )}
+        </div>
+      ),
+    }] : []),
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  ], [canWrite]);
+
+  // ── Create form helpers ──────────────────────────────────────────────
   function set(key: keyof BranchForm, val: string) {
     setForm((f) => ({ ...f, [key]: val }));
     if (errors[key as keyof FormErrors]) {
       setErrors((e) => ({ ...e, [key]: undefined }));
     }
+  }
+
+  // ── Edit form helpers ────────────────────────────────────────────────
+  function setEdit(key: keyof BranchForm, val: string) {
+    setEditForm((f) => ({ ...f, [key]: val }));
+    if (editErrors[key as keyof FormErrors]) {
+      setEditErrors((e) => ({ ...e, [key]: undefined }));
+    }
+  }
+
+  function openEdit(branch: BranchListItem) {
+    setEditForm({
+      name:                   branch.name,
+      code:                   branch.code,
+      state:                  branch.state,
+      district:               branch.district,
+      address:                branch.address,
+      pincode:                branch.pincode,
+      latitude:               String(branch.latitude),
+      longitude:              String(branch.longitude),
+      contactNumber:          branch.contactNumber,
+      alternateContactNumber: branch.alternateContactNumber,
+      email:                  branch.email,
+      openingTime:            branch.openingTime,
+      closingTime:            branch.closingTime,
+      status:                 branch.status,
+      adminName:              '',
+      adminEmail:             '',
+      adminPassword:          '',
+      adminPhone:             '',
+    });
+    setEditErrors({});
+    setEditGeoError(null);
+    setEditingBranch(branch);
+  }
+
+  function closeEdit() {
+    setEditingBranch(null);
+    setEditErrors({});
+    setEditGeoError(null);
+  }
+
+  function detectEditLocation() {
+    if (!navigator.geolocation) {
+      setEditGeoError('Geolocation is not supported by your browser. Enter coordinates manually.');
+      return;
+    }
+    setEditGeoLoad(true);
+    setEditGeoError(null);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setEdit('latitude',  pos.coords.latitude.toFixed(6));
+        setEdit('longitude', pos.coords.longitude.toFixed(6));
+        setEditGeoLoad(false);
+      },
+      (err) => {
+        setEditGeoLoad(false);
+        if (err.code === err.PERMISSION_DENIED) {
+          setEditGeoError('Location access denied. Allow location in browser settings, or enter manually.');
+        } else {
+          setEditGeoError('Could not detect location. Enter coordinates manually.');
+        }
+      },
+      { timeout: 10000, maximumAge: 0 },
+    );
+  }
+
+  function validateEdit(): boolean {
+    const errs: FormErrors = {};
+
+    if (!editForm.name.trim())     errs.name     = 'Branch name is required';
+    if (!editForm.state.trim())    errs.state    = 'State is required';
+    if (!editForm.district.trim()) errs.district = 'District is required';
+    if (!editForm.address.trim())  errs.address  = 'Address is required';
+
+    if (!editForm.pincode.trim())           errs.pincode  = 'Pincode is required';
+    else if (!/^\d{6}$/.test(editForm.pincode.trim()))
+                                            errs.pincode  = 'Enter a valid 6-digit pincode';
+
+    const lat = parseFloat(editForm.latitude);
+    if (!editForm.latitude.trim())          errs.latitude  = 'Latitude is required';
+    else if (isNaN(lat) || lat < -90 || lat > 90)
+                                            errs.latitude  = 'Enter a value between −90 and 90';
+
+    const lng = parseFloat(editForm.longitude);
+    if (!editForm.longitude.trim())         errs.longitude = 'Longitude is required';
+    else if (isNaN(lng) || lng < -180 || lng > 180)
+                                            errs.longitude = 'Enter a value between −180 and 180';
+
+    if (!editForm.contactNumber.trim())     errs.contactNumber = 'Contact number is required';
+    else if (!PHONE_10.test(editForm.contactNumber.replace(/\s/g, '')))
+                                            errs.contactNumber = 'Enter a valid 10-digit number';
+
+    if (!editForm.alternateContactNumber.trim())
+                                            errs.alternateContactNumber = 'Alternate number is required';
+    else if (!PHONE_10.test(editForm.alternateContactNumber.replace(/\s/g, '')))
+                                            errs.alternateContactNumber = 'Enter a valid 10-digit number';
+
+    if (!editForm.email.trim())             errs.email = 'Branch email is required';
+    else if (!EMAIL_RE.test(editForm.email.trim()))
+                                            errs.email = 'Enter a valid email address';
+
+    setEditErrors(errs);
+    return Object.keys(errs).length === 0;
+  }
+
+  async function handleSave() {
+    if (!editingBranch || !validateEdit()) return;
+
+    const payload: BranchPatchPayload = {
+      id:                     editingBranch.id,
+      name:                   editForm.name.trim(),
+      state:                  editForm.state.trim(),
+      district:               editForm.district.trim(),
+      address:                editForm.address.trim(),
+      pincode:                editForm.pincode.trim(),
+      latitude:               parseFloat(editForm.latitude),
+      longitude:              parseFloat(editForm.longitude),
+      contactNumber:          editForm.contactNumber.trim(),
+      alternateContactNumber: editForm.alternateContactNumber.trim(),
+      email:                  editForm.email.trim().toLowerCase(),
+      openingTime:            editForm.openingTime,
+      closingTime:            editForm.closingTime,
+      status:                 editForm.status as BranchPatchPayload['status'],
+    };
+
+    const result = await updateBranch(payload);
+
+    if ('data' in result) {
+      toast.success(`Branch "${payload.name}" updated successfully.`);
+      closeEdit();
+      return;
+    }
+
+    if ('error' in result) {
+      const err = result.error as FetchBaseQueryError;
+      if (typeof err.status === 'number') {
+        const msg = (err.data as { message?: string } | null)?.message;
+        if (err.status === 404) {
+          toast.error('Branch not found. It may have been deleted.');
+        } else {
+          toast.error(msg ?? 'Failed to update branch. Please try again.');
+        }
+      } else {
+        toast.error('Network error. Please check your connection and try again.');
+      }
+    }
+  }
+
+  async function handleDeactivate() {
+    if (!confirmBranch) return;
+    const { name, id } = confirmBranch;
+    setConfirmBranch(null);
+
+    const result = await deactivateBranch(id);
+
+    if ('error' in result) {
+      const err = result.error as FetchBaseQueryError;
+      if ((err as { status?: number }).status === 404) {
+        toast.error('Branch not found. It may have already been removed.');
+      } else {
+        toast.error('Failed to deactivate branch. Please try again.');
+      }
+      return;
+    }
+
+    toast.success(`Branch "${name}" deactivated successfully.`);
   }
 
   function validate(): boolean {
@@ -312,7 +534,7 @@ export function BranchesPage() {
       heading="Branches"
       description="Manage branch locations, assign managers and configure service areas."
       actions={
-        canCreate ? (
+        canWrite ? (
           <Button leftIcon={<Building2 size={16} />} onClick={openModal}>
             Add Branch
           </Button>
@@ -351,7 +573,7 @@ export function BranchesPage() {
           </div>
         )}
         {!isLoading && !isError && branches.length > 0 && (
-          <DataTable columns={COLUMNS} data={branches} />
+          <DataTable columns={columns} data={branches} />
         )}
       </SectionCard>
 
@@ -584,6 +806,204 @@ export function BranchesPage() {
             fullWidth
           />
         </div>
+      </Modal>
+
+      {/* ── Edit Branch Modal ──────────────────────────────────────────── */}
+      <Modal
+        isOpen={editingBranch !== null}
+        onClose={closeEdit}
+        title={editingBranch ? `Edit Branch — ${editingBranch.name}` : 'Edit Branch'}
+        footer={
+          <div className={styles.modalFooter}>
+            <Button variant="ghost" onClick={closeEdit} disabled={updating}>Cancel</Button>
+            <Button onClick={handleSave} loading={updating}>Save Changes</Button>
+          </div>
+        }
+      >
+        <div className={styles.form}>
+
+          {/* ── Branch details ─────────────────────────────────────── */}
+          <Input
+            label="Branch Name"
+            value={editForm.name}
+            onChange={(e) => setEdit('name', e.target.value)}
+            placeholder="e.g. Glass Pro – Hyderabad Hitech City"
+            error={editErrors.name}
+            required
+            fullWidth
+            autoFocus
+          />
+
+          {/* ── Location ──────────────────────────────────────────── */}
+          <div className={styles.twoCol}>
+            <Input
+              label="State"
+              value={editForm.state}
+              onChange={(e) => setEdit('state', e.target.value)}
+              placeholder="e.g. Telangana"
+              error={editErrors.state}
+              required
+            />
+            <Input
+              label="District"
+              value={editForm.district}
+              onChange={(e) => setEdit('district', e.target.value)}
+              placeholder="e.g. Hyderabad"
+              error={editErrors.district}
+              required
+            />
+          </div>
+
+          <div className={styles.field}>
+            <label className={styles.label}>
+              Full Address <span className={styles.req}>*</span>
+            </label>
+            <textarea
+              className={`${styles.textarea} ${editErrors.address ? styles.textareaError : ''}`}
+              value={editForm.address}
+              onChange={(e) => setEdit('address', e.target.value)}
+              placeholder="Plot No., Street, Area, City"
+              rows={2}
+            />
+            {editErrors.address && <span className={styles.errMsg}>{editErrors.address}</span>}
+          </div>
+
+          <div className={styles.twoCol}>
+            <Input
+              label="Pincode"
+              value={editForm.pincode}
+              onChange={(e) => setEdit('pincode', e.target.value.replace(/\D/g, '').slice(0, 6))}
+              placeholder="e.g. 500081"
+              error={editErrors.pincode}
+              required
+            />
+            <div />
+          </div>
+
+          <div className={styles.field}>
+            <div className={styles.coordHeader}>
+              <span className={styles.label}>
+                Coordinates <span className={styles.req}>*</span>
+              </span>
+              <button
+                type="button"
+                className={styles.geoBtn}
+                onClick={detectEditLocation}
+                disabled={editGeoLoad}
+              >
+                {editGeoLoad
+                  ? <Loader2 size={12} className={styles.spin} />
+                  : <LocateFixed size={12} />}
+                {editGeoLoad ? 'Detecting…' : 'Detect my location'}
+              </button>
+            </div>
+            <div className={styles.twoCol}>
+              <Input
+                label="Latitude"
+                value={editForm.latitude}
+                onChange={(e) => setEdit('latitude', e.target.value)}
+                placeholder="e.g. 17.385"
+                error={editErrors.latitude}
+                required
+              />
+              <Input
+                label="Longitude"
+                value={editForm.longitude}
+                onChange={(e) => setEdit('longitude', e.target.value)}
+                placeholder="e.g. 78.4867"
+                error={editErrors.longitude}
+                required
+              />
+            </div>
+            {editGeoError && <span className={styles.geoError}>{editGeoError}</span>}
+          </div>
+
+          {/* ── Contact ────────────────────────────────────────────── */}
+          <div className={styles.twoCol}>
+            <Input
+              label="Contact Number"
+              type="tel"
+              value={editForm.contactNumber}
+              onChange={(e) => setEdit('contactNumber', e.target.value.replace(/\D/g, '').slice(0, 10))}
+              placeholder="9140234567"
+              error={editErrors.contactNumber}
+              required
+            />
+            <Input
+              label="Alternate Number"
+              type="tel"
+              value={editForm.alternateContactNumber}
+              onChange={(e) => setEdit('alternateContactNumber', e.target.value.replace(/\D/g, '').slice(0, 10))}
+              placeholder="9140234568"
+              error={editErrors.alternateContactNumber}
+              required
+            />
+          </div>
+
+          <Input
+            label="Branch Email"
+            type="email"
+            value={editForm.email}
+            onChange={(e) => setEdit('email', e.target.value)}
+            placeholder="e.g. hitech@glasspro.com"
+            error={editErrors.email}
+            required
+            fullWidth
+          />
+
+          {/* ── Hours & Status ─────────────────────────────────────── */}
+          <div className={styles.field}>
+            <label className={styles.label}>Working Hours</label>
+            <div className={styles.hoursRow}>
+              <input
+                type="time"
+                className={styles.timeInput}
+                value={editForm.openingTime}
+                onChange={(e) => setEdit('openingTime', e.target.value)}
+              />
+              <span className={styles.hoursSep}>to</span>
+              <input
+                type="time"
+                className={styles.timeInput}
+                value={editForm.closingTime}
+                onChange={(e) => setEdit('closingTime', e.target.value)}
+              />
+            </div>
+          </div>
+
+          <Select
+            label="Status"
+            options={EDIT_STATUS_OPTIONS}
+            value={editForm.status}
+            onChange={(e) => setEdit('status', e.target.value)}
+          />
+        </div>
+      </Modal>
+
+      {/* ── Deactivate Confirmation Modal ──────────────────────────────── */}
+      <Modal
+        isOpen={confirmBranch !== null}
+        onClose={() => setConfirmBranch(null)}
+        title="Deactivate Branch"
+        footer={
+          <div className={styles.modalFooter}>
+            <Button variant="ghost" onClick={() => setConfirmBranch(null)} disabled={deactivating}>
+              Cancel
+            </Button>
+            <Button variant="danger" onClick={handleDeactivate} loading={deactivating}>
+              Deactivate
+            </Button>
+          </div>
+        }
+      >
+        <p className={styles.confirmText}>
+          Are you sure you want to deactivate{' '}
+          <strong>{confirmBranch?.name}</strong>?
+        </p>
+        <p className={styles.confirmHint}>
+          This will set the branch status to Inactive. No data will be deleted.
+          You can reactivate it later by editing the branch status.
+        </p>
       </Modal>
     </PageShell>
   );

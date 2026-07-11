@@ -1,14 +1,13 @@
 import { baseApi } from '@/services/baseApi';
-import { mockableQuery, mockableMutation, mockId } from '@/services/mockUtils';
+import { mockableQuery, mockableMutation, mockId, USE_MOCK, MOCK_DELAY } from '@/services/mockUtils';
 import { branchMock } from '@/mocks/adminBranches';
 import type {
-  Branch,
   BranchListItem,
   BranchListResponse,
   BranchListStatus,
   BranchCreatePayload,
   BranchCreateResponse,
-  BranchUpdatePayload,
+  BranchPatchPayload,
 } from '@/types/models/branch';
 
 export const branchesApi = baseApi.injectEndpoints({
@@ -79,13 +78,44 @@ export const branchesApi = baseApi.injectEndpoints({
       invalidatesTags: ['Branch'],
     }),
 
-    updateBranch: builder.mutation<Branch, BranchUpdatePayload>({
-      ...mockableMutation<Branch, BranchUpdatePayload>({
-        mockFn: ({ id, ...dto }) => branchMock.update(id, dto),
-        url: (arg) => `/settings/branches/${arg.id}`,
-        method: 'PUT',
-        body: ({ id: _id, ...dto }) => dto,
+    // PATCH /api/v1/branches/:id — confirmed live endpoint.
+    // All editable fields are required in the body; id goes in the URL only.
+    // Response is the updated BranchListItem. invalidatesTags triggers list refetch.
+    updateBranch: builder.mutation<BranchListItem, BranchPatchPayload>({
+      ...mockableMutation<BranchListItem, BranchPatchPayload>({
+        mockFn: ({ id, ...dto }) => ({
+          id,
+          code:       'mock-code',
+          createdById: 'mock-user',
+          createdAt:   new Date().toISOString(),
+          updatedAt:   new Date().toISOString(),
+          ...dto,
+        }),
+        url:    (arg) => `/branches/${arg.id}`,
+        method: 'PATCH',
+        body:   ({ id: _id, ...rest }) => rest,
       }),
+      invalidatesTags: ['Branch'],
+    }),
+
+    // DELETE /api/v1/branches/:id — deactivates the branch (sets status = INACTIVE).
+    // Returns 204 No Content on success. Uses responseHandler to skip JSON parsing on
+    // the empty body; bypasses mockableMutation for the same reason.
+    deactivateBranch: builder.mutation<void, string>({
+      ...(USE_MOCK
+        ? {
+            queryFn: async () => {
+              await new Promise<void>((r) => setTimeout(r, MOCK_DELAY));
+              return { data: undefined };
+            },
+          }
+        : {
+            query: (id) => ({
+              url:             `/branches/${id}`,
+              method:          'DELETE',
+              responseHandler: async () => undefined,
+            }),
+          }),
       invalidatesTags: ['Branch'],
     }),
   }),
@@ -96,4 +126,5 @@ export const {
   useGetBranchesQuery,
   useCreateBranchMutation,
   useUpdateBranchMutation,
+  useDeactivateBranchMutation,
 } = branchesApi;

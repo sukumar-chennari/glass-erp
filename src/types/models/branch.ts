@@ -130,3 +130,23 @@ export interface BranchUpdatePayload {
   managerId?:    string;
   status?:       BranchStatus;
 }
+
+// Matches PATCH /api/v1/branches/:id request body exactly.
+// id goes in the URL; all remaining fields are required in the body.
+// Response is the updated BranchListItem.
+export interface BranchPatchPayload {
+  id:                     string;
+  name:                   string;
+  state:                  string;
+  district:               string;
+  address:                string;
+  pincode:                string;
+  latitude:               number;
+  longitude:              number;
+  contactNumber:          string;
+  alternateContactNumber: string;
+  email:                  string;
+  openingTime:            string;
+  closingTime:            string;
+  status:                 BranchListStatus;
+}

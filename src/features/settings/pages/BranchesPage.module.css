@@ -175,3 +175,75 @@
   justify-content: flex-end;
   gap: var(--space-3);
 }
+
+/* ── Row action container ── */
+.rowActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: nowrap;
+}
+
+/* ── Edit action button (inline table cell) ── */
+.editBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--font-size-xs);
+  font-family: inherit;
+  font-weight: 500;
+  color: var(--color-primary);
+  background: none;
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-sm);
+  padding: 3px 8px;
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast);
+  white-space: nowrap;
+}
+.editBtn:hover {
+  background: var(--color-primary);
+  color: #fff;
+}
+.editBtn:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* ── Deactivate action button (inline table cell) ── */
+.deactivateBtn {
+  display: inline-flex;
+  align-items: center;
+  font-size: var(--font-size-xs);
+  font-family: inherit;
+  font-weight: 500;
+  color: var(--color-danger, #e53e3e);
+  background: none;
+  border: 1px solid var(--color-danger, #e53e3e);
+  border-radius: var(--radius-sm);
+  padding: 3px 8px;
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast);
+  white-space: nowrap;
+}
+.deactivateBtn:hover {
+  background: var(--color-danger, #e53e3e);
+  color: #fff;
+}
+.deactivateBtn:focus-visible {
+  outline: 2px solid var(--color-danger, #e53e3e);
+  outline-offset: 2px;
+}
+
+/* ── Confirmation modal text ── */
+.confirmText {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-2);
+}
+.confirmHint {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  margin: 0;
+  line-height: 1.5;
+}
