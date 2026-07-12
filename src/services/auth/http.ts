@@ -157,7 +157,9 @@ function derivePermissions(role: Session['role']): string[] {
         'jobs:read', 'jobs:write', 'invoices:read', 'invoices:write',
         'claims:read', 'claims:write', 'customers:read', 'customers:write',
         'technicians:read', 'technicians:write', 'vendors:read', 'vendors:write',
-        'products:read', 'products:write', 'stock:read', 'stock:write', 'reports:read',
+        'products:read', 'products:write', 'stock:read', 'stock:write',
+        'staff:read', 'staff:write',
+        'reports:read',
       ];
     case 'operator':
       return [

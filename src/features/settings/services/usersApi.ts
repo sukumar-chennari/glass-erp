@@ -1,7 +1,7 @@
 import { baseApi } from '@/services/baseApi';
 import { mockableQuery, mockableMutation } from '@/services/mockUtils';
 import { userMock } from '@/mocks/adminUsers';
-import type { AppUser, StaffListResponse, UserCreatePayload, UserUpdateStatusPayload } from '@/types/models/appUser';
+import type { AppUser, StaffListResponse, StaffCreatePayload, StaffUpdatePayload, UserCreatePayload } from '@/types/models/appUser';
 import { FRONTEND_TO_BACKEND_ROLE } from '@/types/models/appUser';
 
 export const usersApi = baseApi.injectEndpoints({
@@ -49,14 +49,37 @@ export const usersApi = baseApi.injectEndpoints({
       invalidatesTags: ['AppUser'],
     }),
 
-    // TODO: backend status-update endpoint not yet implemented (PUT/PATCH /staff/:id/status → 404).
-    // Kept on mock path only until backend confirms the endpoint and payload shape.
-    updateUserStatus: builder.mutation<AppUser, UserUpdateStatusPayload>({
-      ...mockableMutation<AppUser, UserUpdateStatusPayload>({
-        mockFn: ({ id, status }) => userMock.updateStatus(id, status),
-        url: (arg) => `/staff/${arg.id}/status`,
-        method: 'PUT',
-        body: ({ id: _id, status }) => ({ status }),
+    // POST /api/v1/staff — ADMIN (branch_manager) scope.
+    // Body: { name, phone, role } only. Branch is auto-assigned from session on backend.
+    // role must be a BackendStaffRole (FRONTOFFICE | TECHNICIAN) — sent directly, no mapping.
+    createStaff: builder.mutation<AppUser, StaffCreatePayload>({
+      ...mockableMutation<AppUser, StaffCreatePayload>({
+        mockFn: (payload) => userMock.create({
+          name:     payload.name,
+          email:    '',
+          phone:    payload.phone,
+          role:     payload.role === 'FRONTOFFICE' ? 'operator' : 'technician',
+          branchId: null,
+        }),
+        url:    '/staff',
+        method: 'POST',
+        body:   (payload) => ({
+          name:  payload.name,
+          phone: payload.phone,
+          role:  payload.role,
+        }),
+      }),
+      invalidatesTags: ['AppUser'],
+    }),
+
+    // PATCH /api/v1/staff/:id — confirmed live contract.
+    // Accepts only { name, isActive } in the body; id is URL-only.
+    updateStaff: builder.mutation<AppUser, StaffUpdatePayload>({
+      ...mockableMutation<AppUser, StaffUpdatePayload>({
+        mockFn: ({ id, isActive }) => userMock.updateStatus(id, isActive ? 'Active' : 'Inactive'),
+        url:    (arg) => `/staff/${arg.id}`,
+        method: 'PATCH',
+        body:   ({ name, isActive }) => ({ name, isActive }),
       }),
       invalidatesTags: ['AppUser'],
     }),
@@ -67,5 +90,6 @@ export const usersApi = baseApi.injectEndpoints({
 export const {
   useGetUsersQuery,
   useCreateUserMutation,
-  useUpdateUserStatusMutation,
+  useCreateStaffMutation,
+  useUpdateStaffMutation,
 } = usersApi;

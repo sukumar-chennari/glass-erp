@@ -13,14 +13,10 @@ export interface StaffListResponse {
 }
 
 // Role values accepted by POST /api/v1/staff (confirmed via validation response).
-// frontend role → backend role mapping is intentionally partial:
-//   technician    → TECHNICIAN  (confirmed 1:1)
-//   operator      → unconfirmed (FRONTOFFICE is plausible but not verified)
-//   branch_manager→ no confirmed backend equivalent
-//   super_admin   → not applicable to staff creation
 export type BackendStaffRole = 'FRONTOFFICE' | 'TECHNICIAN';
 
 export const FRONTEND_TO_BACKEND_ROLE: Partial<Record<AppRole, BackendStaffRole>> = {
+  operator:   'FRONTOFFICE',
   technician: 'TECHNICIAN',
 };
 
@@ -42,15 +38,27 @@ export interface AppUser {
   isActive:                 boolean;
 }
 
+// Payload for POST /api/v1/staff when called by ADMIN (branch_manager).
+// Branch is inferred from the session — must NOT be sent in the body.
+export interface StaffCreatePayload {
+  name:  string;
+  phone: string;
+  role:  BackendStaffRole;
+}
+
+// Payload for PATCH /api/v1/staff/:id — confirmed live contract.
+// Only name and isActive are editable; phone, role, and branch are immutable.
+// id is used to construct the URL and must NOT be included in the request body.
+export interface StaffUpdatePayload {
+  id:       string;
+  name:     string;
+  isActive: boolean;
+}
+
 export interface UserCreatePayload {
   name:     string;
   email:    string;
   phone:    string;
   role:     AppRole;
   branchId: string | null;
-}
-
-export interface UserUpdateStatusPayload {
-  id:     string;
-  status: UserStatus;
 }

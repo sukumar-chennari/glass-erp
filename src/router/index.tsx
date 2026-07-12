@@ -44,6 +44,7 @@ import { VehicleModelsPage }    from '@/features/settings/pages/VehicleModelsPag
 import { CarBrandsPage }        from '@/features/settings/pages/CarBrandsPage';
 import { CarModelsPage }        from '@/features/settings/pages/CarModelsPage';
 import { EnquiryPage }         from '@/features/enquiry/EnquiryPage';
+import { StaffPage }          from '@/features/staff/pages/StaffPage';
 import { CustomerSubmitPage }  from '@/features/customer/CustomerSubmitPage';
 import { CustomerTrackPage }   from '@/features/customer/CustomerTrackPage';
 import { EntryPage }           from '@/features/entry/EntryPage';
@@ -131,6 +132,7 @@ export const router = createBrowserRouter([
               { path: ROUTES.SETTINGS_PRICING,          element: <PricingPage /> },
             ],
           },
+          { path: ROUTES.STAFF,             element: <StaffPage /> },
           { path: ROUTES.ENQUIRY,           element: <EnquiryPage /> },
         ],
       },

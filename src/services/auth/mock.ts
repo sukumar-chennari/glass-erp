@@ -95,6 +95,7 @@ function mockPermissions(role: UserRole): string[] {
         'vendors:read', 'vendors:write',
         'products:read', 'products:write',
         'stock:read', 'stock:write',
+        'staff:read', 'staff:write',
         'reports:read',
       ];
     case 'operator':

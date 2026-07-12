@@ -6,7 +6,7 @@ export type { Claim, CreateClaimDto, UpdateClaimDto, ClaimTimelineStep, Insurer 
 export type { Invoice, CreateInvoiceDto, UpdateInvoiceDto, InvoiceLineItem } from './invoice';
 export type { DashboardData, DashboardKpi, DashboardRecentCustomer, DashboardPendingClaim, DashboardRecentJob } from './dashboard';
 export type { Branch, BranchCreatePayload, BranchUpdatePayload, BranchStatus } from './branch';
-export type { AppUser, AppRole, UserStatus, InvitationStatus, UserCreatePayload, UserUpdateStatusPayload } from './appUser';
+export type { AppUser, AppRole, UserStatus, InvitationStatus, UserCreatePayload, StaffCreatePayload, StaffUpdatePayload, BackendStaffRole } from './appUser';
 export type { BranchPerformanceRow, AdminSummary } from './adminSummary';
 export type { InsuranceRule, InsuranceRulePayload, InsuranceRuleUpdatePayload, BoardType, CCCondition } from './insuranceRule';
 export type { VehicleModel, VehicleModelPayload, VehicleModelUpdatePayload } from './vehicleModel';

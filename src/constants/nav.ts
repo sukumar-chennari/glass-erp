@@ -86,6 +86,14 @@ export const NAV_ITEMS: NavItem[] = [
     section:  'main',
     roles:    ['branch_manager'],
   },
+  {
+    id:      'staff',
+    label:   'Staff',
+    icon:    'UserCog',
+    path:    ROUTES.STAFF,
+    section: 'main',
+    roles:   ['branch_manager'],
+  },
 
   // ── Management ─────────────────────────────────────────────────────────────
   {
