@@ -105,13 +105,29 @@ import type { AuthErrorCode } from './types';
 export const SESSION_KEY = 'erp-session-v1';
 export const TOKEN_KEY   = 'glass_erp_token';
 
-// ── In-memory access token ─────────────────────────────────────────────────
-// The access token lives in this module variable only — never written to storage.
-// Exported so baseApi.ts can update it after a mid-session token refresh.
-let _accessToken: string | null = null;
-export const getToken   = (): string | null => _accessToken;
-export const setToken   = (t: string): void  => { _accessToken = t; };
-export const clearToken = (): void           => { _accessToken = null; };
+// ── In-memory token store ──────────────────────────────────────────────────
+// Both tokens live in module variables only — never written to persistent storage.
+// accessToken: read by prepareHeaders on every RTK Query request.
+// refreshToken: sent as { refreshToken } in POST /auth/refresh body.
+//   Falls back to the HttpOnly cookie when not yet in memory (page reload / first load).
+let _accessToken:  string | null = null;
+let _refreshToken: string | null = null;
+export const getToken          = (): string | null => _accessToken;
+export const setToken          = (t: string): void => { _accessToken = t; };
+export const clearToken        = (): void          => { _accessToken = null; };
+export const getRefreshToken   = (): string | null => _refreshToken;
+export const setRefreshToken   = (t: string): void => { _refreshToken = t; };
+export const clearRefreshToken = (): void          => { _refreshToken = null; };
+
+// ── Session-refresh notification bridge ────────────────────────────────────
+// baseApi.ts lives outside React and cannot call setSession() directly.
+// AuthContext registers a listener here on mount; tryRefreshToken() fires it
+// after a successful mid-session silent refresh so React session state stays
+// in sync with the rotated accessToken and fresh user/branch payload.
+type SessionRefreshCallback = (session: Session) => void;
+let _sessionRefreshCallback: SessionRefreshCallback | null = null;
+export const onSessionRefreshed     = (cb: SessionRefreshCallback | null): void => { _sessionRefreshCallback = cb; };
+export const notifySessionRefreshed = (session: Session): void => { _sessionRefreshCallback?.(session); };
 
 // ── Role mapping ──────────────────────────────────────────────────────────────
 
@@ -201,30 +217,35 @@ async function throwAuthError(res: Response): Promise<never> {
 //
 // 13B.7 — Refresh token moved to HttpOnly cookie:
 //   - REFRESH_TOKEN_KEY / glass_erp_refresh_token localStorage entry removed
-//   - Frontend never stores, reads, or clears the refresh token value
-//   - Backend sets it via Set-Cookie (HttpOnly; Secure; SameSite=Strict)
+//   - Backend sets refresh token via Set-Cookie (HttpOnly; Secure; SameSite=Strict)
 //
 // 13B.8 — Access token moved to module memory (/auth/me activated):
 //   - TOKEN_KEY / glass_erp_token no longer written to localStorage
 //   - storeAuth() stores the access token in _accessToken (module variable) only
 //   - clearAuth() removes pre-13B.8 localStorage entries as cleanup
-//   - getSession() bootstraps via GET /auth/me → POST /auth/refresh (cookie)
+//   - getSession() bootstraps via GET /auth/me → POST /auth/refresh
 //   - baseApi.ts tryRefreshToken() handles mid-session 401s silently
+//
+// Current — refresh token also stored in memory + sent as body:
+//   - storeAuth() accepts refreshToken and stores it in _refreshToken
+//   - POST /auth/refresh sends { refreshToken } in body when available in memory
+//   - Falls back to HttpOnly cookie only (no body) on first load / after page reload
+//   - _refreshToken is rotated on each successful refresh response
 //
 // No persistent auth storage remains in the browser after logout.
 //
 // ─────────────────────────────────────────────────────────────────────────────
 
-export function storeAuth(token: string, _session: Session): void {
-  setToken(token);  // in-memory only — backend is authoritative via /auth/me
+export function storeAuth(accessToken: string, _session: Session, refreshToken?: string): void {
+  setToken(accessToken);
+  if (refreshToken) setRefreshToken(refreshToken);
 }
 
 export function clearAuth(): void {
   clearToken();
+  clearRefreshToken();
   localStorage.removeItem(SESSION_KEY);  // cleanup of pre-13B.8 cached sessions
   localStorage.removeItem(TOKEN_KEY);    // cleanup of pre-13B.8 stored access tokens
-  // Refresh token: HttpOnly cookie — JS cannot clear it.
-  // POST /auth/logout asks the server to expire it (Set-Cookie; Max-Age=0).
 }
 
 /**
@@ -271,7 +292,7 @@ export const authServiceHttp: AuthService = {
     if (!res.ok) return throwAuthError(res);
     const data = await res.json() as BackendAuthResponse;
     const session = mapSession(data as unknown as Record<string, unknown>);
-    storeAuth(data.accessToken, session);
+    storeAuth(data.accessToken, session, data.refreshToken);
     return session;
   },
 
@@ -292,7 +313,7 @@ export const authServiceHttp: AuthService = {
     if (!res.ok) return throwAuthError(res);
     const data = await res.json() as BackendAuthResponse;
     const session = mapSession(data as unknown as Record<string, unknown>);
-    storeAuth(data.accessToken, session);
+    storeAuth(data.accessToken, session, data.refreshToken);
     return session;
   },
 
@@ -320,11 +341,15 @@ export const authServiceHttp: AuthService = {
     } catch { return null; }
     // /auth/me returned 401 — access token expired; attempt silent refresh.
     try {
-      const refreshRes = await apiFetch('/auth/refresh', { method: 'POST' });
+      const rt = getRefreshToken();
+      const refreshRes = await apiFetch('/auth/refresh', {
+        method: 'POST',
+        body:   JSON.stringify(rt ? { refreshToken: rt } : {}),
+      });
       if (!refreshRes.ok) { clearAuth(); return null; }
       const data = await refreshRes.json() as BackendAuthResponse;
       const session = mapSession(data as unknown as Record<string, unknown>);
-      storeAuth(data.accessToken, session);
+      storeAuth(data.accessToken, session, data.refreshToken);
       return session;
     } catch { clearAuth(); return null; }
   },

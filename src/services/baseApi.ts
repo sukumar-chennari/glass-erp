@@ -1,6 +1,7 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import type { BaseQueryFn, FetchArgs, FetchBaseQueryError } from '@reduxjs/toolkit/query/react';
-import { getToken, setToken, clearAuth } from '@/services/auth/http';
+import { getToken, setToken, clearAuth, getRefreshToken, setRefreshToken, mapSession, notifySessionRefreshed } from '@/services/auth/http';
+import type { BackendAuthResponse } from '@/services/auth/types';
 
 /**
  * Base RTK Query API instance.
@@ -37,14 +38,18 @@ async function tryRefreshToken(): Promise<boolean> {
   if (refreshPromise) return refreshPromise;
   refreshPromise = (async (): Promise<boolean> => {
     try {
+      const rt = getRefreshToken();
       const res = await fetch(`${getBaseUrl()}/auth/refresh`, {
         method:      'POST',
         credentials: 'include',
         headers:     { 'Content-Type': 'application/json' },
+        body:        JSON.stringify(rt ? { refreshToken: rt } : {}),
       });
       if (res.ok) {
-        const data = await res.json() as { accessToken: string };
+        const data = await res.json() as BackendAuthResponse;
         setToken(data.accessToken);
+        if (data.refreshToken) setRefreshToken(data.refreshToken);
+        notifySessionRefreshed(mapSession(data as unknown as Record<string, unknown>));
         return true;
       }
     } catch { /* network error — treat as failed refresh */ }

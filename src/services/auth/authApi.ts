@@ -12,7 +12,7 @@ import { baseApi } from '@/services/baseApi';
 import { mockableQuery, mockableMutation, MOCK_DELAY } from '@/services/mockUtils';
 import { ENDPOINTS } from '@/services/api';
 import { userMock } from '@/mocks/adminUsers';
-import type { Session, BackendAuthResponse, OtpSendResult } from './types';
+import type { Session, BackendAuthResponse, BackendRole, OtpSendResult } from './types';
 
 // ── Payload types ─────────────────────────────────────────────────────────────
 
@@ -103,13 +103,27 @@ export const authApi = baseApi.injectEndpoints({
       providesTags: ['AuthSession'],
     }),
 
-    refresh: builder.mutation<{ token: string }, void>({
-      ...mockableMutation<{ token: string }, void>({
+    refresh: builder.mutation<BackendAuthResponse, void>({
+      ...mockableMutation<BackendAuthResponse, void>({
         mockFn: async () => {
           await delay(MOCK_DELAY);
           const session = readMockSession();
           if (!session) throw new Error('No session to refresh');
-          return { token: `mock-jwt-refreshed-${session.user.id}` };
+          const roleMap: Record<string, BackendRole> = {
+            super_admin: 'SUPER_ADMIN', branch_manager: 'ADMIN',
+            operator: 'OPERATOR',      technician: 'TECHNICIAN',
+          };
+          return {
+            accessToken: `mock-jwt-refreshed-${session.user.id}`,
+            user: {
+              id:       session.user.id,
+              name:     session.user.name,
+              email:    session.user.email,
+              role:     roleMap[session.role] ?? 'OPERATOR',
+              isActive: session.user.isActive,
+            },
+            branch: session.branch,
+          };
         },
         url:    ENDPOINTS.auth.refresh,
         method: 'POST',

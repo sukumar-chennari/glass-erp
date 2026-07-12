@@ -10,7 +10,7 @@
 import { createContext, useContext, useEffect, useRef, useState, useCallback, type ReactNode } from 'react';
 import { authService } from '@/services/auth';
 import type { Session, LoginCredentials, VerifyOtpOptions, OtpSendResult, BackendAuthResponse } from '@/services/auth';
-import { mapSession, storeAuth, clearAuth } from '@/services/auth/http';
+import { mapSession, storeAuth, clearAuth, onSessionRefreshed } from '@/services/auth/http';
 
 // Re-export types so existing imports from '@/context/AuthContext' keep working.
 export type { AuthUser, UserRole, Session, AuthBranch } from '@/services/auth';
@@ -70,9 +70,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .finally(() => setIsLoading(false));
   }, []);
 
+  // Bridge: lets service-layer tryRefreshToken() (baseApi.ts) update React
+  // session state after a successful mid-session silent refresh.
+  useEffect(() => {
+    onSessionRefreshed((s) => setSession(s));
+    return () => { onSessionRefreshed(null); };
+  }, []);
+
   const acceptLoginResponse = useCallback((response: BackendAuthResponse): Session => {
     const newSession = mapSession(response as unknown as Record<string, unknown>);
-    storeAuth(response.accessToken, newSession);
+    storeAuth(response.accessToken, newSession, response.refreshToken);
     setSession(newSession);
     setIsSessionExpired(false);
     return newSession;
