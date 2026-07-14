@@ -26,7 +26,7 @@ const delay = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 interface MockableQueryOptions<R, A> {
   mockFn: (arg: A) => R | Promise<R>;
   url:    string | ((arg: A) => string);
-  params?: (arg: A) => Record<string, unknown>;
+  params?: (arg: A) => Record<string, unknown> | undefined;
   // Only applied in real (query) mode — RTK skips transformResponse for queryFn.
   transformResponse?: (raw: unknown) => R;
 }

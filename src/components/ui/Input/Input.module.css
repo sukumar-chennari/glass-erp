@@ -67,6 +67,11 @@
   align-items: center;
 }
 
+.adornLeft button,
+.adornRight button {
+  pointer-events: auto;
+}
+
 .adornLeft  { left:  var(--space-3); }
 .adornRight { right: var(--space-3); }
 
