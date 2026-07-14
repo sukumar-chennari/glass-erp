@@ -3,7 +3,8 @@
   publish = "dist"
 
 [build.environment]
-  VITE_USE_MOCK_API    = "true"
+  VITE_USE_MOCK_API    = "false"
+  VITE_API_BASE_URL    = "https://wxg-backend.onrender.com/api/v1"
   VITE_MOCK_DELAY_MS   = "350"
 
 [[redirects]]
