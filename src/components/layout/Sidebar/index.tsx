@@ -1,7 +1,10 @@
+import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import * as LucideIcons from 'lucide-react';
 import { ChevronLeft, Diamond, LogOut } from 'lucide-react';
+import { Spinner } from '@/components/ui/Spinner';
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { toggleSidebar, closeMobileSidebar } from '@/store/slices/uiSlice';
 import type { NavItem } from '@/constants/nav';
@@ -23,14 +26,21 @@ export function Sidebar() {
   const mobileOpen = useAppSelector((s) => s.ui.sidebarMobileOpen);
   const { session, logout } = useAuth();
   const navigate   = useNavigate();
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [loggingOut, setLoggingOut]   = useState(false);
 
   // Only show nav items the current role is allowed to access
   const roleItems  = getRoleNavItems(session?.role);
   const sections: NavItem['section'][] = ['main', 'management'];
 
-  function handleLogout() {
-    logout();
-    navigate(ROUTES.LOGIN, { replace: true });
+  async function handleConfirmLogout() {
+    if (loggingOut) return;
+    setLoggingOut(true);
+    try {
+      await logout();
+    } finally {
+      navigate(ROUTES.LOGIN, { replace: true });
+    }
   }
 
   return (
@@ -131,15 +141,25 @@ export function Sidebar() {
           {!collapsed && (
             <button
               className={styles.logoutBtn}
-              onClick={handleLogout}
+              onClick={() => setShowConfirm(true)}
+              disabled={loggingOut}
               aria-label={t('sidebar.user.logout')}
               title={t('sidebar.user.logout')}
             >
-              <LogOut size={15} />
+              {loggingOut ? <Spinner size="sm" /> : <LogOut size={15} />}
             </button>
           )}
         </div>
       </div>
+      <ConfirmDialog
+        isOpen={showConfirm}
+        title="Log out"
+        message="Are you sure you want to log out?"
+        confirmLabel={loggingOut ? 'Logging out…' : 'Log out'}
+        isLoading={loggingOut}
+        onConfirm={handleConfirmLogout}
+        onCancel={() => setShowConfirm(false)}
+      />
     </aside>
   );
 }

@@ -187,7 +187,9 @@ async function apiFetch(path: string, init?: RequestInit): Promise<Response> {
     // to rotate the cookie on POST /auth/refresh without extra frontend work.
     credentials: 'include',
     headers: {
-      'Content-Type': 'application/json',
+      // Only set Content-Type when a body is present — some backends (e.g. NestJS)
+      // reject requests that declare application/json but send no body.
+      ...(init?.body !== undefined ? { 'Content-Type': 'application/json' } : {}),
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...(init?.headers ?? {}),
     },

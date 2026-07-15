@@ -33,8 +33,8 @@ interface AuthContextValue {
    * Kept for backward compatibility and non-UI callers.
    */
   login:     (credentials: LoginCredentials) => Promise<Session>;
-  /** Optimistic: clears local state immediately, calls server best-effort. */
-  logout:    () => void;
+  /** Awaits the server logout call, then clears all local auth state. */
+  logout:    () => Promise<void>;
   /**
    * Send OTP to a phone number via authService (non-RTK path).
    * LoginPage uses useOtpSendMutation directly — this is kept for
@@ -92,12 +92,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return newSession;
   };
 
-  const logout = useCallback(() => {
-    clearAuth();                 // synchronously clear in-memory token + localStorage cleanup
-    setSession(null);
-    setIsSessionExpired(false);
-    if (timerRef.current) clearTimeout(timerRef.current);
-    void authService.logout();   // best-effort: tells server to expire the HttpOnly cookie
+  const logout = useCallback(async (): Promise<void> => {
+    try {
+      // apiFetch captures getToken() synchronously before its first await,
+      // so the Bearer header is built before we clear the in-memory token below.
+      await authService.logout();
+    } finally {
+      clearAuth();
+      setSession(null);
+      setIsSessionExpired(false);
+      if (timerRef.current) clearTimeout(timerRef.current);
+    }
   }, []);
 
   const sendOtp = async (phone: string): Promise<OtpSendResult> => {
