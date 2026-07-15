@@ -1,5 +1,5 @@
-import { useState, useMemo } from 'react';
-import { Plus, Pencil, Trash2, Layers, AlertCircle } from 'lucide-react';
+import { useState, useMemo, useRef } from 'react';
+import { Plus, Pencil, Trash2, Layers, AlertCircle, Upload, X } from 'lucide-react';
 import { PageShell, SectionCard } from '@/components/layout/PageShell';
 import { DataTable }   from '@/components/ui/DataTable';
 import { StatusBadge } from '@/components/ui/Badge';
@@ -51,6 +51,7 @@ interface FormErrors {
   brand_id?:     string;
   name?:         string;
   compare_name?: string;
+  image?:        string;
 }
 
 const EMPTY_FORM: ModelForm = {
@@ -65,15 +66,38 @@ function toCompareName(name: string): string {
   return name.trim().toLowerCase().replace(/\s+/g, ' ');
 }
 
-function brandName(brands: CarBrand[], brand_id: string): string {
+function getBrandName(brands: CarBrand[], brand_id: string): string {
   return brands.find((b) => b.id === brand_id)?.name ?? '—';
+}
+
+function extractApiError(error: unknown): string | null {
+  if (!error || typeof error !== 'object') return null;
+  const data = (error as { data?: unknown }).data;
+  if (!data || typeof data !== 'object') return null;
+  const msg = (data as { message?: unknown }).message;
+  if (!msg) return null;
+  if (Array.isArray(msg)) return msg.join('; ');
+  return typeof msg === 'string' ? msg : null;
 }
 
 // ── Component ──────────────────────────────────────────────────────────
 export function CarModelsPage() {
   const toast = useToast();
 
-  const { data: models = [], isLoading: modelsLoading, isError, refetch } = useGetCarModelsQuery();
+  // ── Filter state (declared before query) ─────────────────────────────
+  const [search,       setSearch]       = useState('');
+  const [brandFilter,  setBrandFilter]  = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
+
+  // Server-side query args — undefined means no filter (avoids trailing ?)
+  const queryArg = useMemo(() => {
+    const args: { brandId?: string; status?: CarModelStatus } = {};
+    if (brandFilter)  args.brandId = brandFilter;
+    if (statusFilter) args.status  = statusFilter as CarModelStatus;
+    return Object.keys(args).length > 0 ? args : undefined;
+  }, [brandFilter, statusFilter]);
+
+  const { data: models = [], isLoading: modelsLoading, isError, refetch } = useGetCarModelsQuery(queryArg);
   const { data: brands = [], isLoading: brandsLoading } = useGetCarBrandsQuery();
 
   const [createModel, { isLoading: creating }] = useCreateCarModelMutation();
@@ -82,51 +106,45 @@ export function CarModelsPage() {
 
   const isLoading = modelsLoading || brandsLoading;
 
-  // ── Filter state ─────────────────────────────────────────────────────
-  const [search,       setSearch]       = useState('');
-  const [brandFilter,  setBrandFilter]  = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
-
   // ── Modal state ──────────────────────────────────────────────────────
   const [modalOpen,    setModalOpen]    = useState(false);
   const [editTarget,   setEditTarget]   = useState<CarModel | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<CarModel | null>(null);
   const [form,         setForm]         = useState<ModelForm>(EMPTY_FORM);
   const [errors,       setErrors]       = useState<FormErrors>({});
+  // urlInput decouples the visible text field from form.image so a
+  // file-upload data URI never appears as raw text in the input.
+  const [urlInput,     setUrlInput]     = useState('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // ── Brand options for selects ─────────────────────────────────────────
-  const brandOpts: SelectOption[] = useMemo(() => [
-    ...brands.map((b) => ({ value: b.id, label: b.name })),
-  ], [brands]);
+  const brandOpts: SelectOption[] = useMemo(() => (
+    brands.map((b) => ({ value: b.id, label: b.name }))
+  ), [brands]);
 
   const brandFilterOpts: SelectOption[] = useMemo(() => [
     { value: '', label: 'All brands' },
     ...brands.map((b) => ({ value: b.id, label: b.name })),
   ], [brands]);
 
-  // ── Filtered list (client-side until API supports search/filter) ──────
+  // ── Client-side text search over server results ───────────────────────
   const filtered = useMemo(() => {
-    let list = models;
-    if (brandFilter)   list = list.filter((m) => m.brand_id === brandFilter);
-    if (statusFilter)  list = list.filter((m) => m.status === statusFilter);
-    if (search.trim()) {
-      const q = search.trim().toLowerCase();
-      list = list.filter(
-        (m) =>
-          m.name.toLowerCase().includes(q) ||
-          m.compare_name.toLowerCase().includes(q) ||
-          brandName(brands, m.brand_id).toLowerCase().includes(q),
-      );
-    }
-    return list;
-  }, [models, brands, search, brandFilter, statusFilter]);
+    if (!search.trim()) return models;
+    const q = search.trim().toLowerCase();
+    return models.filter(
+      (m) =>
+        m.name.toLowerCase().includes(q) ||
+        m.compare_name.toLowerCase().includes(q) ||
+        getBrandName(brands, m.brand_id).toLowerCase().includes(q),
+    );
+  }, [models, brands, search]);
 
   // ── Table columns ─────────────────────────────────────────────────────
   const columns = useMemo<TableColumn<CarModel>[]>(() => [
     {
       key:    'brand_id',
       header: 'Brand',
-      render: (m) => <span className={styles.brandCell}>{brandName(brands, m.brand_id)}</span>,
+      render: (m) => <span className={styles.brandCell}>{getBrandName(brands, m.brand_id)}</span>,
     },
     {
       key:    'name',
@@ -135,7 +153,7 @@ export function CarModelsPage() {
     },
     {
       key:    'compare_name',
-      header: 'Compare Name',
+      header: 'Company Name',
       render: (m) => <span className={styles.compareName}>{m.compare_name}</span>,
     },
     {
@@ -184,11 +202,12 @@ export function CarModelsPage() {
     }
   }
 
-  function validate(): boolean {
+  function validate(isEdit: boolean): boolean {
     const errs: FormErrors = {};
     if (!form.brand_id)            errs.brand_id     = 'Brand is required';
     if (!form.name.trim())         errs.name         = 'Model name is required';
-    if (!form.compare_name.trim()) errs.compare_name = 'Compare name is required';
+    if (!form.compare_name.trim()) errs.compare_name = 'Company name is required';
+    if (!isEdit && !form.image)    errs.image        = 'Image is required';
     setErrors(errs);
     return Object.keys(errs).length === 0;
   }
@@ -197,6 +216,7 @@ export function CarModelsPage() {
   function openAdd() {
     setEditTarget(null);
     setForm({ ...EMPTY_FORM, brand_id: brandFilter || '' });
+    setUrlInput('');
     setErrors({});
     setModalOpen(true);
   }
@@ -210,6 +230,7 @@ export function CarModelsPage() {
       image:        model.image ?? '',
       status:       model.status,
     });
+    setUrlInput(model.image ?? '');
     setErrors({});
     setModalOpen(true);
   }
@@ -218,28 +239,56 @@ export function CarModelsPage() {
     setModalOpen(false);
     setEditTarget(null);
     setForm(EMPTY_FORM);
+    setUrlInput('');
     setErrors({});
+  }
+
+  // ── Image helpers ─────────────────────────────────────────────────────
+  function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      set('image', ev.target?.result as string);
+      setUrlInput('');
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  }
+
+  function handleUrlChange(val: string) {
+    setUrlInput(val);
+    set('image', val);
   }
 
   // ── Save ──────────────────────────────────────────────────────────────
   async function handleSave() {
-    if (!validate()) return;
+    const isEdit = editTarget !== null;
+    if (!validate(isEdit)) return;
 
     const payload = {
       brand_id:     form.brand_id,
       name:         form.name.trim(),
       compare_name: form.compare_name.trim().toLowerCase(),
-      image:        form.image.trim() || null,
+      image:        form.image || null,
       status:       form.status as CarModelStatus,
     };
 
-    if (editTarget) {
-      const result = await updateModel({ id: editTarget.id, ...payload });
+    if (isEdit) {
+      const result = await updateModel({ id: editTarget!.id, ...payload });
       if ('data' in result) {
         toast.success(`Model "${payload.name}" updated.`);
         closeModal();
       } else {
-        toast.error('Failed to update model. Please try again.');
+        const err = result.error as { status?: number };
+        if (err?.status === 404) {
+          toast.error('This car model no longer exists.');
+          closeModal();
+          void refetch();
+        } else {
+          const msg = extractApiError(result.error) ?? 'Failed to update model. Please try again.';
+          toast.error(msg);
+        }
       }
     } else {
       const result = await createModel(payload);
@@ -247,7 +296,14 @@ export function CarModelsPage() {
         toast.success(`Model "${payload.name}" added.`);
         closeModal();
       } else {
-        toast.error('Failed to add model. Please try again.');
+        const err = result.error as { status?: number };
+        if (err?.status === 400) {
+          const msg = extractApiError(result.error) ?? 'Invalid request. Check the selected brand.';
+          toast.error(msg);
+        } else {
+          const msg = extractApiError(result.error) ?? 'Failed to add model. Please try again.';
+          toast.error(msg);
+        }
       }
     }
   }
@@ -259,7 +315,13 @@ export function CarModelsPage() {
     setDeleteTarget(null);
     const result = await deleteModel(id);
     if ('error' in result) {
-      toast.error('Failed to delete model. Please try again.');
+      const err = result.error as { status?: number };
+      if (err?.status === 404) {
+        toast.error('This car model no longer exists.');
+        void refetch();
+      } else {
+        toast.error('Failed to delete model. Please try again.');
+      }
       return;
     }
     toast.success(`Model "${name}" deleted.`);
@@ -275,7 +337,6 @@ export function CarModelsPage() {
         </Button>
       }
     >
-
 
       <SectionCard>
         {/* ── Toolbar ───────────────────────────────────────────────── */}
@@ -367,7 +428,7 @@ export function CarModelsPage() {
             autoFocus
           />
           <Input
-            label="Compare Name"
+            label="Company Name"
             value={form.compare_name}
             onChange={(e) => set('compare_name', e.target.value.toLowerCase())}
             placeholder="e.g. swift"
@@ -376,13 +437,53 @@ export function CarModelsPage() {
             required
             fullWidth
           />
-          <Input
-            label="Image URL"
-            value={form.image}
-            onChange={(e) => set('image', e.target.value)}
-            placeholder="https://… (optional)"
-            fullWidth
-          />
+          {/* ── Image ─────────────────────────────────────────── */}
+          <div className={styles.imageSection}>
+            <label className={styles.imageLabel}>
+              Image{!editTarget && <span className={styles.required}>*</span>}
+            </label>
+            {form.image && (
+              <div className={styles.imagePreviewWrap}>
+                <img
+                  src={form.image}
+                  alt="Model preview"
+                  className={styles.imageThumb}
+                  onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                />
+                <button
+                  type="button"
+                  className={styles.clearImageBtn}
+                  onClick={() => { set('image', ''); setUrlInput(''); }}
+                  aria-label="Remove image"
+                >
+                  <X size={11} />
+                </button>
+              </div>
+            )}
+            <Button
+              variant="secondary"
+              size="sm"
+              leftIcon={<Upload size={14} />}
+              onClick={() => fileInputRef.current?.click()}
+            >
+              Upload from device
+            </Button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              style={{ display: 'none' }}
+              onChange={handleFileSelect}
+            />
+            <div className={styles.imageDivider}>or paste a URL</div>
+            <Input
+              value={urlInput}
+              onChange={(e) => handleUrlChange(e.target.value)}
+              placeholder="https://…"
+              error={errors.image}
+              fullWidth
+            />
+          </div>
           <Select
             label="Status"
             options={STATUS_OPTS}
