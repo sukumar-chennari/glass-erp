@@ -208,6 +208,9 @@ export function CarModelsPage() {
     if (!form.name.trim())         errs.name         = 'Model name is required';
     if (!form.compare_name.trim()) errs.compare_name = 'Company name is required';
     if (!isEdit && !form.image)    errs.image        = 'Image is required';
+    if (!isEdit && form.image && !form.image.startsWith('data:image/')) {
+      errs.image = 'Please upload a file — URL links are not accepted for new models';
+    }
     setErrors(errs);
     return Object.keys(errs).length === 0;
   }
