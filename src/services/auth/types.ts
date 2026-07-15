@@ -221,6 +221,20 @@ export interface BackendAuthResponse {
   branch:        BackendBranch | null;
 }
 
+/** Returned by GET /auth/me — flat current-user profile, no access token. */
+export interface BackendMeResponse {
+  id:        string;
+  branchId:  string | null;
+  name:      string;
+  email:     string;
+  phone:     string | null;
+  role:      BackendRole;
+  isActive:  boolean;
+  createdAt: string;
+  updatedAt: string;
+  branch:    { id: string; name: string } | null;
+}
+
 /** Returned by POST /auth/otp/send */
 export interface OtpSendResult {
   otpToken: string;

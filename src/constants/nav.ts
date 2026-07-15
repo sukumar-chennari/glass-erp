@@ -27,6 +27,8 @@ export interface NavItem {
    * Undefined = visible to all roles. Prefer explicit role lists.
    */
   roles?: UserRole[];
+  /** When true, NavLink only marks active on exact path match (no prefix). */
+  end?: boolean;
 }
 
 export const NAV_ITEMS: NavItem[] = [
@@ -181,5 +183,6 @@ export const NAV_ITEMS: NavItem[] = [
     path:    ROUTES.SETTINGS,
     section: 'management',
     roles:   ['super_admin', 'branch_manager'],
+    end:     true,
   },
 ];

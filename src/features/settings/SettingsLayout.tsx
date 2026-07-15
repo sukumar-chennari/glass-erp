@@ -1,6 +1,6 @@
 import { NavLink, Outlet, useMatch } from 'react-router-dom';
 import type { LucideIcon } from 'lucide-react';
-import { Shield, Car, Tag, Layers } from 'lucide-react';
+import { Shield, Tag, Layers } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { ROUTES } from '@/constants/routes';
 import { SettingsPage } from './SettingsPage';
@@ -15,7 +15,6 @@ interface SubNavItem {
 
 const MASTER_DATA_NAV: SubNavItem[] = [
   { path: ROUTES.SETTINGS_INSURANCE_RULES, label: 'Insurance Rules', Icon: Shield },
-  { path: ROUTES.SETTINGS_VEHICLE_MODELS,  label: 'Vehicle Models',  Icon: Car    },
   { path: ROUTES.SETTINGS_CAR_BRANDS,      label: 'Car Brands',      Icon: Tag    },
   { path: ROUTES.SETTINGS_CAR_MODELS,      label: 'Car Models',      Icon: Layers },
 ];
@@ -42,12 +41,11 @@ function NavItems({ items }: { items: SubNavItem[] }) {
 export function SettingsLayout() {
   const { session }       = useAuth();
   const onInsuranceRules  = useMatch(ROUTES.SETTINGS_INSURANCE_RULES);
-  const onVehicleModels   = useMatch(ROUTES.SETTINGS_VEHICLE_MODELS);
   const onCarBrands       = useMatch(ROUTES.SETTINGS_CAR_BRANDS);
   const onCarModels       = useMatch(ROUTES.SETTINGS_CAR_MODELS);
 
   // Subnav only for master-data sub-pages; landing + direct sidebar items render full-width
-  const showSubnav = !!(onInsuranceRules || onVehicleModels || onCarBrands || onCarModels);
+  const showSubnav = !!(onInsuranceRules || onCarBrands || onCarModels);
 
   if (session?.role !== 'super_admin' || !showSubnav) {
     return <Outlet />;

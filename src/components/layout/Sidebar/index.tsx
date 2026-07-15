@@ -81,6 +81,7 @@ export function Sidebar() {
                     <li key={item.id} className={styles.navItem}>
                       <NavLink
                         to={item.path}
+                        end={item.end}
                         className={({ isActive }) =>
                           `${styles.navLink} ${isActive ? styles.active : ''}`
                         }

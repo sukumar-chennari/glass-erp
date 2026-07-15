@@ -13,7 +13,7 @@
 
 import type {
   AuthService, Session, LoginCredentials, ResetPasswordOptions,
-  VerifyOtpOptions, BackendAuthResponse, OtpSendResult,
+  VerifyOtpOptions, BackendAuthResponse, BackendMeResponse, OtpSendResult,
 } from './types';
 import { AuthError } from './types';
 import type { AuthErrorCode } from './types';
@@ -102,20 +102,21 @@ import type { AuthErrorCode } from './types';
 // ─────────────────────────────────────────────────────────────────────────────
 
 // Kept for clearAuth() cleanup of pre-13B.8 localStorage entries.
-export const SESSION_KEY = 'erp-session-v1';
-export const TOKEN_KEY   = 'glass_erp_token';
+export const SESSION_KEY       = 'erp-session-v1';
+export const TOKEN_KEY         = 'glass_erp_token';
+// Refresh token persisted to survive page reloads (backend sends it in body, not HttpOnly cookie).
+export const REFRESH_TOKEN_KEY = 'glass_erp_refresh';
 
 // ── In-memory token store ──────────────────────────────────────────────────
-// Both tokens live in module variables only — never written to persistent storage.
-// accessToken: read by prepareHeaders on every RTK Query request.
-// refreshToken: sent as { refreshToken } in POST /auth/refresh body.
-//   Falls back to the HttpOnly cookie when not yet in memory (page reload / first load).
+// accessToken: module variable only — lost on page reload (intentional; re-obtained via refresh).
+// refreshToken: module variable + localStorage — must survive page reloads so /auth/refresh works.
 let _accessToken:  string | null = null;
 let _refreshToken: string | null = null;
 export const getToken          = (): string | null => _accessToken;
 export const setToken          = (t: string): void => { _accessToken = t; };
 export const clearToken        = (): void          => { _accessToken = null; };
-export const getRefreshToken   = (): string | null => _refreshToken;
+// Falls back to localStorage so the token survives a Ctrl+R page reload.
+export const getRefreshToken   = (): string | null => _refreshToken ?? localStorage.getItem(REFRESH_TOKEN_KEY);
 export const setRefreshToken   = (t: string): void => { _refreshToken = t; };
 export const clearRefreshToken = (): void          => { _refreshToken = null; };
 
@@ -228,36 +229,44 @@ async function throwAuthError(res: Response): Promise<never> {
 //   - getSession() bootstraps via GET /auth/me → POST /auth/refresh
 //   - baseApi.ts tryRefreshToken() handles mid-session 401s silently
 //
-// Current — refresh token also stored in memory + sent as body:
-//   - storeAuth() accepts refreshToken and stores it in _refreshToken
-//   - POST /auth/refresh sends { refreshToken } in body when available in memory
-//   - Falls back to HttpOnly cookie only (no body) on first load / after page reload
-//   - _refreshToken is rotated on each successful refresh response
+// Current — refresh token in body (not HttpOnly cookie):
+//   - Backend returns refreshToken in JSON body (not Set-Cookie)
+//   - storeAuth() writes refreshToken to _refreshToken (memory) + localStorage (REFRESH_TOKEN_KEY)
+//   - getRefreshToken() reads _refreshToken ?? localStorage — survives page reloads
+//   - POST /auth/refresh sends { refreshToken } in body; rotated on each response
+//   - clearAuth() removes REFRESH_TOKEN_KEY from localStorage on logout
 //
-// No persistent auth storage remains in the browser after logout.
+// accessToken is memory-only (lost on reload; re-obtained via /auth/refresh).
+// refreshToken persists in localStorage until explicit logout.
 //
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function storeAuth(accessToken: string, _session: Session, refreshToken?: string): void {
   setToken(accessToken);
-  if (refreshToken) setRefreshToken(refreshToken);
+  if (refreshToken) {
+    setRefreshToken(refreshToken);
+    localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
+  }
 }
 
 export function clearAuth(): void {
   clearToken();
   clearRefreshToken();
-  localStorage.removeItem(SESSION_KEY);  // cleanup of pre-13B.8 cached sessions
-  localStorage.removeItem(TOKEN_KEY);    // cleanup of pre-13B.8 stored access tokens
+  localStorage.removeItem(REFRESH_TOKEN_KEY); // clear persisted refresh token on logout
+  localStorage.removeItem(SESSION_KEY);        // cleanup of pre-13B.8 cached sessions
+  localStorage.removeItem(TOKEN_KEY);          // cleanup of pre-13B.8 stored access tokens
 }
 
 /**
  * Maps a backend auth response to the canonical frontend Session.
- * Handles the live /auth/me and login shapes { accessToken, user, branch }.
- * Also accepts legacy localStorage-cached objects { role, branch, user, ... }
- * from pre-13B.8 sessions for backward-compatible reads.
+ * Handles two shapes:
+ *   - Wrapped: { accessToken, user: { id, name, ... }, branch }  — login / refresh
+ *   - Flat:    { id, name, email, role, ..., branch }             — GET /auth/me
+ * Also accepts legacy localStorage-cached objects { role, branch, user, ... }.
  */
 export function mapSession(raw: Record<string, unknown>): Session {
-  const user = (raw.user ?? {}) as Record<string, unknown>;
+  // Wrapped shape has raw.user; flat /auth/me shape has user fields at root.
+  const user = (raw.user ?? raw) as Record<string, unknown>;
   const role = mapRole(user.role ?? raw.role);
 
   // Branch may be at response root (live login) or cached directly in the stored session.
@@ -333,10 +342,11 @@ export const authServiceHttp: AuthService = {
     try {
       const res = await apiFetch('/auth/me');
       if (res.ok) {
-        const data = await res.json() as BackendAuthResponse;
-        const session = mapSession(data as unknown as Record<string, unknown>);
-        storeAuth(data.accessToken, session);
-        return session;
+        // /auth/me returns a flat user profile — no accessToken in the response.
+        // The bearer token that was used to make this call is already in memory;
+        // do not call storeAuth() here (no new token to store).
+        const data = await res.json() as BackendMeResponse;
+        return mapSession(data as unknown as Record<string, unknown>);
       }
       // Non-401 (server error, network issue) — don't clear local state, just bail.
       if (res.status !== 401) return null;
