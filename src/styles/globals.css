@@ -60,6 +60,8 @@ ul, ol { list-style: none; }
   --color-bg-input:         rgba(255, 255, 255, 0.06);
   --color-bg-disabled:      rgba(255, 255, 255, 0.03);
   --color-bg-subtle:        rgba(255, 255, 255, 0.04);
+  /* Solid elevated surface — used by Drawer, Popovers, and any panel that must be opaque */
+  --color-bg-light:         #15193e;
 
   /* ── Colors — Text ── */
   --color-text-primary:     #ffffff;
@@ -329,6 +331,7 @@ ul, ol { list-style: none; }
   --color-bg-input:         #ffffff;
   --color-bg-disabled:      #f8fafc;
   --color-bg-subtle:        #f8fafc;
+  --color-bg-light:         #ffffff;
 
   /* Text */
   --color-text-primary:    #0f172a;
@@ -505,6 +508,7 @@ ul, ol { list-style: none; }
   --color-bg-input:         #ffffff;
   --color-bg-disabled:      #fef3ec;
   --color-bg-subtle:        #fff8f0;
+  --color-bg-light:         #ffffff;
 
   /* Text — warm dark charcoal */
   --color-text-primary:    #1c1410;
@@ -683,6 +687,7 @@ ul, ol { list-style: none; }
   /* Backgrounds */
   --color-bg-page:          #0f172a;
   --color-bg-surface-hover: rgba(129, 140, 248, 0.06);
+  --color-bg-light:         #1e293b;
 
   /* Borders & focus */
   --color-border-focus: rgba(129, 140, 248, 0.6);
