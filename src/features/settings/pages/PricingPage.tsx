@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Pencil, Check, X } from 'lucide-react';
 import { PageShell, SectionCard } from '@/components/layout/PageShell';
@@ -33,6 +34,7 @@ const INITIAL_PRICING: PriceRow[] = [
 type EditMap = Record<string, Partial<Record<keyof Omit<PriceRow, 'glassType'>, string>>>;
 
 export function PricingPage() {
+  const { t } = useTranslation('settings');
   const toast = useToast();
   const [pricing, setPricing] = useState<PriceRow[]>(INITIAL_PRICING);
   const [editMode, setEditMode] = useState(false);
@@ -78,7 +80,7 @@ export function PricingPage() {
       setPricing(updated);
       setDraft({});
       setEditMode(false);
-      toast.success('Pricing updated successfully.');
+      toast.success(t('pricing.toast.saved'));
     } finally {
       setSaving(false);
     }
@@ -92,30 +94,30 @@ export function PricingPage() {
   }
 
   const cols: Array<{ key: keyof Omit<PriceRow, 'glassType'>; label: string }> = [
-    { key: 'oem',    label: 'OEM'           },
-    { key: 'oee',    label: 'OEE'           },
-    { key: 'am',     label: 'Aftermarket'   },
-    { key: 'labour', label: 'Labour'        },
-    { key: 'sealant',label: 'Sealant'       },
+    { key: 'oem',    label: t('pricing.columns.oem')    },
+    { key: 'oee',    label: t('pricing.columns.oee')    },
+    { key: 'am',     label: t('pricing.columns.am')     },
+    { key: 'labour', label: t('pricing.columns.labour') },
+    { key: 'sealant',label: t('pricing.columns.sealant')},
   ];
 
   return (
     <PageShell
-      heading="Pricing Management"
-      description="Configure base glass prices and labour rates. These are used in quote generation."
+      heading={t('pricing.heading')}
+      description={t('pricing.description')}
       actions={
         editMode ? (
           <div className={styles.actionsGroup}>
             <Button variant="ghost" leftIcon={<X size={14} />} onClick={cancelEdit} disabled={saving}>
-              Cancel
+              {t('pricing.actions.cancel')}
             </Button>
             <Button leftIcon={<Check size={14} />} onClick={saveEdit} loading={saving}>
-              Save Prices
+              {saving ? t('pricing.actions.saving') : t('pricing.actions.save')}
             </Button>
           </div>
         ) : (
           <Button variant="secondary" leftIcon={<Pencil size={14} />} onClick={startEdit}>
-            Edit Prices
+            {t('pricing.actions.edit')}
           </Button>
         )
       }
@@ -130,7 +132,7 @@ export function PricingPage() {
           <table className={styles.table}>
             <thead>
               <tr>
-                <th className={styles.glassCol}>Glass Type</th>
+                <th className={styles.glassCol}>{t('pricing.columns.glassType')}</th>
                 {cols.map((c) => <th key={c.key}>{c.label} (₹)</th>)}
               </tr>
             </thead>

@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { Building2, ArrowLeft, LocateFixed, Loader2, Pencil } from 'lucide-react';
 import type { FetchBaseQueryError } from '@reduxjs/toolkit/query/react';
@@ -16,64 +17,6 @@ import type { BranchListItem, BranchListStatus, BranchCreatePayload, BranchPatch
 import type { TableColumn, SelectOption } from '@/types/ui';
 import { ROUTES } from '@/constants/routes';
 import styles from './BranchesPage.module.css';
-
-// Matches backend uppercase status enum including SUSPENDED
-const BRANCH_STATUS_MAP: Record<BranchListStatus, { label: string; variant: 'success' | 'warning' | 'neutral' }> = {
-  ACTIVE:    { label: 'Active',    variant: 'success' },
-  INACTIVE:  { label: 'Inactive',  variant: 'neutral' },
-  SUSPENDED: { label: 'Suspended', variant: 'warning' },
-};
-
-// Used in the create form status select (SUSPENDED not allowed at create time)
-const STATUS_OPTIONS: SelectOption[] = [
-  { value: 'ACTIVE',   label: 'Active' },
-  { value: 'INACTIVE', label: 'Inactive' },
-];
-
-// Edit form may set any status including SUSPENDED
-const EDIT_STATUS_OPTIONS: SelectOption[] = [
-  { value: 'ACTIVE',    label: 'Active' },
-  { value: 'INACTIVE',  label: 'Inactive' },
-  { value: 'SUSPENDED', label: 'Suspended' },
-];
-
-const FILTER_OPTIONS: SelectOption[] = [
-  { value: '',          label: 'All statuses' },
-  { value: 'ACTIVE',    label: 'Active' },
-  { value: 'INACTIVE',  label: 'Inactive' },
-  { value: 'SUSPENDED', label: 'Suspended' },
-];
-
-// ── Table Columns ──────────────────────────────────────────────────────
-// Uses real backend field names: contactNumber, openingTime, closingTime.
-// Edit action column is added dynamically inside the component via useMemo.
-const BASE_COLUMNS: TableColumn<BranchListItem>[] = [
-  {
-    key: 'name',
-    header: 'Branch',
-    render: (b) => (
-      <div>
-        <div className={styles.cellPrimary}>{b.name}</div>
-        <div className={styles.cellMuted}>{b.address}</div>
-        <div className={styles.cellMuted}>{b.district}, {b.state}</div>
-      </div>
-    ),
-  },
-  {
-    key: 'openingTime',
-    header: 'Hours',
-    render: (b) => (
-      <span className={styles.hours}>{b.openingTime} – {b.closingTime}</span>
-    ),
-  },
-  { key: 'contactNumber', header: 'Phone' },
-  { key: 'email',         header: 'Email' },
-  {
-    key: 'status',
-    header: 'Status',
-    render: (b) => <StatusBadge status={b.status} statusMap={BRANCH_STATUS_MAP} size="sm" />,
-  },
-];
 
 // ── Form ───────────────────────────────────────────────────────────────
 // All fields are `string` in form state; BranchCreatePayload casting happens in handleAdd.
@@ -143,6 +86,7 @@ const PHONE_LONG = /^\d{10,13}$/;  // admin phone: with or without country code
 
 // ── Component ──────────────────────────────────────────────────────────
 export function BranchesPage() {
+  const { t } = useTranslation(['settings', 'common']);
   const toast     = useToast();
   const canWrite  = useHasPermission('branches:write');
 
@@ -155,6 +99,33 @@ export function BranchesPage() {
   const [createBranch,     { isLoading: saving }]       = useCreateBranchMutation();
   const [updateBranch,     { isLoading: updating }]     = useUpdateBranchMutation();
   const [deactivateBranch, { isLoading: deactivating }] = useDeactivateBranchMutation();
+
+  // ── Status maps & filter options ─────────────────────────────────────
+  const BRANCH_STATUS_MAP = useMemo<Record<BranchListStatus, { label: string; variant: 'success' | 'warning' | 'neutral' }>>(() => ({
+    ACTIVE:    { label: t('branches.statusLabels.active'),    variant: 'success' },
+    INACTIVE:  { label: t('branches.statusLabels.inactive'),  variant: 'neutral' },
+    SUSPENDED: { label: t('branches.statusLabels.suspended'), variant: 'warning' },
+  }), [t]);
+
+  // Used in the create form status select (SUSPENDED not allowed at create time)
+  const STATUS_OPTIONS = useMemo<SelectOption[]>(() => [
+    { value: 'ACTIVE',   label: t('branches.statusLabels.active')   },
+    { value: 'INACTIVE', label: t('branches.statusLabels.inactive')  },
+  ], [t]);
+
+  // Edit form may set any status including SUSPENDED
+  const EDIT_STATUS_OPTIONS = useMemo<SelectOption[]>(() => [
+    { value: 'ACTIVE',    label: t('branches.statusLabels.active')    },
+    { value: 'INACTIVE',  label: t('branches.statusLabels.inactive')  },
+    { value: 'SUSPENDED', label: t('branches.statusLabels.suspended') },
+  ], [t]);
+
+  const FILTER_OPTIONS = useMemo<SelectOption[]>(() => [
+    { value: '',          label: t('branches.allStatuses')            },
+    { value: 'ACTIVE',    label: t('branches.statusLabels.active')    },
+    { value: 'INACTIVE',  label: t('branches.statusLabels.inactive')  },
+    { value: 'SUSPENDED', label: t('branches.statusLabels.suspended') },
+  ], [t]);
 
   // ── Create modal state ───────────────────────────────────────────────
   const [modalOpen,   setModal]     = useState(false);
@@ -175,6 +146,37 @@ export function BranchesPage() {
 
   const isUnauthorized = isError &&
     (error as FetchBaseQueryError | undefined)?.status === 401;
+
+  // ── Table columns ────────────────────────────────────────────────────
+  // Uses real backend field names: contactNumber, openingTime, closingTime.
+  // Edit action column is added dynamically inside the component via useMemo.
+  const BASE_COLUMNS = useMemo<TableColumn<BranchListItem>[]>(() => [
+    {
+      key: 'name',
+      header: t('branches.columns.branch'),
+      render: (b) => (
+        <div>
+          <div className={styles.cellPrimary}>{b.name}</div>
+          <div className={styles.cellMuted}>{b.address}</div>
+          <div className={styles.cellMuted}>{b.district}, {b.state}</div>
+        </div>
+      ),
+    },
+    {
+      key: 'openingTime',
+      header: t('branches.columns.hours'),
+      render: (b) => (
+        <span className={styles.hours}>{b.openingTime} – {b.closingTime}</span>
+      ),
+    },
+    { key: 'contactNumber', header: t('branches.columns.phone') },
+    { key: 'email',         header: t('branches.columns.email') },
+    {
+      key: 'status',
+      header: t('branches.columns.status'),
+      render: (b) => <StatusBadge status={b.status} statusMap={BRANCH_STATUS_MAP} size="sm" />,
+    },
+  ], [t, BRANCH_STATUS_MAP]);
 
   // ── Dynamic columns (action handlers captured by closure) ────────────
   const columns = useMemo<TableColumn<BranchListItem>[]>(() => [
@@ -207,7 +209,7 @@ export function BranchesPage() {
       ),
     }] : []),
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  ], [canWrite]);
+  ], [canWrite, BASE_COLUMNS]);
 
   // ── Create form helpers ──────────────────────────────────────────────
   function set(key: keyof BranchForm, val: string) {
@@ -344,7 +346,7 @@ export function BranchesPage() {
     const result = await updateBranch(payload);
 
     if ('data' in result) {
-      toast.success(`Branch "${payload.name}" updated successfully.`);
+      toast.success(t('branches.toast.updated', { name: payload.name }));
       closeEdit();
       return;
     }
@@ -366,7 +368,7 @@ export function BranchesPage() {
 
   async function handleDeactivate() {
     if (!confirmBranch) return;
-    const { name, id } = confirmBranch;
+    const { id } = confirmBranch;
     setConfirmBranch(null);
 
     const result = await deactivateBranch(id);
@@ -381,7 +383,7 @@ export function BranchesPage() {
       return;
     }
 
-    toast.success(`Branch "${name}" deactivated successfully.`);
+    toast.success(t('branches.toast.deactivated'));
   }
 
   function validate(): boolean {
@@ -509,7 +511,7 @@ export function BranchesPage() {
     const result = await createBranch(payload);
 
     if ('data' in result) {
-      toast.success(`Branch "${payload.name}" created successfully.`);
+      toast.success(t('branches.toast.added', { name: payload.name }));
       closeModal();
       return;
     }
@@ -531,12 +533,12 @@ export function BranchesPage() {
 
   return (
     <PageShell
-      heading="Branches"
-      description="Manage branch locations, assign managers and configure service areas."
+      heading={t('branches.heading')}
+      description={t('branches.description')}
       actions={
         canWrite ? (
           <Button leftIcon={<Building2 size={16} />} onClick={openModal}>
-            Add Branch
+            {t('branches.actions.add')}
           </Button>
         ) : null
       }
@@ -565,11 +567,11 @@ export function BranchesPage() {
           </div>
         )}
         {isError && !isUnauthorized && (
-          <div className={styles.emptyState}>Failed to load branches. Please try again.</div>
+          <div className={styles.emptyState}>{t('branches.loadError')}</div>
         )}
         {!isLoading && !isError && branches.length === 0 && (
           <div className={styles.emptyState}>
-            {statusFilter ? `No ${statusFilter.toLowerCase()} branches found.` : 'No branches found.'}
+            {statusFilter ? `No ${statusFilter.toLowerCase()} branches found.` : t('branches.emptyNoResults')}
           </div>
         )}
         {!isLoading && !isError && branches.length > 0 && (
@@ -580,11 +582,11 @@ export function BranchesPage() {
       <Modal
         isOpen={modalOpen}
         onClose={closeModal}
-        title="Add Branch"
+        title={t('branches.modal.addTitle')}
         footer={
           <div className={styles.modalFooter}>
-            <Button variant="ghost" onClick={closeModal}>Cancel</Button>
-            <Button onClick={handleAdd} loading={saving}>Create Branch</Button>
+            <Button variant="ghost" onClick={closeModal}>{t('common:actions.cancel')}</Button>
+            <Button onClick={handleAdd} loading={saving}>{t('branches.modal.add')}</Button>
           </div>
         }
       >
@@ -592,7 +594,7 @@ export function BranchesPage() {
 
           {/* ── Branch details ────────────────────────────────────── */}
           <Input
-            label="Branch Name"
+            label={t('branches.modal.name')}
             value={form.name}
             onChange={(e) => set('name', e.target.value)}
             placeholder="e.g. Glass Pro – Hyderabad Hitech City"
@@ -616,7 +618,7 @@ export function BranchesPage() {
           {/* ── Location ─────────────────────────────────────────── */}
           <div className={styles.twoCol}>
             <Input
-              label="State"
+              label={t('branches.modal.state')}
               value={form.state}
               onChange={(e) => set('state', e.target.value)}
               placeholder="e.g. Telangana"
@@ -624,7 +626,7 @@ export function BranchesPage() {
               required
             />
             <Input
-              label="District"
+              label={t('branches.modal.district')}
               value={form.district}
               onChange={(e) => set('district', e.target.value)}
               placeholder="e.g. Hyderabad"
@@ -635,7 +637,7 @@ export function BranchesPage() {
 
           <div className={styles.field}>
             <label className={styles.label}>
-              Full Address <span className={styles.req}>*</span>
+              {t('branches.modal.address')} <span className={styles.req}>*</span>
             </label>
             <textarea
               className={`${styles.textarea} ${errors.address ? styles.textareaError : ''}`}
@@ -649,7 +651,7 @@ export function BranchesPage() {
 
           <div className={styles.twoCol}>
             <Input
-              label="Pincode"
+              label={t('branches.modal.pincode')}
               value={form.pincode}
               onChange={(e) => set('pincode', e.target.value.replace(/\D/g, '').slice(0, 6))}
               placeholder="e.g. 500081"
@@ -673,12 +675,12 @@ export function BranchesPage() {
                 {geoLoading
                   ? <Loader2 size={12} className={styles.spin} />
                   : <LocateFixed size={12} />}
-                {geoLoading ? 'Detecting…' : 'Detect my location'}
+                {geoLoading ? 'Detecting…' : t('branches.actions.detectLocation')}
               </button>
             </div>
             <div className={styles.twoCol}>
               <Input
-                label="Latitude"
+                label={t('branches.modal.latitude')}
                 value={form.latitude}
                 onChange={(e) => set('latitude', e.target.value)}
                 placeholder="e.g. 17.385"
@@ -686,7 +688,7 @@ export function BranchesPage() {
                 required
               />
               <Input
-                label="Longitude"
+                label={t('branches.modal.longitude')}
                 value={form.longitude}
                 onChange={(e) => set('longitude', e.target.value)}
                 placeholder="e.g. 78.4867"
@@ -700,7 +702,7 @@ export function BranchesPage() {
           {/* ── Contact ──────────────────────────────────────────── */}
           <div className={styles.twoCol}>
             <Input
-              label="Contact Number"
+              label={t('branches.modal.phone')}
               type="tel"
               value={form.contactNumber}
               onChange={(e) => set('contactNumber', e.target.value.replace(/\D/g, '').slice(0, 10))}
@@ -720,7 +722,7 @@ export function BranchesPage() {
           </div>
 
           <Input
-            label="Branch Email"
+            label={t('branches.modal.email')}
             type="email"
             value={form.email}
             onChange={(e) => set('email', e.target.value)}
@@ -751,7 +753,7 @@ export function BranchesPage() {
           </div>
 
           <Select
-            label="Status"
+            label={t('branches.modal.status')}
             options={STATUS_OPTIONS}
             value={form.status}
             onChange={(e) => set('status', e.target.value)}
@@ -812,11 +814,11 @@ export function BranchesPage() {
       <Modal
         isOpen={editingBranch !== null}
         onClose={closeEdit}
-        title={editingBranch ? `Edit Branch — ${editingBranch.name}` : 'Edit Branch'}
+        title={t('branches.modal.editTitle', { name: editingBranch?.name ?? '' })}
         footer={
           <div className={styles.modalFooter}>
-            <Button variant="ghost" onClick={closeEdit} disabled={updating}>Cancel</Button>
-            <Button onClick={handleSave} loading={updating}>Save Changes</Button>
+            <Button variant="ghost" onClick={closeEdit} disabled={updating}>{t('common:actions.cancel')}</Button>
+            <Button onClick={handleSave} loading={updating}>{t('branches.modal.save')}</Button>
           </div>
         }
       >
@@ -824,7 +826,7 @@ export function BranchesPage() {
 
           {/* ── Branch details ─────────────────────────────────────── */}
           <Input
-            label="Branch Name"
+            label={t('branches.modal.name')}
             value={editForm.name}
             onChange={(e) => setEdit('name', e.target.value)}
             placeholder="e.g. Glass Pro – Hyderabad Hitech City"
@@ -837,7 +839,7 @@ export function BranchesPage() {
           {/* ── Location ──────────────────────────────────────────── */}
           <div className={styles.twoCol}>
             <Input
-              label="State"
+              label={t('branches.modal.state')}
               value={editForm.state}
               onChange={(e) => setEdit('state', e.target.value)}
               placeholder="e.g. Telangana"
@@ -845,7 +847,7 @@ export function BranchesPage() {
               required
             />
             <Input
-              label="District"
+              label={t('branches.modal.district')}
               value={editForm.district}
               onChange={(e) => setEdit('district', e.target.value)}
               placeholder="e.g. Hyderabad"
@@ -856,7 +858,7 @@ export function BranchesPage() {
 
           <div className={styles.field}>
             <label className={styles.label}>
-              Full Address <span className={styles.req}>*</span>
+              {t('branches.modal.address')} <span className={styles.req}>*</span>
             </label>
             <textarea
               className={`${styles.textarea} ${editErrors.address ? styles.textareaError : ''}`}
@@ -870,7 +872,7 @@ export function BranchesPage() {
 
           <div className={styles.twoCol}>
             <Input
-              label="Pincode"
+              label={t('branches.modal.pincode')}
               value={editForm.pincode}
               onChange={(e) => setEdit('pincode', e.target.value.replace(/\D/g, '').slice(0, 6))}
               placeholder="e.g. 500081"
@@ -894,12 +896,12 @@ export function BranchesPage() {
                 {editGeoLoad
                   ? <Loader2 size={12} className={styles.spin} />
                   : <LocateFixed size={12} />}
-                {editGeoLoad ? 'Detecting…' : 'Detect my location'}
+                {editGeoLoad ? 'Detecting…' : t('branches.actions.detectLocation')}
               </button>
             </div>
             <div className={styles.twoCol}>
               <Input
-                label="Latitude"
+                label={t('branches.modal.latitude')}
                 value={editForm.latitude}
                 onChange={(e) => setEdit('latitude', e.target.value)}
                 placeholder="e.g. 17.385"
@@ -907,7 +909,7 @@ export function BranchesPage() {
                 required
               />
               <Input
-                label="Longitude"
+                label={t('branches.modal.longitude')}
                 value={editForm.longitude}
                 onChange={(e) => setEdit('longitude', e.target.value)}
                 placeholder="e.g. 78.4867"
@@ -921,7 +923,7 @@ export function BranchesPage() {
           {/* ── Contact ────────────────────────────────────────────── */}
           <div className={styles.twoCol}>
             <Input
-              label="Contact Number"
+              label={t('branches.modal.phone')}
               type="tel"
               value={editForm.contactNumber}
               onChange={(e) => setEdit('contactNumber', e.target.value.replace(/\D/g, '').slice(0, 10))}
@@ -941,7 +943,7 @@ export function BranchesPage() {
           </div>
 
           <Input
-            label="Branch Email"
+            label={t('branches.modal.email')}
             type="email"
             value={editForm.email}
             onChange={(e) => setEdit('email', e.target.value)}
@@ -972,7 +974,7 @@ export function BranchesPage() {
           </div>
 
           <Select
-            label="Status"
+            label={t('branches.modal.status')}
             options={EDIT_STATUS_OPTIONS}
             value={editForm.status}
             onChange={(e) => setEdit('status', e.target.value)}
@@ -988,7 +990,7 @@ export function BranchesPage() {
         footer={
           <div className={styles.modalFooter}>
             <Button variant="ghost" onClick={() => setConfirmBranch(null)} disabled={deactivating}>
-              Cancel
+              {t('common:actions.cancel')}
             </Button>
             <Button variant="danger" onClick={handleDeactivate} loading={deactivating}>
               Deactivate

@@ -89,5 +89,11 @@
     "rearRightWindow":      "వెనుక కుడి విండో",
     "sunroofGlass":         "సన్‌రూఫ్ గ్లాస్",
     "quarterGlass":         "క్వార్టర్ గ్లాస్"
+  },
+  "fileUpload": {
+    "clickToBrowse": "బ్రౌజ్ చేయడానికి క్లిక్ చేయండి",
+    "dragAndDrop": "లేదా లాగి వదలండి",
+    "removeFile": "ఫైల్ తొలగించండి",
+    "ariaLabel": "ఫైల్ అప్‌లోడ్ చేయండి — క్లిక్ చేయండి లేదా లాగి వదలండి"
   }
 }

@@ -29,6 +29,12 @@
         "branch_manager": "शाखा प्रबंधक",
         "technician":     "तकनीशियन",
         "operator":       "ऑपरेटर"
+      },
+      "logoutConfirm": {
+        "title": "लॉग आउट",
+        "message": "क्या आप लॉग आउट करना चाहते हैं?",
+        "confirm": "लॉग आउट",
+        "confirming": "लॉग आउट हो रहे हैं…"
       }
     },
     "aria": {

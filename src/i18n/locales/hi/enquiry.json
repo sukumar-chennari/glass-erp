@@ -27,5 +27,107 @@
     "invalidUrl": "कृपया https:// से शुरू होने वाला वैध URL दर्ज करें",
     "urlSaved": "✓ फॉर्म URL सहेजा गया! अब आप इसे ग्राहकों को भेज सकते हैं।",
     "whatsappOpened": "✓ WhatsApp खुला! +91 {{phone}} को फॉर्म लिंक भेजा जा रहा है"
+  },
+  "page": {
+    "heading": "पूछताछ",
+    "description": "ग्राहक पूछताछ प्रबंधित करें — मूल्य पुष्टि करें, जॉब में परिवर्तित करें और खोई हुई लीड बंद करें।",
+    "tabs": {
+      "enquiries": "पूछताछ",
+      "submissions": "ग्राहक सबमिशन"
+    },
+    "summary": {
+      "pending": "{{count}} लंबित",
+      "confirmed": "{{count}} मूल्य पुष्टि"
+    },
+    "filters": {
+      "all": "सभी",
+      "pending": "लंबित",
+      "priceConfirmed": "मूल्य पुष्टि",
+      "converted": "परिवर्तित",
+      "closed": "बंद"
+    },
+    "columns": {
+      "enquiry": "पूछताछ",
+      "customer": "ग्राहक",
+      "vehicle": "वाहन",
+      "glassType": "कांच का प्रकार",
+      "price": "मूल्य",
+      "status": "स्थिति",
+      "actions": "कार्रवाई",
+      "received": "प्राप्त",
+      "description": "विवरण",
+      "glass": "कांच",
+      "photos": "फ़ोटो"
+    },
+    "actions": {
+      "newEnquiry": "नई पूछताछ",
+      "confirmPrice": "मूल्य पुष्टि करें",
+      "convertToJob": "जॉब में परिवर्तित करें",
+      "close": "बंद करें",
+      "review": "समीक्षा",
+      "createEnquiry": "पूछताछ बनाएं",
+      "dismiss": "खारिज करें"
+    },
+    "status": {
+      "pending": "लंबित",
+      "priceConfirmed": "मूल्य पुष्टि",
+      "converted": "परिवर्तित",
+      "closed": "बंद"
+    },
+    "source": {
+      "phone": "फ़ोन कॉल",
+      "walk_in": "वॉक-इन",
+      "whatsapp": "व्हाट्सएप"
+    },
+    "closeReasons": {
+      "declined_price": "ग्राहक ने मूल्य अस्वीकार किया",
+      "found_vendor": "दूसरा विक्रेता मिला",
+      "wrong_number": "गलत नंबर",
+      "test_spam": "टेस्ट / स्पैम पूछताछ",
+      "other_channel": "दूसरे चैनल से परिवर्तित",
+      "other": "अन्य"
+    },
+    "glassOptions": {
+      "frontWindshield": "फ्रंट विंडशील्ड",
+      "rearWindshield": "रियर विंडशील्ड",
+      "driverSideWindow": "ड्राइवर साइड विंडो",
+      "passengerSideWindow": "पैसेंजर साइड विंडो",
+      "rearLeftWindow": "रियर लेफ्ट विंडो",
+      "rearRightWindow": "रियर राइट विंडो",
+      "sunroofGlass": "सनरूफ ग्लास",
+      "quarterGlass": "क्वार्टर ग्लास"
+    },
+    "emptyFilter": "चयनित फ़िल्टर से मेल खाती कोई पूछताछ नहीं।",
+    "noSubmissions": "कोई लंबित ग्राहक सबमिशन नहीं।",
+    "createModal": {
+      "title": "नई पूछताछ",
+      "phoneNumber": "फ़ोन नंबर",
+      "phonePlaceholder": "10 अंकों का नंबर",
+      "customerName": "ग्राहक का नाम",
+      "vehicleNumber": "वाहन नंबर",
+      "vehicleModel": "वाहन मॉडल",
+      "glassType": "कांच का प्रकार",
+      "source": "स्रोत",
+      "create": "पूछताछ बनाएं"
+    },
+    "confirmPriceModal": {
+      "title": "मूल्य पुष्टि करें",
+      "selectHint": "ऊपर से मूल्य स्तर चुनें",
+      "confirmWith": "₹{{price}} ({{brand}}) पुष्टि करें"
+    },
+    "closeModal": {
+      "title": "पूछताछ बंद करें",
+      "reasonLabel": "बंद करने का कारण",
+      "notesLabel": "नोट्स (वैकल्पिक)",
+      "notesPlaceholder": "कोई अतिरिक्त संदर्भ...",
+      "confirm": "पूछताछ बंद करें"
+    },
+    "toast": {
+      "enquiryCreated": "पूछताछ {{enquiryNo}} बनाई गई।",
+      "priceConfirmed": "{{enquiryNo}} के लिए ₹{{price}} ({{brand}}) पुष्टि हुई।",
+      "enquiryClosed": "{{enquiryNo}} बंद की गई।",
+      "converted": "{{enquiryNo}} को जॉब {{jobRef}} में परिवर्तित किया गया।",
+      "submissionDismissed": "सबमिशन खारिज किया गया।"
+    }
   }
 }

@@ -27,5 +27,107 @@
     "invalidUrl": "https:// తో ప్రారంభించే సరైన URL నమోదు చేయండి",
     "urlSaved": "✓ ఫారమ్ URL సేవ్ అయింది! ఇప్పుడు కస్టమర్లకు పంపవచ్చు.",
     "whatsappOpened": "✓ WhatsApp తెరిచారు! +91 {{phone}} కి ఫారమ్ లింక్ పంపుతున్నారు"
+  },
+  "page": {
+    "heading": "విచారణలు",
+    "description": "కస్టమర్ విచారణలను నిర్వహించండి — ధరలు నిర్ధారించండి, జాబ్‌లుగా మార్చండి మరియు వదిలిపెట్టిన లీడ్‌లను మూసివేయండి.",
+    "tabs": {
+      "enquiries": "విచారణలు",
+      "submissions": "కస్టమర్ సమర్పణలు"
+    },
+    "summary": {
+      "pending": "{{count}} పెండింగ్",
+      "confirmed": "{{count}} ధర నిర్ధారించబడింది"
+    },
+    "filters": {
+      "all": "అన్నీ",
+      "pending": "పెండింగ్",
+      "priceConfirmed": "ధర నిర్ధారించబడింది",
+      "converted": "మార్చబడింది",
+      "closed": "మూసివేయబడింది"
+    },
+    "columns": {
+      "enquiry": "విచారణ",
+      "customer": "కస్టమర్",
+      "vehicle": "వాహనం",
+      "glassType": "గాజు రకం",
+      "price": "ధర",
+      "status": "స్థితి",
+      "actions": "చర్యలు",
+      "received": "అందుకున్నారు",
+      "description": "వివరణ",
+      "glass": "గాజు",
+      "photos": "ఫోటోలు"
+    },
+    "actions": {
+      "newEnquiry": "కొత్త విచారణ",
+      "confirmPrice": "ధర నిర్ధారించండి",
+      "convertToJob": "జాబ్‌గా మార్చండి",
+      "close": "మూసివేయండి",
+      "review": "సమీక్షించండి",
+      "createEnquiry": "విచారణ సృష్టించండి",
+      "dismiss": "తిరస్కరించండి"
+    },
+    "status": {
+      "pending": "పెండింగ్",
+      "priceConfirmed": "ధర నిర్ధారించబడింది",
+      "converted": "మార్చబడింది",
+      "closed": "మూసివేయబడింది"
+    },
+    "source": {
+      "phone": "ఫోన్ కాల్",
+      "walk_in": "వాక్-ఇన్",
+      "whatsapp": "వాట్సాప్"
+    },
+    "closeReasons": {
+      "declined_price": "కస్టమర్ ధర తిరస్కరించారు",
+      "found_vendor": "మరొక వెండర్ కనుగొన్నారు",
+      "wrong_number": "తప్పు నంబర్",
+      "test_spam": "టెస్ట్ / స్పామ్ విచారణ",
+      "other_channel": "మరొక చానెల్ ద్వారా మార్చబడింది",
+      "other": "ఇతర"
+    },
+    "glassOptions": {
+      "frontWindshield": "ముందు విండ్‌షీల్డ్",
+      "rearWindshield": "వెనుక విండ్‌షీల్డ్",
+      "driverSideWindow": "డ్రైవర్ సైడ్ విండో",
+      "passengerSideWindow": "పాసెంజర్ సైడ్ విండో",
+      "rearLeftWindow": "వెనుక ఎడమ విండో",
+      "rearRightWindow": "వెనుక కుడి విండో",
+      "sunroofGlass": "సన్‌రూఫ్ గ్లాస్",
+      "quarterGlass": "క్వార్టర్ గ్లాస్"
+    },
+    "emptyFilter": "ఎంచుకున్న ఫిల్టర్‌కు సరిపోలే విచారణలు లేవు.",
+    "noSubmissions": "పెండింగ్ కస్టమర్ సమర్పణలు లేవు.",
+    "createModal": {
+      "title": "కొత్త విచారణ",
+      "phoneNumber": "ఫోన్ నంబర్",
+      "phonePlaceholder": "10 అంకెల నంబర్",
+      "customerName": "కస్టమర్ పేరు",
+      "vehicleNumber": "వాహన నంబర్",
+      "vehicleModel": "వాహన మోడల్",
+      "glassType": "గాజు రకం",
+      "source": "మూలం",
+      "create": "విచారణ సృష్టించండి"
+    },
+    "confirmPriceModal": {
+      "title": "ధర నిర్ధారించండి",
+      "selectHint": "పైన ధర స్థాయి ఎంచుకోండి",
+      "confirmWith": "₹{{price}} ({{brand}}) నిర్ధారించండి"
+    },
+    "closeModal": {
+      "title": "విచారణ మూసివేయండి",
+      "reasonLabel": "మూసివేయడానికి కారణం",
+      "notesLabel": "నోట్స్ (ఐచ్ఛికం)",
+      "notesPlaceholder": "అదనపు సందర్భం...",
+      "confirm": "విచారణ మూసివేయండి"
+    },
+    "toast": {
+      "enquiryCreated": "విచారణ {{enquiryNo}} సృష్టించబడింది.",
+      "priceConfirmed": "{{enquiryNo}} కోసం ₹{{price}} ({{brand}}) నిర్ధారించబడింది.",
+      "enquiryClosed": "{{enquiryNo}} మూసివేయబడింది.",
+      "converted": "{{enquiryNo}} జాబ్ {{jobRef}}గా మార్చబడింది.",
+      "submissionDismissed": "సమర్పణ తిరస్కరించబడింది."
+    }
   }
 }

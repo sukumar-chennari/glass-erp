@@ -1,5 +1,6 @@
 import { useState, useMemo, useRef } from 'react';
 import { Plus, Pencil, Trash2, Layers, AlertCircle, Upload, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { PageShell, SectionCard } from '@/components/layout/PageShell';
 import { DataTable }   from '@/components/ui/DataTable';
 import { StatusBadge } from '@/components/ui/Badge';
@@ -21,23 +22,6 @@ import type { CarModel, CarModelStatus } from '@/types/models/carModel';
 import type { CarBrand } from '@/types/models/carBrand';
 import type { TableColumn, SelectOption } from '@/types/ui';
 import styles from './CarModelsPage.module.css';
-
-// ── Constants ──────────────────────────────────────────────────────────
-const STATUS_OPTS: SelectOption[] = [
-  { value: 'ACTIVE',   label: 'Active'   },
-  { value: 'INACTIVE', label: 'Inactive' },
-];
-
-const STATUS_FILTER_OPTS: SelectOption[] = [
-  { value: '',         label: 'All statuses' },
-  { value: 'ACTIVE',   label: 'Active'       },
-  { value: 'INACTIVE', label: 'Inactive'     },
-];
-
-const STATUS_MAP: Record<CarModelStatus, { label: string; variant: 'success' | 'neutral' }> = {
-  ACTIVE:   { label: 'Active',   variant: 'success' },
-  INACTIVE: { label: 'Inactive', variant: 'neutral' },
-};
 
 // ── Form types ─────────────────────────────────────────────────────────
 interface ModelForm {
@@ -83,14 +67,13 @@ function extractApiError(error: unknown): string | null {
 
 // ── Component ──────────────────────────────────────────────────────────
 export function CarModelsPage() {
+  const { t } = useTranslation(['settings', 'common']);
   const toast = useToast();
 
-  // ── Filter state (declared before query) ─────────────────────────────
   const [search,       setSearch]       = useState('');
   const [brandFilter,  setBrandFilter]  = useState('');
   const [statusFilter, setStatusFilter] = useState('');
 
-  // Server-side query args — undefined means no filter (avoids trailing ?)
   const queryArg = useMemo(() => {
     const args: { brandId?: string; status?: CarModelStatus } = {};
     if (brandFilter)  args.brandId = brandFilter;
@@ -107,29 +90,41 @@ export function CarModelsPage() {
 
   const isLoading = modelsLoading || brandsLoading;
 
-  // ── Modal state ──────────────────────────────────────────────────────
   const [bulkOpen,     setBulkOpen]     = useState(false);
   const [modalOpen,    setModalOpen]    = useState(false);
   const [editTarget,   setEditTarget]   = useState<CarModel | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<CarModel | null>(null);
   const [form,         setForm]         = useState<ModelForm>(EMPTY_FORM);
   const [errors,       setErrors]       = useState<FormErrors>({});
-  // urlInput decouples the visible text field from form.image so a
-  // file-upload data URI never appears as raw text in the input.
   const [urlInput,     setUrlInput]     = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // ── Brand options for selects ─────────────────────────────────────────
+  // ── i18n-driven dropdown options ─────────────────────────────────────
+  const STATUS_OPTS = useMemo<SelectOption[]>(() => [
+    { value: 'ACTIVE',   label: t('carModels.statusLabels.active')   },
+    { value: 'INACTIVE', label: t('carModels.statusLabels.inactive') },
+  ], [t]);
+
+  const STATUS_FILTER_OPTS = useMemo<SelectOption[]>(() => [
+    { value: '',         label: t('carModels.allStatuses')            },
+    { value: 'ACTIVE',   label: t('carModels.statusLabels.active')   },
+    { value: 'INACTIVE', label: t('carModels.statusLabels.inactive') },
+  ], [t]);
+
+  const STATUS_MAP = useMemo(() => ({
+    ACTIVE:   { label: t('carModels.statusLabels.active'),   variant: 'success' as const },
+    INACTIVE: { label: t('carModels.statusLabels.inactive'), variant: 'neutral' as const },
+  }), [t]);
+
   const brandOpts: SelectOption[] = useMemo(() => (
     brands.map((b) => ({ value: b.id, label: b.name }))
   ), [brands]);
 
   const brandFilterOpts: SelectOption[] = useMemo(() => [
-    { value: '', label: 'All brands' },
+    { value: '', label: t('carModels.allBrands') },
     ...brands.map((b) => ({ value: b.id, label: b.name })),
-  ], [brands]);
+  ], [brands, t]);
 
-  // ── Client-side text search over server results ───────────────────────
   const filtered = useMemo(() => {
     if (!search.trim()) return models;
     const q = search.trim().toLowerCase();
@@ -141,26 +136,25 @@ export function CarModelsPage() {
     );
   }, [models, brands, search]);
 
-  // ── Table columns ─────────────────────────────────────────────────────
   const columns = useMemo<TableColumn<CarModel>[]>(() => [
     {
       key:    'brand_id',
-      header: 'Brand',
+      header: t('carModels.columns.brand'),
       render: (m) => <span className={styles.brandCell}>{getBrandName(brands, m.brand_id)}</span>,
     },
     {
       key:    'name',
-      header: 'Model Name',
+      header: t('carModels.columns.model'),
       render: (m) => <span className={styles.modelName}>{m.name}</span>,
     },
     {
       key:    'compare_name',
-      header: 'Company Name',
+      header: t('carBrands.columns.companyName'),
       render: (m) => <span className={styles.compareName}>{m.compare_name}</span>,
     },
     {
       key:    'status',
-      header: 'Status',
+      header: t('carModels.columns.status'),
       render: (m) => <StatusBadge status={m.status} statusMap={STATUS_MAP} size="sm" />,
     },
     {
@@ -188,9 +182,8 @@ export function CarModelsPage() {
       ),
     },
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  ], [brands]);
+  ], [brands, t, STATUS_MAP]);
 
-  // ── Form helpers ──────────────────────────────────────────────────────
   function set(key: keyof ModelForm, val: string) {
     setForm((f) => {
       const next = { ...f, [key]: val };
@@ -206,9 +199,9 @@ export function CarModelsPage() {
 
   function validate(isEdit: boolean): boolean {
     const errs: FormErrors = {};
-    if (!form.brand_id)            errs.brand_id     = 'Brand is required';
-    if (!form.name.trim())         errs.name         = 'Model name is required';
-    if (!form.compare_name.trim()) errs.compare_name = 'Company name is required';
+    if (!form.brand_id)            errs.brand_id     = t('carModels.modal.brandRequired');
+    if (!form.name.trim())         errs.name         = t('carModels.modal.modelNameRequired');
+    if (!form.compare_name.trim()) errs.compare_name = t('carModels.modal.compareNameRequired');
     if (!isEdit && !form.image)    errs.image        = 'Image is required';
     if (!isEdit && form.image && !form.image.startsWith('data:image/')) {
       errs.image = 'Please upload a file — URL links are not accepted for new models';
@@ -217,7 +210,6 @@ export function CarModelsPage() {
     return Object.keys(errs).length === 0;
   }
 
-  // ── Modal open/close ──────────────────────────────────────────────────
   function openAdd() {
     setEditTarget(null);
     setForm({ ...EMPTY_FORM, brand_id: brandFilter || '' });
@@ -248,7 +240,6 @@ export function CarModelsPage() {
     setErrors({});
   }
 
-  // ── Image helpers ─────────────────────────────────────────────────────
   function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -266,7 +257,6 @@ export function CarModelsPage() {
     set('image', val);
   }
 
-  // ── Save ──────────────────────────────────────────────────────────────
   async function handleSave() {
     const isEdit = editTarget !== null;
     if (!validate(isEdit)) return;
@@ -282,38 +272,37 @@ export function CarModelsPage() {
     if (isEdit) {
       const result = await updateModel({ id: editTarget!.id, ...payload });
       if ('data' in result) {
-        toast.success(`Model "${payload.name}" updated.`);
+        toast.success(t('carModels.toast.updated', { name: payload.name }));
         closeModal();
       } else {
         const err = result.error as { status?: number };
         if (err?.status === 404) {
-          toast.error('This car model no longer exists.');
+          toast.error(t('carModels.toast.notFound'));
           closeModal();
           void refetch();
         } else {
-          const msg = extractApiError(result.error) ?? 'Failed to update model. Please try again.';
+          const msg = extractApiError(result.error) ?? t('carModels.toast.updateFailed');
           toast.error(msg);
         }
       }
     } else {
       const result = await createModel(payload);
       if ('data' in result) {
-        toast.success(`Model "${payload.name}" added.`);
+        toast.success(t('carModels.toast.added', { name: payload.name }));
         closeModal();
       } else {
         const err = result.error as { status?: number };
         if (err?.status === 400) {
-          const msg = extractApiError(result.error) ?? 'Invalid request. Check the selected brand.';
+          const msg = extractApiError(result.error) ?? t('carModels.toast.addFailed');
           toast.error(msg);
         } else {
-          const msg = extractApiError(result.error) ?? 'Failed to add model. Please try again.';
+          const msg = extractApiError(result.error) ?? t('carModels.toast.addFailed');
           toast.error(msg);
         }
       }
     }
   }
 
-  // ── Delete ────────────────────────────────────────────────────────────
   async function handleDelete() {
     if (!deleteTarget) return;
     const { name, id } = deleteTarget;
@@ -322,37 +311,37 @@ export function CarModelsPage() {
     if ('error' in result) {
       const err = result.error as { status?: number };
       if (err?.status === 404) {
-        toast.error('This car model no longer exists.');
+        toast.error(t('carModels.toast.notFound'));
         void refetch();
       } else {
-        toast.error('Failed to delete model. Please try again.');
+        toast.error(t('carModels.toast.deleteFailed'));
       }
       return;
     }
-    toast.success(`Model "${name}" deleted.`);
+    toast.success(t('carModels.toast.deleted', { name }));
   }
+
+  const modelCount = filtered.length;
 
   return (
     <PageShell
-      heading="Car Models"
-      description="Manage vehicle models available across job cards and insurance workflows."
+      heading={t('carModels.heading')}
+      description={t('carModels.description')}
       actions={
         <>
           <Button variant="secondary" leftIcon={<Upload size={15} />} onClick={() => setBulkOpen(true)}>
-            Bulk Upload
+            {t('carModels.actions.bulkUpload')}
           </Button>
           <Button leftIcon={<Plus size={15} />} onClick={openAdd}>
-            Add Model
+            {t('carModels.actions.add')}
           </Button>
         </>
       }
     >
-
       <SectionCard>
-        {/* ── Toolbar ───────────────────────────────────────────────── */}
         <div className={styles.toolbar}>
           <Input
-            placeholder="Search models…"
+            placeholder={t('carModels.searchPlaceholder')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className={styles.searchInput}
@@ -361,41 +350,44 @@ export function CarModelsPage() {
             options={brandFilterOpts}
             value={brandFilter}
             onChange={(e) => setBrandFilter(e.target.value)}
-            aria-label="Filter by brand"
+            aria-label={t('carModels.allBrands')}
           />
           <Select
             options={STATUS_FILTER_OPTS}
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            aria-label="Filter by status"
+            aria-label={t('carModels.allStatuses')}
           />
           <span className={styles.count}>
-            {isLoading ? '' : `${filtered.length} model${filtered.length !== 1 ? 's' : ''}`}
+            {isLoading ? '' : t('carModels.count', { count: modelCount })}
           </span>
         </div>
 
-        {/* ── States ────────────────────────────────────────────────── */}
         {isLoading && <TableSkeleton rows={6} cols={4} />}
 
         {isError && !isLoading && (
           <div className={styles.emptyState}>
             <AlertCircle size={32} className={styles.emptyIcon} />
-            <p className={styles.emptyTitle}>Failed to load models</p>
-            <Button variant="secondary" size="sm" onClick={() => void refetch()}>Retry</Button>
+            <p className={styles.emptyTitle}>{t('carModels.loadError')}</p>
+            <Button variant="secondary" size="sm" onClick={() => void refetch()}>
+              {t('carModels.actions.retry')}
+            </Button>
           </div>
         )}
 
         {!isLoading && !isError && filtered.length === 0 && (
           <div className={styles.emptyState}>
             <Layers size={32} className={styles.emptyIcon} />
-            <p className={styles.emptyTitle}>No models found</p>
+            <p className={styles.emptyTitle}>{t('carModels.emptyNoResults')}</p>
             <p className={styles.emptyDesc}>
               {search || brandFilter || statusFilter
-                ? 'Try adjusting your search or filters.'
-                : 'Add your first car model to get started.'}
+                ? t('carModels.emptyFilterHint')
+                : t('carModels.emptyNoData')}
             </p>
             {!search && !brandFilter && !statusFilter && (
-              <Button leftIcon={<Plus size={14} />} size="sm" onClick={openAdd}>Add Model</Button>
+              <Button leftIcon={<Plus size={14} />} size="sm" onClick={openAdd}>
+                {t('carModels.actions.add')}
+              </Button>
             )}
           </div>
         )}
@@ -405,56 +397,53 @@ export function CarModelsPage() {
         )}
       </SectionCard>
 
-      {/* ── Bulk Upload Modal ────────────────────────────────────────── */}
       <BulkUploadModal
         isOpen={bulkOpen}
         onClose={() => setBulkOpen(false)}
         entityType="models"
       />
 
-      {/* ── Add / Edit Modal ─────────────────────────────────────────── */}
       <Modal
         isOpen={modalOpen}
         onClose={closeModal}
-        title={editTarget ? `Edit Model — ${editTarget.name}` : 'Add Car Model'}
+        title={editTarget ? t('carModels.modal.editTitle', { name: editTarget.name }) : t('carModels.modal.addTitle')}
         footer={
           <div className={styles.modalFooter}>
-            <Button variant="ghost" onClick={closeModal}>Cancel</Button>
+            <Button variant="ghost" onClick={closeModal}>{t('common:actions.cancel')}</Button>
             <Button onClick={handleSave} loading={creating || updating}>
-              {editTarget ? 'Save Changes' : 'Add Model'}
+              {editTarget ? t('carModels.modal.save') : t('carModels.modal.add')}
             </Button>
           </div>
         }
       >
         <div className={styles.form}>
           <Select
-            label="Brand"
+            label={t('carModels.modal.brand')}
             options={[{ value: '', label: 'Select a brand…' }, ...brandOpts]}
             value={form.brand_id}
             onChange={(e) => set('brand_id', e.target.value)}
             error={errors.brand_id}
           />
           <Input
-            label="Model Name"
+            label={t('carModels.modal.modelName')}
             value={form.name}
             onChange={(e) => set('name', e.target.value)}
-            placeholder="e.g. Swift"
+            placeholder={t('carModels.modal.modelNamePlaceholder')}
             error={errors.name}
             required
             fullWidth
             autoFocus
           />
           <Input
-            label="Company Name"
+            label={t('carModels.modal.compareName')}
             value={form.compare_name}
             onChange={(e) => set('compare_name', e.target.value.toLowerCase())}
-            placeholder="e.g. swift"
-            hint="Lowercase, used for search matching. Auto-filled from name."
+            placeholder={t('carModels.modal.compareNamePlaceholder')}
+            hint={t('carModels.modal.compareNameHint')}
             error={errors.compare_name}
             required
             fullWidth
           />
-          {/* ── Image ─────────────────────────────────────────── */}
           <div className={styles.imageSection}>
             <label className={styles.imageLabel}>
               Image{!editTarget && <span className={styles.required}>*</span>}
@@ -483,7 +472,7 @@ export function CarModelsPage() {
               leftIcon={<Upload size={14} />}
               onClick={() => fileInputRef.current?.click()}
             >
-              Upload from device
+              {t('carBrands.modal.uploadFromDevice')}
             </Button>
             <input
               ref={fileInputRef}
@@ -492,7 +481,7 @@ export function CarModelsPage() {
               style={{ display: 'none' }}
               onChange={handleFileSelect}
             />
-            <div className={styles.imageDivider}>or paste a URL</div>
+            <div className={styles.imageDivider}>{t('carBrands.modal.orPasteUrl')}</div>
             <Input
               value={urlInput}
               onChange={(e) => handleUrlChange(e.target.value)}
@@ -502,7 +491,7 @@ export function CarModelsPage() {
             />
           </div>
           <Select
-            label="Status"
+            label={t('carModels.modal.status')}
             options={STATUS_OPTS}
             value={form.status}
             onChange={(e) => set('status', e.target.value)}
@@ -510,21 +499,19 @@ export function CarModelsPage() {
         </div>
       </Modal>
 
-      {/* ── Delete Confirmation Modal ─────────────────────────────────── */}
       <Modal
         isOpen={deleteTarget !== null}
         onClose={() => setDeleteTarget(null)}
-        title="Delete Model"
+        title={t('carModels.modal.deleteTitle')}
         footer={
           <div className={styles.modalFooter}>
-            <Button variant="ghost" onClick={() => setDeleteTarget(null)} disabled={deleting}>Cancel</Button>
-            <Button variant="danger" onClick={handleDelete} loading={deleting}>Delete</Button>
+            <Button variant="ghost" onClick={() => setDeleteTarget(null)} disabled={deleting}>{t('common:actions.cancel')}</Button>
+            <Button variant="danger" onClick={handleDelete} loading={deleting}>{t('common:actions.delete')}</Button>
           </div>
         }
       >
         <p className={styles.deleteMsg}>
-          Are you sure you want to delete <strong>{deleteTarget?.name}</strong>?
-          This cannot be undone.
+          {t('carModels.modal.deleteMessage', { name: deleteTarget?.name ?? '' })}
         </p>
       </Modal>
     </PageShell>

@@ -1,6 +1,7 @@
 import { NavLink, Outlet, useMatch } from 'react-router-dom';
 import type { LucideIcon } from 'lucide-react';
 import { Shield, Tag, Layers } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/context/AuthContext';
 import { ROUTES } from '@/constants/routes';
 import { SettingsPage } from './SettingsPage';
@@ -9,20 +10,20 @@ import styles from './SettingsLayout.module.css';
 
 interface SubNavItem {
   path:  string;
-  label: string;
+  labelKey: string;
   Icon?: LucideIcon;
 }
 
 const MASTER_DATA_NAV: SubNavItem[] = [
-  { path: ROUTES.SETTINGS_INSURANCE_RULES, label: 'Insurance Rules', Icon: Shield },
-  { path: ROUTES.SETTINGS_CAR_BRANDS,      label: 'Car Brands',      Icon: Tag    },
-  { path: ROUTES.SETTINGS_CAR_MODELS,      label: 'Car Models',      Icon: Layers },
+  { path: ROUTES.SETTINGS_INSURANCE_RULES, labelKey: 'insuranceRules', Icon: Shield },
+  { path: ROUTES.SETTINGS_CAR_BRANDS,      labelKey: 'carBrands',      Icon: Tag    },
+  { path: ROUTES.SETTINGS_CAR_MODELS,      labelKey: 'carModels',      Icon: Layers },
 ];
 
-function NavItems({ items }: { items: SubNavItem[] }) {
+function NavItems({ items, t }: { items: SubNavItem[]; t: (key: string) => string }) {
   return (
     <>
-      {items.map(({ path, label, Icon }) => (
+      {items.map(({ path, labelKey, Icon }) => (
         <NavLink
           key={path}
           to={path}
@@ -31,7 +32,7 @@ function NavItems({ items }: { items: SubNavItem[] }) {
           }
         >
           {Icon && <Icon size={15} />}
-          {label}
+          {t(`subnav.${labelKey}`)}
         </NavLink>
       ))}
     </>
@@ -39,6 +40,7 @@ function NavItems({ items }: { items: SubNavItem[] }) {
 }
 
 export function SettingsLayout() {
+  const { t }             = useTranslation('settings');
   const { session }       = useAuth();
   const onInsuranceRules  = useMatch(ROUTES.SETTINGS_INSURANCE_RULES);
   const onCarBrands       = useMatch(ROUTES.SETTINGS_CAR_BRANDS);
@@ -54,10 +56,10 @@ export function SettingsLayout() {
   return (
     <div className={styles.container}>
       <aside className={styles.subnav}>
-        <div className={styles.subnavHeader}>Settings</div>
-        <div className={styles.subnavSection}>Master Data</div>
-        <nav className={styles.subnavList} aria-label="Master data settings">
-          <NavItems items={MASTER_DATA_NAV} />
+        <div className={styles.subnavHeader}>{t('subnav.header')}</div>
+        <div className={styles.subnavSection}>{t('subnav.masterData')}</div>
+        <nav className={styles.subnavList} aria-label={t('subnav.aria')}>
+          <NavItems items={MASTER_DATA_NAV} t={t} />
         </nav>
       </aside>
       <div className={styles.content}>

@@ -1,4 +1,5 @@
 import { useState, useCallback, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { UserPlus, ArrowLeft, Search } from 'lucide-react';
 import { PageShell, SectionCard } from '@/components/layout/PageShell';
@@ -11,19 +12,12 @@ import { Modal } from '@/components/ui/Modal';
 import { useToast } from '@/components/ui/Toast';
 import { useGetUsersQuery, useCreateUserMutation } from '@/features/settings/services/usersApi';
 import { useResendInviteMutation } from '@/services/auth/authApi';
-import type { AppUser, AppRole, UserStatus, InvitationStatus, UserCreatePayload } from '@/types/models/appUser';
+import type { AppUser, AppRole, UserStatus, UserCreatePayload } from '@/types/models/appUser';
 import type { TableColumn, SelectOption } from '@/types/ui';
 import { ROUTES } from '@/constants/routes';
 import styles from './UsersPage.module.css';
 
 // ── Constants ──────────────────────────────────────────────────────────
-const ROLE_LABEL: Record<AppRole, string> = {
-  super_admin:    'Super Admin',
-  branch_manager: 'Branch Manager',
-  operator:       'Operator',
-  technician:     'Technician',
-};
-
 const ROLE_VARIANT: Record<AppRole, 'primary' | 'info' | 'success' | 'warning'> = {
   super_admin:    'primary',
   branch_manager: 'info',
@@ -37,14 +31,6 @@ const ROLE_OPTIONS: SelectOption[] = [
   { value: 'technician', label: 'Technician' },
 ];
 
-const ROLE_FILTER_OPTIONS: SelectOption[] = [
-  { value: '',               label: 'All Roles'      },
-  { value: 'super_admin',    label: 'Super Admin'    },
-  { value: 'branch_manager', label: 'Branch Manager' },
-  { value: 'operator',       label: 'Operator'       },
-  { value: 'technician',     label: 'Technician'     },
-];
-
 const BRANCH_OPTIONS: SelectOption[] = [
   { value: 'br-001', label: 'Banjara Hills'  },
   { value: 'br-002', label: 'Secunderabad'   },
@@ -53,74 +39,11 @@ const BRANCH_OPTIONS: SelectOption[] = [
   { value: 'br-005', label: 'Mehdipatnam'    },
 ];
 
-const BRANCH_FILTER_OPTIONS: SelectOption[] = [
-  { value: '', label: 'All Branches' },
-  ...BRANCH_OPTIONS,
-];
-
 const USER_STATUS_MAP: Record<UserStatus, { label: string; variant: 'success' | 'neutral' | 'warning' }> = {
   'Active':        { label: 'Active',        variant: 'success' },
   'Inactive':      { label: 'Inactive',      variant: 'neutral' },
   'Pending Setup': { label: 'Pending Setup', variant: 'warning' },
 };
-
-const INVITE_STATUS_LABEL: Record<InvitationStatus, string> = {
-  pending:  'Invite pending',
-  sent:     'Setup link sent',
-  accepted: 'Invite accepted',
-  expired:  'Invite expired',
-};
-
-// ── Static table columns (no component state needed) ───────────────────
-const BASE_COLUMNS: TableColumn<AppUser>[] = [
-  {
-    key: 'name',
-    header: 'Name / Email',
-    render: (u) => (
-      <div>
-        <div className={styles.cellPrimary}>{u.name}</div>
-        <div className={styles.cellMuted}>{u.email}</div>
-        {u.lastLoginAt && (
-          <div className={styles.cellMuted}>
-            Last login: {new Date(u.lastLoginAt).toLocaleDateString('en-IN')}
-          </div>
-        )}
-      </div>
-    ),
-  },
-  { key: 'phone', header: 'Mobile' },
-  {
-    key: 'role',
-    header: 'Role',
-    render: (u) => (
-      <Badge label={ROLE_LABEL[u.role]} variant={ROLE_VARIANT[u.role]} size="sm" />
-    ),
-  },
-  {
-    key: 'branch',
-    header: 'Branch',
-    render: (u) => (
-      <span className={u.branch ? undefined : styles.cellMuted}>
-        {u.branch ?? '—'}
-      </span>
-    ),
-  },
-  {
-    key: 'status',
-    header: 'Status',
-    render: (u) => (
-      <div>
-        <StatusBadge status={u.status} statusMap={USER_STATUS_MAP} size="sm" />
-        {u.status === 'Pending Setup' && (
-          <div className={styles.inviteInfo}>
-            {INVITE_STATUS_LABEL[u.invitationStatus]}
-            {u.invitationSentAt && ` · ${new Date(u.invitationSentAt).toLocaleDateString('en-IN')}`}
-          </div>
-        )}
-      </div>
-    ),
-  },
-];
 
 // ── Form state ─────────────────────────────────────────────────────────
 interface UserForm {
@@ -147,6 +70,7 @@ interface FormErrors {
 
 // ── Component ──────────────────────────────────────────────────────────
 export function UsersPage() {
+  const { t } = useTranslation(['settings', 'common']);
   const toast = useToast();
   const { data: staffRes, isLoading, isError } = useGetUsersQuery();
   const users = staffRes?.data ?? [];
@@ -159,6 +83,20 @@ export function UsersPage() {
   const [roleFilter,   setRoleFilter]   = useState('');
   const [branchFilter, setBranchFilter] = useState('');
   const [search,       setSearch]       = useState('');
+
+  // ── Filter options ─────────────────────────────────────────────────
+  const ROLE_FILTER_OPTIONS = useMemo<SelectOption[]>(() => [
+    { value: '',               label: t('users.allRoles')                 },
+    { value: 'super_admin',    label: t('users.roleLabels.super_admin')   },
+    { value: 'branch_manager', label: t('users.roleLabels.branch_manager')},
+    { value: 'operator',       label: t('users.roleLabels.operator')      },
+    { value: 'technician',     label: t('users.roleLabels.technician')    },
+  ], [t]);
+
+  const BRANCH_FILTER_OPTIONS = useMemo<SelectOption[]>(() => [
+    { value: '', label: t('users.allBranches') },
+    ...BRANCH_OPTIONS,
+  ], [t]);
 
   const filtered = useMemo(() => {
     let list = users;
@@ -182,9 +120,60 @@ export function UsersPage() {
   const handleResendInvite = useCallback(async (userId: string, userName: string) => {
     const result = await resendInvite({ userId });
     if ('data' in result) {
-      toast.success(`Invite resent to ${userName}. A new setup link has been emailed.`);
+      toast.success(t('users.toast.resent', { name: userName }));
     }
-  }, [resendInvite, toast]);
+  }, [resendInvite, toast, t]);
+
+  // ── Base columns (uses t for headers and role/invite labels) ───────
+  const BASE_COLUMNS = useMemo<TableColumn<AppUser>[]>(() => [
+    {
+      key: 'name',
+      header: t('users.columns.nameEmail'),
+      render: (u) => (
+        <div>
+          <div className={styles.cellPrimary}>{u.name}</div>
+          <div className={styles.cellMuted}>{u.email}</div>
+          {u.lastLoginAt && (
+            <div className={styles.cellMuted}>
+              Last login: {new Date(u.lastLoginAt).toLocaleDateString('en-IN')}
+            </div>
+          )}
+        </div>
+      ),
+    },
+    { key: 'phone', header: 'Mobile' },
+    {
+      key: 'role',
+      header: t('users.columns.role'),
+      render: (u) => (
+        <Badge label={t(`users.roleLabels.${u.role}`)} variant={ROLE_VARIANT[u.role]} size="sm" />
+      ),
+    },
+    {
+      key: 'branch',
+      header: t('users.columns.branch'),
+      render: (u) => (
+        <span className={u.branch ? undefined : styles.cellMuted}>
+          {u.branch ?? '—'}
+        </span>
+      ),
+    },
+    {
+      key: 'status',
+      header: t('users.columns.status'),
+      render: (u) => (
+        <div>
+          <StatusBadge status={u.status} statusMap={USER_STATUS_MAP} size="sm" />
+          {u.status === 'Pending Setup' && (
+            <div className={styles.inviteInfo}>
+              {t(`users.inviteStatus.${u.invitationStatus}`)}
+              {u.invitationSentAt && ` · ${new Date(u.invitationSentAt).toLocaleDateString('en-IN')}`}
+            </div>
+          )}
+        </div>
+      ),
+    },
+  ], [t]);
 
   // Dynamic last column captures handleResendInvite and resending state
   const columns = useMemo<TableColumn<AppUser>[]>(() => [
@@ -200,12 +189,12 @@ export function UsersPage() {
             disabled={resending}
             title="Resend setup email"
           >
-            Resend Invite
+            {t('users.actions.resendInvite')}
           </button>
         ) : null
       ),
     },
-  ], [handleResendInvite, resending]);
+  ], [BASE_COLUMNS, handleResendInvite, resending, t]);
 
   function setField(key: keyof UserForm, val: string) {
     setForm((f) => ({ ...f, [key]: val }));
@@ -216,9 +205,9 @@ export function UsersPage() {
 
   function validate(): boolean {
     const errs: FormErrors = {};
-    if (!form.name.trim())  errs.name  = 'Name is required';
-    if (!form.email.trim()) errs.email = 'Email is required';
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) errs.email = 'Enter a valid email address';
+    if (!form.name.trim())  errs.name  = t('users.modal.nameRequired');
+    if (!form.email.trim()) errs.email = t('users.modal.emailRequired');
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) errs.email = t('users.modal.emailInvalid');
     if (form.phone && !/^\d{10}$/.test(form.phone)) errs.phone = 'Enter a valid 10-digit mobile number';
     setFormErrors(errs);
     return Object.keys(errs).length === 0;
@@ -246,7 +235,7 @@ export function UsersPage() {
     };
     const result = await createUser(payload);
     if ('data' in result) {
-      toast.success(`${form.name.trim()} added. A welcome email with login setup link will be sent.`);
+      toast.success(t('users.toast.invited', { email: payload.email }));
       closeModal();
     }
   }
@@ -256,11 +245,11 @@ export function UsersPage() {
 
   return (
     <PageShell
-      heading="Users"
-      description="Manage staff accounts, roles and branch access."
+      heading={t('users.heading')}
+      description={t('users.description')}
       actions={
         <Button leftIcon={<UserPlus size={16} />} onClick={openModal}>
-          Add User
+          {t('users.actions.invite')}
         </Button>
       }
     >
@@ -289,7 +278,7 @@ export function UsersPage() {
               <input
                 type="text"
                 className={styles.searchInput}
-                placeholder="Search name, email, phone…"
+                placeholder={t('users.searchPlaceholder')}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
@@ -322,7 +311,7 @@ export function UsersPage() {
         {!isLoading && !isError && (
           <>
             {filtered.length === 0 ? (
-              <div className={styles.emptyState}>No users match the current filters.</div>
+              <div className={styles.emptyState}>{t('users.emptyNoResults')}</div>
             ) : (
               <>
                 {(roleFilter || branchFilter || search) && (
@@ -340,19 +329,19 @@ export function UsersPage() {
       <Modal
         isOpen={modalOpen}
         onClose={closeModal}
-        title="Add User"
+        title={t('users.modal.title')}
         footer={
           <div className={styles.modalFooter}>
-            <Button variant="ghost" onClick={closeModal}>Cancel</Button>
+            <Button variant="ghost" onClick={closeModal}>{t('common:actions.cancel')}</Button>
             <Button onClick={handleAdd} loading={saving}>
-              Add User
+              {saving ? t('users.modal.submitting') : t('users.modal.submit')}
             </Button>
           </div>
         }
       >
         <div className={styles.form}>
           <Input
-            label="Full Name"
+            label={t('users.modal.name')}
             value={form.name}
             onChange={(e) => setField('name', e.target.value)}
             error={formErrors.name}
@@ -361,7 +350,7 @@ export function UsersPage() {
             autoFocus
           />
           <Input
-            label="Email Address"
+            label={t('users.modal.email')}
             type="email"
             value={form.email}
             onChange={(e) => setField('email', e.target.value)}
@@ -379,7 +368,7 @@ export function UsersPage() {
             fullWidth
           />
           <Select
-            label="Role"
+            label={t('users.modal.role')}
             options={ROLE_OPTIONS}
             value={form.role}
             onChange={(e) => setField('role', e.target.value)}
@@ -388,7 +377,7 @@ export function UsersPage() {
             Only <strong>Technician</strong> is available — other roles are pending backend role alignment.
           </p>
           <Select
-            label="Branch"
+            label={t('users.modal.branch')}
             options={BRANCH_OPTIONS}
             value={form.branch}
             onChange={(e) => setField('branch', e.target.value)}

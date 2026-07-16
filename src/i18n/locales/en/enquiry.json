@@ -27,5 +27,107 @@
     "invalidUrl": "Please enter a valid URL starting with https://",
     "urlSaved": "✓ Form URL saved! You can now send it to customers.",
     "whatsappOpened": "✓ WhatsApp opened! Sending form link to +91 {{phone}}"
+  },
+  "page": {
+    "heading": "Enquiries",
+    "description": "Manage customer enquiries — confirm prices, convert to jobs and close lost leads.",
+    "tabs": {
+      "enquiries": "Enquiries",
+      "submissions": "Customer Submissions"
+    },
+    "summary": {
+      "pending": "{{count}} pending",
+      "confirmed": "{{count}} price confirmed"
+    },
+    "filters": {
+      "all": "All",
+      "pending": "Pending",
+      "priceConfirmed": "Price Confirmed",
+      "converted": "Converted",
+      "closed": "Closed"
+    },
+    "columns": {
+      "enquiry": "Enquiry",
+      "customer": "Customer",
+      "vehicle": "Vehicle",
+      "glassType": "Glass Type",
+      "price": "Price",
+      "status": "Status",
+      "actions": "Actions",
+      "received": "Received",
+      "description": "Description",
+      "glass": "Glass",
+      "photos": "photos"
+    },
+    "actions": {
+      "newEnquiry": "New Enquiry",
+      "confirmPrice": "Confirm Price",
+      "convertToJob": "Convert to Job",
+      "close": "Close",
+      "review": "Review",
+      "createEnquiry": "Create Enquiry",
+      "dismiss": "Dismiss"
+    },
+    "status": {
+      "pending": "Pending",
+      "priceConfirmed": "Price Confirmed",
+      "converted": "Converted",
+      "closed": "Closed"
+    },
+    "source": {
+      "phone": "Phone Call",
+      "walk_in": "Walk-in",
+      "whatsapp": "WhatsApp"
+    },
+    "closeReasons": {
+      "declined_price": "Customer declined price",
+      "found_vendor": "Found another vendor",
+      "wrong_number": "Wrong number",
+      "test_spam": "Test / spam enquiry",
+      "other_channel": "Converted via other channel",
+      "other": "Other"
+    },
+    "glassOptions": {
+      "frontWindshield": "Front Windshield",
+      "rearWindshield": "Rear Windshield",
+      "driverSideWindow": "Driver Side Window",
+      "passengerSideWindow": "Passenger Side Window",
+      "rearLeftWindow": "Rear Left Window",
+      "rearRightWindow": "Rear Right Window",
+      "sunroofGlass": "Sunroof Glass",
+      "quarterGlass": "Quarter Glass"
+    },
+    "emptyFilter": "No enquiries match the selected filter.",
+    "noSubmissions": "No pending customer submissions.",
+    "createModal": {
+      "title": "New Enquiry",
+      "phoneNumber": "Phone Number",
+      "phonePlaceholder": "10-digit number",
+      "customerName": "Customer Name",
+      "vehicleNumber": "Vehicle Number",
+      "vehicleModel": "Vehicle Model",
+      "glassType": "Glass Type",
+      "source": "Source",
+      "create": "Create Enquiry"
+    },
+    "confirmPriceModal": {
+      "title": "Confirm Price",
+      "selectHint": "Select a pricing tier above",
+      "confirmWith": "Confirm ₹{{price}} ({{brand}})"
+    },
+    "closeModal": {
+      "title": "Close Enquiry",
+      "reasonLabel": "Reason for closing",
+      "notesLabel": "Notes (optional)",
+      "notesPlaceholder": "Any additional context...",
+      "confirm": "Close Enquiry"
+    },
+    "toast": {
+      "enquiryCreated": "Enquiry {{enquiryNo}} created.",
+      "priceConfirmed": "₹{{price}} ({{brand}}) confirmed for {{enquiryNo}}.",
+      "enquiryClosed": "{{enquiryNo}} closed.",
+      "converted": "{{enquiryNo}} converted to job {{jobRef}}.",
+      "submissionDismissed": "Submission dismissed."
+    }
   }
 }

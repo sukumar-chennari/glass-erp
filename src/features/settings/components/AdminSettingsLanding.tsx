@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Shield, Tag, Layers, type LucideIcon } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { ROUTES } from '@/constants/routes';
 import styles from './AdminSettingsLanding.module.css';
 
@@ -9,27 +10,6 @@ interface EntryCard {
   desc:  string;
   href:  string;
 }
-
-const MASTER_DATA: EntryCard[] = [
-  {
-    icon:  Shield,
-    title: 'Insurance Rules',
-    desc:  'Define claim eligibility, required documents, and approval workflows for insurance jobs.',
-    href:  ROUTES.SETTINGS_INSURANCE_RULES,
-  },
-  {
-    icon:  Tag,
-    title: 'Car Brands',
-    desc:  'Onboard car brands and their models with status management for use across all workflows.',
-    href:  ROUTES.SETTINGS_CAR_BRANDS,
-  },
-  {
-    icon:  Layers,
-    title: 'Car Models',
-    desc:  'Manage vehicle models linked to brands for use across job cards and insurance workflows.',
-    href:  ROUTES.SETTINGS_CAR_MODELS,
-  },
-];
 
 function Card({ icon: Icon, title, desc, href }: EntryCard) {
   return (
@@ -46,13 +26,34 @@ function Card({ icon: Icon, title, desc, href }: EntryCard) {
 }
 
 export function AdminSettingsLanding() {
+  const { t } = useTranslation('settings');
+
+  const MASTER_DATA: EntryCard[] = [
+    {
+      icon:  Shield,
+      title: t('subnav.insuranceRules'),
+      desc:  t('insuranceRules.description'),
+      href:  ROUTES.SETTINGS_INSURANCE_RULES,
+    },
+    {
+      icon:  Tag,
+      title: t('subnav.carBrands'),
+      desc:  t('carBrands.description'),
+      href:  ROUTES.SETTINGS_CAR_BRANDS,
+    },
+    {
+      icon:  Layers,
+      title: t('subnav.carModels'),
+      desc:  t('carModels.description'),
+      href:  ROUTES.SETTINGS_CAR_MODELS,
+    },
+  ];
+
   return (
     <div className={styles.page}>
       <header className={styles.pageHeader}>
-        <h1 className={styles.pageTitle}>Settings</h1>
-        <p className={styles.pageSubtitle}>
-          Core configuration shared across all branches and operations.
-        </p>
+        <h1 className={styles.pageTitle}>{t('admin.title')}</h1>
+        <p className={styles.pageSubtitle}>{t('admin.subtitle')}</p>
       </header>
 
       <div className={styles.grid}>

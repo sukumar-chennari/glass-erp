@@ -153,9 +153,9 @@ export function Sidebar() {
       </div>
       <ConfirmDialog
         isOpen={showConfirm}
-        title="Log out"
-        message="Are you sure you want to log out?"
-        confirmLabel={loggingOut ? 'Logging out…' : 'Log out'}
+        title={t('sidebar.user.logoutConfirm.title')}
+        message={t('sidebar.user.logoutConfirm.message')}
+        confirmLabel={loggingOut ? t('sidebar.user.logoutConfirm.confirming') : t('sidebar.user.logoutConfirm.confirm')}
         isLoading={loggingOut}
         onConfirm={handleConfirmLogout}
         onCancel={() => setShowConfirm(false)}

@@ -89,5 +89,11 @@
     "rearRightWindow":      "Rear Right Window",
     "sunroofGlass":         "Sunroof Glass",
     "quarterGlass":         "Quarter Glass"
+  },
+  "fileUpload": {
+    "clickToBrowse": "Click to browse",
+    "dragAndDrop": "or drag and drop",
+    "removeFile": "Remove file",
+    "ariaLabel": "Upload file — click or drag and drop"
   }
 }

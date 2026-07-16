@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { CheckCircle2, XCircle, Download, Info } from 'lucide-react';
 import { Modal }      from '@/components/ui/Modal';
 import { Button }     from '@/components/ui/Button';
@@ -22,11 +23,6 @@ const COLUMN_REQUIREMENTS: Record<BulkEntity, RequirementGroup[]> = {
     { label: 'Model name',     candidates: ['name', 'modelName', 'model_name'] },
     { label: 'Brand reference', candidates: ['brandId', 'brand_id', 'brandName', 'brand_name'] },
   ],
-};
-
-const ENTITY_LABELS: Record<BulkEntity, string> = {
-  brands: 'Brands',
-  models: 'Models',
 };
 
 // Template CSVs generated client-side — no server dependency
@@ -97,6 +93,7 @@ interface BulkUploadModalProps {
 }
 
 export function BulkUploadModal({ isOpen, onClose, entityType }: BulkUploadModalProps) {
+  const { t } = useTranslation(['settings', 'common']);
   const [file,       setFile]       = useState<File | null>(null);
   const [stage,      setStage]      = useState<ParseStage>('idle');
   const [parsed,     setParsed]     = useState<ParsedData | null>(null);
@@ -138,22 +135,24 @@ export function BulkUploadModal({ isOpen, onClose, entityType }: BulkUploadModal
   const allValid     = parsed
     ? requirements.every((r) => meetsRequirement(r, parsed.headers))
     : false;
-  const entityLabel  = ENTITY_LABELS[entityType];
+
+  // Compute entity label via t() so it reflects the active locale
+  const entityLabel = entityType === 'brands' ? t('carBrands.heading') : t('carModels.heading');
 
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={`Bulk Upload ${entityLabel}`}
+      title={t('bulkUpload.title', { entity: entityLabel })}
       maxWidth="720px"
       footer={
         <div className={styles.footer}>
-          <Button variant="ghost" onClick={onClose}>Cancel</Button>
+          <Button variant="ghost" onClick={onClose}>{t('common:actions.cancel')}</Button>
           <Button
             disabled
-            title="API integration coming soon — submit will be enabled once the backend endpoint is confirmed"
+            title={t('bulkUpload.importDisabledTitle')}
           >
-            Import {entityLabel}
+            {t('bulkUpload.import', { entity: entityLabel })}
           </Button>
         </div>
       }
@@ -163,14 +162,14 @@ export function BulkUploadModal({ isOpen, onClose, entityType }: BulkUploadModal
         {/* ── Template download hint ──────────────────────────────── */}
         <div className={styles.templateRow}>
           <Info size={14} className={styles.infoIcon} />
-          <span>Use the correct column headers to ensure a successful import.</span>
+          <span>{t('bulkUpload.templateHint')}</span>
           <button
             type="button"
             className={styles.templateLink}
             onClick={() => downloadTemplate(entityType)}
           >
             <Download size={12} />
-            Download template
+            {t('bulkUpload.downloadTemplate')}
           </button>
         </div>
 
@@ -180,13 +179,13 @@ export function BulkUploadModal({ isOpen, onClose, entityType }: BulkUploadModal
           onFile={handleFile}
           onClear={handleClear}
           accept=".csv,.xlsx"
-          hint="CSV or XLSX · max 5 MB"
+          hint={t('bulkUpload.fileHint')}
           error={stage === 'error' ? (parseError ?? undefined) : undefined}
         />
 
         {/* ── Parsing indicator ────────────────────────────────────── */}
         {stage === 'parsing' && (
-          <p className={styles.parsingStat}>Parsing file…</p>
+          <p className={styles.parsingStat}>{t('bulkUpload.parsing')}</p>
         )}
 
         {/* ── Preview ──────────────────────────────────────────────── */}
@@ -196,7 +195,7 @@ export function BulkUploadModal({ isOpen, onClose, entityType }: BulkUploadModal
             {/* Column detection */}
             <div className={styles.section}>
               <p className={styles.sectionLabel}>
-                Detected columns ({parsed.headers.length})
+                {t('bulkUpload.detectedColumns', { count: parsed.headers.length })}
               </p>
               <div className={styles.columnBadges}>
                 {parsed.headers.map((h) => (
@@ -207,7 +206,7 @@ export function BulkUploadModal({ isOpen, onClose, entityType }: BulkUploadModal
 
             {/* Requirement check */}
             <div className={styles.section}>
-              <p className={styles.sectionLabel}>Column validation</p>
+              <p className={styles.sectionLabel}>{t('bulkUpload.columnValidation')}</p>
               <div className={styles.validationList}>
                 {requirements.map((req) => {
                   const ok = meetsRequirement(req, parsed.headers);
@@ -223,7 +222,7 @@ export function BulkUploadModal({ isOpen, onClose, entityType }: BulkUploadModal
                       <span>{req.label}</span>
                       {!ok && (
                         <span className={styles.validHint}>
-                          accepted: {req.candidates.slice(0, 3).join(' / ')}
+                          {t('bulkUpload.accepted')} {req.candidates.slice(0, 3).join(' / ')}
                         </span>
                       )}
                     </div>
@@ -232,7 +231,7 @@ export function BulkUploadModal({ isOpen, onClose, entityType }: BulkUploadModal
               </div>
               {!allValid && (
                 <p className={styles.validError}>
-                  Fix the missing columns in your file before importing.
+                  {t('bulkUpload.fixColumnsError')}
                 </p>
               )}
             </div>
@@ -240,8 +239,7 @@ export function BulkUploadModal({ isOpen, onClose, entityType }: BulkUploadModal
             {/* Row preview table */}
             <div className={styles.section}>
               <p className={styles.sectionLabel}>
-                Preview — first {parsed.rows.length} of {parsed.totalRows}{' '}
-                {parsed.totalRows === 1 ? 'row' : 'rows'}
+                {t('bulkUpload.preview', { count: parsed.rows.length, total: parsed.totalRows })}
               </p>
               <div className={styles.tableWrap}>
                 <table className={styles.previewTable}>

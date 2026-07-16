@@ -24,6 +24,12 @@
     "user": {
       "role": "Admin",
       "logout": "Sign out",
+      "logoutConfirm": {
+        "title": "Log out",
+        "message": "Are you sure you want to log out?",
+        "confirm": "Log out",
+        "confirming": "Logging out…"
+      },
       "roles": {
         "super_admin":    "Super Admin",
         "branch_manager": "Branch Manager",

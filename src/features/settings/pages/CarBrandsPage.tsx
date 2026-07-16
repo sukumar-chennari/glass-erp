@@ -1,5 +1,6 @@
 import { useState, useMemo, useRef } from 'react';
 import { Plus, Pencil, Trash2, Tag, AlertCircle, Upload, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { PageShell, SectionCard } from '@/components/layout/PageShell';
 import { DataTable }   from '@/components/ui/DataTable';
 import { StatusBadge } from '@/components/ui/Badge';
@@ -19,56 +20,6 @@ import {
 import type { CarBrand, CarBrandStatus } from '@/types/models/carBrand';
 import type { TableColumn, SelectOption } from '@/types/ui';
 import styles from './CarBrandsPage.module.css';
-
-// ── Constants ──────────────────────────────────────────────────────────
-const STATUS_OPTS: SelectOption[] = [
-  { value: 'ACTIVE',   label: 'Active'   },
-  { value: 'INACTIVE', label: 'Inactive' },
-];
-
-const FILTER_OPTS: SelectOption[] = [
-  { value: '',         label: 'All statuses' },
-  { value: 'ACTIVE',   label: 'Active'       },
-  { value: 'INACTIVE', label: 'Inactive'     },
-];
-
-const STATUS_MAP: Record<CarBrandStatus, { label: string; variant: 'success' | 'neutral' }> = {
-  ACTIVE:   { label: 'Active',   variant: 'success' },
-  INACTIVE: { label: 'Inactive', variant: 'neutral' },
-};
-
-// ── Table columns ──────────────────────────────────────────────────────
-const COLUMNS: TableColumn<CarBrand>[] = [
-  {
-    key:    'name',
-    header: 'Brand Name',
-    render: (b) => (
-      <div className={styles.brandCell}>
-        <div className={styles.brandThumbWrap}>
-          {b.image && (
-            <img
-              src={b.image}
-              alt={b.name}
-              className={styles.brandThumb}
-              onError={(e) => { e.currentTarget.style.display = 'none'; }}
-            />
-          )}
-        </div>
-        <span className={styles.brandName}>{b.name}</span>
-      </div>
-    ),
-  },
-  {
-    key:    'compare_name',
-    header: 'Company Name',
-    render: (b) => <span className={styles.compareName}>{b.compare_name}</span>,
-  },
-  {
-    key:    'status',
-    header: 'Status',
-    render: (b) => <StatusBadge status={b.status} statusMap={STATUS_MAP} size="sm" />,
-  },
-];
 
 // ── Form types ─────────────────────────────────────────────────────────
 interface BrandForm {
@@ -107,9 +58,10 @@ function extractApiError(error: unknown): string | null {
 
 // ── Component ──────────────────────────────────────────────────────────
 export function CarBrandsPage() {
+  const { t } = useTranslation(['settings', 'common']);
   const toast = useToast();
 
-  // ── Filter state (declared before query so statusFilter is in scope) ──
+  // ── Filter state ──────────────────────────────────────────────────────
   const [search,       setSearch]       = useState('');
   const [statusFilter, setStatusFilter] = useState('');
 
@@ -127,12 +79,27 @@ export function CarBrandsPage() {
   const [deleteTarget, setDeleteTarget] = useState<CarBrand | null>(null);
   const [form,         setForm]         = useState<BrandForm>(EMPTY_FORM);
   const [errors,       setErrors]       = useState<FormErrors>({});
-  // urlInput is the visible text field value — decoupled from form.image so a
-  // file-upload data URL never appears as raw text in the input.
   const [urlInput,     setUrlInput]     = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // ── Filtered list — status is server-side via ?status= param; search is client-side ──
+  // ── Dropdown options ──────────────────────────────────────────────────
+  const STATUS_OPTS = useMemo<SelectOption[]>(() => [
+    { value: 'ACTIVE',   label: t('carBrands.statusLabels.active')   },
+    { value: 'INACTIVE', label: t('carBrands.statusLabels.inactive') },
+  ], [t]);
+
+  const FILTER_OPTS = useMemo<SelectOption[]>(() => [
+    { value: '',         label: t('carBrands.allStatuses')            },
+    { value: 'ACTIVE',   label: t('carBrands.statusLabels.active')   },
+    { value: 'INACTIVE', label: t('carBrands.statusLabels.inactive') },
+  ], [t]);
+
+  const STATUS_MAP = useMemo(() => ({
+    ACTIVE:   { label: t('carBrands.statusLabels.active'),   variant: 'success' as const },
+    INACTIVE: { label: t('carBrands.statusLabels.inactive'), variant: 'neutral' as const },
+  }), [t]);
+
+  // ── Filtered list ─────────────────────────────────────────────────────
   const filtered = useMemo(() => {
     if (!search.trim()) return brands;
     const q = search.trim().toLowerCase();
@@ -143,7 +110,35 @@ export function CarBrandsPage() {
 
   // ── Table columns with actions ────────────────────────────────────────
   const columns = useMemo<TableColumn<CarBrand>[]>(() => [
-    ...COLUMNS,
+    {
+      key:    'name',
+      header: t('carBrands.columns.brandName'),
+      render: (b) => (
+        <div className={styles.brandCell}>
+          <div className={styles.brandThumbWrap}>
+            {b.image && (
+              <img
+                src={b.image}
+                alt={b.name}
+                className={styles.brandThumb}
+                onError={(e) => { e.currentTarget.style.display = 'none'; }}
+              />
+            )}
+          </div>
+          <span className={styles.brandName}>{b.name}</span>
+        </div>
+      ),
+    },
+    {
+      key:    'compare_name',
+      header: t('carBrands.columns.companyName'),
+      render: (b) => <span className={styles.compareName}>{b.compare_name}</span>,
+    },
+    {
+      key:    'status',
+      header: t('carBrands.columns.status'),
+      render: (b) => <StatusBadge status={b.status} statusMap={STATUS_MAP} size="sm" />,
+    },
     {
       key:    'id' as const,
       header: '',
@@ -169,7 +164,7 @@ export function CarBrandsPage() {
       ),
     },
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  ], []);
+  ], [t, STATUS_MAP]);
 
   // ── Form helpers ──────────────────────────────────────────────────────
   function set(key: keyof BrandForm, val: string) {
@@ -187,19 +182,18 @@ export function CarBrandsPage() {
 
   function validate(): boolean {
     const errs: FormErrors = {};
-    if (!form.name.trim())         errs.name         = 'Brand name is required';
-    if (!form.compare_name.trim()) errs.compare_name = 'Compare name is required';
+    if (!form.name.trim())         errs.name         = t('carBrands.modal.brandNameRequired');
+    if (!form.compare_name.trim()) errs.compare_name = t('carBrands.modal.companyNameRequired');
     if (!form.image.trim()) {
-      errs.image = 'Image URL is required';
+      errs.image = t('carBrands.modal.imageRequired');
     } else {
       try { new URL(form.image.trim()); }
-      catch { errs.image = 'Image URL must be a valid URL (e.g. https://…)'; }
+      catch { errs.image = t('carBrands.modal.imageInvalidUrl'); }
     }
     setErrors(errs);
     return Object.keys(errs).length === 0;
   }
 
-  // ── Add modal ─────────────────────────────────────────────────────────
   function openAdd() {
     setEditTarget(null);
     setForm(EMPTY_FORM);
@@ -208,7 +202,6 @@ export function CarBrandsPage() {
     setModalOpen(true);
   }
 
-  // ── Edit modal ────────────────────────────────────────────────────────
   function openEdit(brand: CarBrand) {
     setEditTarget(brand);
     setForm({
@@ -247,7 +240,6 @@ export function CarBrandsPage() {
     set('image', val);
   }
 
-  // ── Save (add or edit) ────────────────────────────────────────────────
   async function handleSave() {
     if (!validate()) return;
 
@@ -261,32 +253,31 @@ export function CarBrandsPage() {
     if (editTarget) {
       const result = await updateBrand({ id: editTarget.id, ...payload });
       if ('data' in result) {
-        toast.success(`Brand "${payload.name}" updated.`);
+        toast.success(t('carBrands.toast.updated', { name: payload.name }));
         closeModal();
       } else {
         const err = result.error as { status?: number };
         if (err?.status === 404) {
-          toast.error('This car brand no longer exists.');
+          toast.error(t('carBrands.toast.notFound'));
           closeModal();
           void refetch();
         } else {
-          const msg = extractApiError(result.error) ?? 'Failed to update brand. Please try again.';
+          const msg = extractApiError(result.error) ?? t('carBrands.toast.updateFailed');
           toast.error(msg);
         }
       }
     } else {
       const result = await createBrand(payload);
       if ('data' in result) {
-        toast.success(`Brand "${payload.name}" added.`);
+        toast.success(t('carBrands.toast.added', { name: payload.name }));
         closeModal();
       } else {
-        const msg = extractApiError(result.error) ?? 'Failed to add brand. Please try again.';
+        const msg = extractApiError(result.error) ?? t('carBrands.toast.addFailed');
         toast.error(msg);
       }
     }
   }
 
-  // ── Delete ────────────────────────────────────────────────────────────
   async function handleDelete() {
     if (!deleteTarget) return;
     const { name, id } = deleteTarget;
@@ -295,38 +286,38 @@ export function CarBrandsPage() {
     if ('error' in result) {
       const err = result.error as { status?: number };
       if (err?.status === 404) {
-        toast.error('This car brand no longer exists.');
+        toast.error(t('carBrands.toast.notFound'));
         void refetch();
       } else {
-        toast.error('Failed to delete brand. Please try again.');
+        toast.error(t('carBrands.toast.deleteFailed'));
       }
       return;
     }
-    toast.success(`Brand "${name}" deleted.`);
+    toast.success(t('carBrands.toast.deleted', { name }));
   }
+
+  const brandCount = filtered.length;
 
   return (
     <PageShell
-      heading="Car Brands"
-      description="Manage vehicle brands available across job cards and insurance workflows."
+      heading={t('carBrands.heading')}
+      description={t('carBrands.description')}
       actions={
         <>
           <Button variant="secondary" leftIcon={<Upload size={15} />} onClick={() => setBulkOpen(true)}>
-            Bulk Upload
+            {t('carBrands.actions.bulkUpload')}
           </Button>
           <Button leftIcon={<Plus size={15} />} onClick={openAdd}>
-            Add Brand
+            {t('carBrands.actions.add')}
           </Button>
         </>
       }
     >
-
-
       <SectionCard>
         {/* ── Toolbar ───────────────────────────────────────────────── */}
         <div className={styles.toolbar}>
           <Input
-            placeholder="Search brands…"
+            placeholder={t('carBrands.searchPlaceholder')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className={styles.searchInput}
@@ -335,33 +326,38 @@ export function CarBrandsPage() {
             options={FILTER_OPTS}
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            aria-label="Filter by status"
+            aria-label={t('carBrands.allStatuses')}
           />
           <span className={styles.count}>
-            {isLoading ? '' : `${filtered.length} brand${filtered.length !== 1 ? 's' : ''}`}
+            {isLoading ? '' : t(`carBrands.count`, { count: brandCount })}
           </span>
         </div>
 
-        {/* ── States ────────────────────────────────────────────────── */}
         {isLoading && <TableSkeleton rows={6} cols={3} />}
 
         {isError && !isLoading && (
           <div className={styles.emptyState}>
             <AlertCircle size={32} className={styles.emptyIcon} />
-            <p className={styles.emptyTitle}>Failed to load brands</p>
-            <Button variant="secondary" size="sm" onClick={() => void refetch()}>Retry</Button>
+            <p className={styles.emptyTitle}>{t('carBrands.loadError')}</p>
+            <Button variant="secondary" size="sm" onClick={() => void refetch()}>
+              {t('carBrands.actions.retry')}
+            </Button>
           </div>
         )}
 
         {!isLoading && !isError && filtered.length === 0 && (
           <div className={styles.emptyState}>
             <Tag size={32} className={styles.emptyIcon} />
-            <p className={styles.emptyTitle}>No brands found</p>
+            <p className={styles.emptyTitle}>{t('carBrands.emptyNoResults')}</p>
             <p className={styles.emptyDesc}>
-              {search || statusFilter ? 'Try adjusting your search or filter.' : 'Add your first car brand to get started.'}
+              {search || statusFilter
+                ? t('carBrands.emptyFilterHint')
+                : t('carBrands.emptyNoData')}
             </p>
             {!search && !statusFilter && (
-              <Button leftIcon={<Plus size={14} />} size="sm" onClick={openAdd}>Add Brand</Button>
+              <Button leftIcon={<Plus size={14} />} size="sm" onClick={openAdd}>
+                {t('carBrands.actions.add')}
+              </Button>
             )}
           </div>
         )}
@@ -382,38 +378,38 @@ export function CarBrandsPage() {
       <Modal
         isOpen={modalOpen}
         onClose={closeModal}
-        title={editTarget ? `Edit Brand — ${editTarget.name}` : 'Add Car Brand'}
+        title={editTarget ? t('carBrands.modal.editTitle', { name: editTarget.name }) : t('carBrands.modal.addTitle')}
         footer={
           <div className={styles.modalFooter}>
-            <Button variant="ghost" onClick={closeModal}>Cancel</Button>
+            <Button variant="ghost" onClick={closeModal}>{t('common:actions.cancel')}</Button>
             <Button onClick={handleSave} loading={creating || updating}>
-              {editTarget ? 'Save Changes' : 'Add Brand'}
+              {editTarget ? t('carBrands.modal.save') : t('carBrands.modal.add')}
             </Button>
           </div>
         }
       >
         <div className={styles.form}>
           <Input
-            label="Brand Name"
+            label={t('carBrands.modal.brandName')}
             value={form.name}
             onChange={(e) => set('name', e.target.value)}
-            placeholder="e.g. Maruti Suzuki"
+            placeholder={t('carBrands.modal.brandNamePlaceholder')}
             error={errors.name}
             required
             fullWidth
             autoFocus
           />
           <Input
-            label="Company Name"
+            label={t('carBrands.modal.companyName')}
             value={form.compare_name}
             onChange={(e) => set('compare_name', e.target.value.toLowerCase())}
-            placeholder="e.g. maruti suzuki"
-            hint="Lowercase, used for search matching. Auto-filled from name."
+            placeholder={t('carBrands.modal.companyNamePlaceholder')}
+            hint={t('carBrands.modal.companyNameHint')}
             error={errors.compare_name}
             required
             fullWidth
           />
-          {/* ── Image ─────────────────────────────────────────── */}
+          {/* ── Image ─────────────────────────────────────── */}
           <div className={styles.imageSection}>
             {form.image && (
               <div className={styles.imagePreviewWrap}>
@@ -439,7 +435,7 @@ export function CarBrandsPage() {
               leftIcon={<Upload size={14} />}
               onClick={() => fileInputRef.current?.click()}
             >
-              Upload from device
+              {t('carBrands.modal.uploadFromDevice')}
             </Button>
             <input
               ref={fileInputRef}
@@ -448,7 +444,7 @@ export function CarBrandsPage() {
               style={{ display: 'none' }}
               onChange={handleFileSelect}
             />
-            <div className={styles.imageDivider}>or paste a URL</div>
+            <div className={styles.imageDivider}>{t('carBrands.modal.orPasteUrl')}</div>
             <Input
               value={urlInput}
               onChange={(e) => handleUrlChange(e.target.value)}
@@ -458,7 +454,7 @@ export function CarBrandsPage() {
             />
           </div>
           <Select
-            label="Status"
+            label={t('carBrands.modal.status')}
             options={STATUS_OPTS}
             value={form.status}
             onChange={(e) => set('status', e.target.value)}
@@ -470,17 +466,16 @@ export function CarBrandsPage() {
       <Modal
         isOpen={deleteTarget !== null}
         onClose={() => setDeleteTarget(null)}
-        title="Delete Brand"
+        title={t('carBrands.modal.deleteTitle')}
         footer={
           <div className={styles.modalFooter}>
-            <Button variant="ghost" onClick={() => setDeleteTarget(null)} disabled={deleting}>Cancel</Button>
-            <Button variant="danger" onClick={handleDelete} loading={deleting}>Delete</Button>
+            <Button variant="ghost" onClick={() => setDeleteTarget(null)} disabled={deleting}>{t('common:actions.cancel')}</Button>
+            <Button variant="danger" onClick={handleDelete} loading={deleting}>{t('common:actions.delete')}</Button>
           </div>
         }
       >
         <p className={styles.deleteMsg}>
-          Are you sure you want to delete <strong>{deleteTarget?.name}</strong>?
-          Any models under this brand will lose their brand association.
+          {t('carBrands.modal.deleteMessage', { name: deleteTarget?.name ?? '' })}
         </p>
       </Modal>
     </PageShell>

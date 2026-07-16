@@ -68,5 +68,327 @@
     "apiModeHint": "Toggle via VITE_USE_MOCK_API environment variable",
     "mock": "Mock (Development)",
     "live": "Live (Production)"
+  },
+  "admin": {
+    "title": "Settings",
+    "subtitle": "Core configuration shared across all branches and operations."
+  },
+  "subnav": {
+    "header": "Settings",
+    "masterData": "Master Data",
+    "insuranceRules": "Insurance Rules",
+    "carBrands": "Car Brands",
+    "carModels": "Car Models",
+    "aria": "Master data settings"
+  },
+  "carBrands": {
+    "heading": "Car Brands",
+    "description": "Manage vehicle brands available across job cards and insurance workflows.",
+    "searchPlaceholder": "Search brands…",
+    "allStatuses": "All statuses",
+    "count_one": "{{count}} brand",
+    "count_other": "{{count}} brands",
+    "columns": {
+      "brandName": "Brand Name",
+      "companyName": "Company Name",
+      "status": "Status"
+    },
+    "emptyNoResults": "No brands found",
+    "emptyFilterHint": "Try adjusting your search or filter.",
+    "emptyNoData": "Add your first car brand to get started.",
+    "loadError": "Failed to load brands",
+    "modal": {
+      "addTitle": "Add Car Brand",
+      "editTitle": "Edit Brand — {{name}}",
+      "brandName": "Brand Name",
+      "brandNamePlaceholder": "e.g. Maruti Suzuki",
+      "brandNameRequired": "Brand name is required",
+      "companyName": "Company Name",
+      "companyNamePlaceholder": "e.g. maruti suzuki",
+      "companyNameHint": "Lowercase, used for search matching. Auto-filled from name.",
+      "companyNameRequired": "Compare name is required",
+      "uploadFromDevice": "Upload from device",
+      "orPasteUrl": "or paste a URL",
+      "imageRequired": "Image URL is required",
+      "imageInvalidUrl": "Image URL must be a valid URL (e.g. https://…)",
+      "status": "Status",
+      "save": "Save Changes",
+      "add": "Add Brand",
+      "deleteTitle": "Delete Brand",
+      "deleteMessage": "Are you sure you want to delete {{name}}? Any models under this brand will lose their brand association."
+    },
+    "actions": {
+      "bulkUpload": "Bulk Upload",
+      "add": "Add Brand",
+      "retry": "Retry"
+    },
+    "toast": {
+      "added": "Brand \"{{name}}\" added.",
+      "updated": "Brand \"{{name}}\" updated.",
+      "deleted": "Brand \"{{name}}\" deleted.",
+      "notFound": "This car brand no longer exists.",
+      "updateFailed": "Failed to update brand. Please try again.",
+      "addFailed": "Failed to add brand. Please try again.",
+      "deleteFailed": "Failed to delete brand. Please try again."
+    },
+    "statusLabels": {
+      "active": "Active",
+      "inactive": "Inactive"
+    }
+  },
+  "carModels": {
+    "heading": "Car Models",
+    "description": "Manage vehicle models linked to brands for use across job cards and insurance workflows.",
+    "searchPlaceholder": "Search models…",
+    "allStatuses": "All statuses",
+    "allBrands": "All brands",
+    "count_one": "{{count}} model",
+    "count_other": "{{count}} models",
+    "columns": {
+      "model": "Model",
+      "brand": "Brand",
+      "status": "Status"
+    },
+    "emptyNoResults": "No models found",
+    "emptyFilterHint": "Try adjusting your search or filter.",
+    "emptyNoData": "Add your first car model to get started.",
+    "loadError": "Failed to load models",
+    "modal": {
+      "addTitle": "Add Car Model",
+      "editTitle": "Edit Model — {{name}}",
+      "modelName": "Model Name",
+      "modelNamePlaceholder": "e.g. Swift",
+      "modelNameRequired": "Model name is required",
+      "compareName": "Compare Name",
+      "compareNamePlaceholder": "e.g. swift",
+      "compareNameHint": "Lowercase. Auto-filled from model name.",
+      "compareNameRequired": "Compare name is required",
+      "brand": "Brand",
+      "brandRequired": "Brand is required",
+      "status": "Status",
+      "save": "Save Changes",
+      "add": "Add Model",
+      "deleteTitle": "Delete Model",
+      "deleteMessage": "Are you sure you want to delete {{name}}?"
+    },
+    "actions": {
+      "bulkUpload": "Bulk Upload",
+      "add": "Add Model",
+      "retry": "Retry"
+    },
+    "toast": {
+      "added": "Model \"{{name}}\" added.",
+      "updated": "Model \"{{name}}\" updated.",
+      "deleted": "Model \"{{name}}\" deleted.",
+      "notFound": "This car model no longer exists.",
+      "updateFailed": "Failed to update model. Please try again.",
+      "addFailed": "Failed to add model. Please try again.",
+      "deleteFailed": "Failed to delete model. Please try again."
+    },
+    "statusLabels": {
+      "active": "Active",
+      "inactive": "Inactive"
+    }
+  },
+  "insuranceRules": {
+    "heading": "Insurance Rules",
+    "description": "Define claim eligibility, required documents, and approval workflows for insurance jobs.",
+    "loadError": "Failed to load insurance rules",
+    "emptyNoData": "No insurance rules yet. Add your first rule.",
+    "columns": {
+      "boardType": "Board Type",
+      "ccCondition": "CC Condition",
+      "extraCharges": "Extra Charges",
+      "depreciation": "Depreciation",
+      "status": "Status"
+    },
+    "drawer": {
+      "addTitle": "Add Insurance Rule",
+      "editTitle": "Edit Rule",
+      "boardType": "Board Type",
+      "ccCondition": "CC Condition",
+      "extraCharges": "Extra Charges (₹)",
+      "extraChargesHint": "Additional charges applied above base price",
+      "extraChargesRequired": "Extra charges are required",
+      "extraChargesInvalid": "Enter a valid non-negative number",
+      "depreciation": "Depreciation (%)",
+      "depreciationHint": "Percentage deducted from claim amount",
+      "depreciationRequired": "Depreciation is required",
+      "depreciationInvalid": "Enter a number between 0 and 100",
+      "activeStatus": "Active",
+      "save": "Save Rule",
+      "add": "Add Rule"
+    },
+    "deleteModal": {
+      "title": "Delete Rule",
+      "message": "Are you sure you want to delete this insurance rule?"
+    },
+    "actions": {
+      "add": "Add Rule",
+      "retry": "Retry"
+    },
+    "toast": {
+      "added": "Insurance rule added.",
+      "updated": "Insurance rule updated.",
+      "deleted": "Insurance rule deleted.",
+      "addFailed": "Failed to add rule. Please try again.",
+      "updateFailed": "Failed to update rule. Please try again.",
+      "deleteFailed": "Failed to delete rule. Please try again."
+    },
+    "boardOptions": {
+      "yellow": "Yellow Board",
+      "white": "White Board"
+    },
+    "ccOptions": {
+      "above": "Above 1500cc",
+      "below": "Below 1500cc"
+    }
+  },
+  "users": {
+    "heading": "Users",
+    "description": "Manage staff accounts, roles and branch assignments.",
+    "searchPlaceholder": "Search users…",
+    "allRoles": "All Roles",
+    "allBranches": "All Branches",
+    "columns": {
+      "nameEmail": "Name / Email",
+      "role": "Role",
+      "branch": "Branch",
+      "inviteStatus": "Invite",
+      "status": "Status"
+    },
+    "emptyNoResults": "No users match your search.",
+    "emptyNoData": "No staff accounts yet.",
+    "modal": {
+      "title": "Invite Staff Member",
+      "name": "Full Name",
+      "namePlaceholder": "e.g. Ravi Kumar",
+      "nameRequired": "Name is required",
+      "email": "Email Address",
+      "emailPlaceholder": "e.g. ravi@example.com",
+      "emailRequired": "Email is required",
+      "emailInvalid": "Enter a valid email address",
+      "role": "Role",
+      "branch": "Branch",
+      "branchRequired": "Branch is required",
+      "submit": "Send Invite",
+      "submitting": "Sending…"
+    },
+    "actions": {
+      "invite": "Invite User",
+      "resendInvite": "Resend invite"
+    },
+    "toast": {
+      "invited": "Invite sent to {{email}}.",
+      "inviteFailed": "Failed to send invite. Please try again.",
+      "resent": "Invite resent to {{name}}.",
+      "resentFailed": "Failed to resend invite."
+    },
+    "roleLabels": {
+      "super_admin": "Super Admin",
+      "branch_manager": "Branch Manager",
+      "operator": "Operator",
+      "technician": "Technician"
+    },
+    "inviteStatus": {
+      "pending": "Invite pending",
+      "sent": "Setup link sent",
+      "accepted": "Invite accepted",
+      "expired": "Invite expired"
+    }
+  },
+  "branches": {
+    "heading": "Branches",
+    "description": "Manage branch offices, contact details, and operating hours.",
+    "searchPlaceholder": "Search branches…",
+    "allStatuses": "All statuses",
+    "columns": {
+      "branch": "Branch",
+      "hours": "Hours",
+      "phone": "Phone",
+      "email": "Email",
+      "status": "Status"
+    },
+    "emptyNoResults": "No branches found.",
+    "emptyNoData": "No branches yet. Add your first branch.",
+    "loadError": "Failed to load branches",
+    "modal": {
+      "addTitle": "Add Branch",
+      "editTitle": "Edit Branch — {{name}}",
+      "name": "Branch Name",
+      "namePlaceholder": "e.g. Banjara Hills",
+      "nameRequired": "Branch name is required",
+      "address": "Address",
+      "addressRequired": "Address is required",
+      "city": "City",
+      "district": "District",
+      "state": "State",
+      "pincode": "Pincode",
+      "phone": "Phone Number",
+      "phoneRequired": "Phone number is required",
+      "email": "Email",
+      "emailRequired": "Email is required",
+      "openingTime": "Opening Time",
+      "closingTime": "Closing Time",
+      "latitude": "Latitude",
+      "longitude": "Longitude",
+      "status": "Status",
+      "save": "Save Changes",
+      "add": "Add Branch"
+    },
+    "actions": {
+      "add": "Add Branch",
+      "retry": "Retry",
+      "detectLocation": "Detect my location"
+    },
+    "toast": {
+      "added": "Branch \"{{name}}\" added.",
+      "updated": "Branch \"{{name}}\" updated.",
+      "deactivated": "Branch deactivated.",
+      "addFailed": "Failed to add branch. Please try again.",
+      "updateFailed": "Failed to update branch. Please try again."
+    },
+    "statusLabels": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "suspended": "Suspended"
+    }
+  },
+  "pricing": {
+    "heading": "Pricing",
+    "description": "Set base prices for glass types by quality grade (OEM / OEE / AM).",
+    "columns": {
+      "glassType": "Glass Type",
+      "oem": "OEM",
+      "oee": "OEE",
+      "am": "AM",
+      "labour": "Labour",
+      "sealant": "Sealant"
+    },
+    "actions": {
+      "edit": "Edit Prices",
+      "save": "Save Prices",
+      "cancel": "Cancel",
+      "saving": "Saving…"
+    },
+    "toast": {
+      "saved": "Prices saved successfully.",
+      "saveFailed": "Failed to save prices."
+    }
+  },
+  "bulkUpload": {
+    "title": "Bulk Upload {{entity}}",
+    "templateHint": "Use the correct column headers to ensure a successful import.",
+    "downloadTemplate": "Download template",
+    "parsing": "Parsing file…",
+    "detectedColumns": "Detected columns ({{count}})",
+    "columnValidation": "Column validation",
+    "accepted": "accepted:",
+    "fixColumnsError": "Fix the missing columns in your file before importing.",
+    "preview_one": "Preview — first {{count}} of {{total}} row",
+    "preview_other": "Preview — first {{count}} of {{total}} rows",
+    "import": "Import {{entity}}",
+    "importDisabledTitle": "API integration coming soon — submit will be enabled once the backend endpoint is confirmed",
+    "fileHint": "CSV or XLSX · max 5 MB"
   }
 }

@@ -68,5 +68,277 @@
     "apiModeHint": "VITE_USE_MOCK_API पर्यावरण चर के माध्यम से टॉगल करें",
     "mock": "मॉक (डेवलपमेंट)",
     "live": "लाइव (प्रोडक्शन)"
+  },
+  "admin": {
+    "title": "सेटिंग्स",
+    "subtitle": "सभी शाखाओं और संचालन में साझा कोर कॉन्फ़िगरेशन।"
+  },
+  "subnav": {
+    "header": "सेटिंग्स",
+    "masterData": "मास्टर डेटा",
+    "insuranceRules": "बीमा नियम",
+    "carBrands": "कार ब्रांड",
+    "carModels": "कार मॉडल",
+    "aria": "मास्टर डेटा सेटिंग्स"
+  },
+  "carBrands": {
+    "heading": "कार ब्रांड",
+    "description": "जॉब कार्ड और बीमा वर्कफ़्लो में उपलब्ध वाहन ब्रांड प्रबंधित करें।",
+    "searchPlaceholder": "ब्रांड खोजें…",
+    "allStatuses": "सभी स्थितियां",
+    "count_one": "{{count}} ब्रांड",
+    "count_other": "{{count}} ब्रांड",
+    "columns": { "brandName": "ब्रांड नाम", "companyName": "कंपनी नाम", "status": "स्थिति" },
+    "emptyNoResults": "कोई ब्रांड नहीं मिला",
+    "emptyFilterHint": "अपनी खोज या फ़िल्टर समायोजित करें।",
+    "emptyNoData": "शुरुआत के लिए अपना पहला कार ब्रांड जोड़ें।",
+    "loadError": "ब्रांड लोड करना विफल हुआ",
+    "modal": {
+      "addTitle": "कार ब्रांड जोड़ें",
+      "editTitle": "ब्रांड संपादित करें — {{name}}",
+      "brandName": "ब्रांड नाम",
+      "brandNamePlaceholder": "जैसे मारुति सुज़ुकी",
+      "brandNameRequired": "ब्रांड नाम आवश्यक है",
+      "companyName": "कंपनी नाम",
+      "companyNamePlaceholder": "जैसे maruti suzuki",
+      "companyNameHint": "लोअरकेस, खोज मिलान के लिए। नाम से स्वचालित रूप से भरा जाता है।",
+      "companyNameRequired": "तुलना नाम आवश्यक है",
+      "uploadFromDevice": "डिवाइस से अपलोड करें",
+      "orPasteUrl": "या URL पेस्ट करें",
+      "imageRequired": "इमेज URL आवश्यक है",
+      "imageInvalidUrl": "इमेज URL एक वैध URL होना चाहिए (जैसे https://…)",
+      "status": "स्थिति",
+      "save": "परिवर्तन सहेजें",
+      "add": "ब्रांड जोड़ें",
+      "deleteTitle": "ब्रांड हटाएं",
+      "deleteMessage": "क्या आप वाकई {{name}} हटाना चाहते हैं? इस ब्रांड के सभी मॉडल अपना ब्रांड संबंध खो देंगे।"
+    },
+    "actions": { "bulkUpload": "बल्क अपलोड", "add": "ब्रांड जोड़ें", "retry": "पुनः प्रयास" },
+    "toast": {
+      "added": "ब्रांड \"{{name}}\" जोड़ा गया।",
+      "updated": "ब्रांड \"{{name}}\" अपडेट हुआ।",
+      "deleted": "ब्रांड \"{{name}}\" हटाया गया।",
+      "notFound": "यह कार ब्रांड अब मौजूद नहीं है।",
+      "updateFailed": "ब्रांड अपडेट करना विफल। कृपया पुनः प्रयास करें।",
+      "addFailed": "ब्रांड जोड़ना विफल। कृपया पुनः प्रयास करें।",
+      "deleteFailed": "ब्रांड हटाना विफल। कृपया पुनः प्रयास करें।"
+    },
+    "statusLabels": { "active": "सक्रिय", "inactive": "निष्क्रिय" }
+  },
+  "carModels": {
+    "heading": "कार मॉडल",
+    "description": "जॉब कार्ड और बीमा वर्कफ़्लो में उपयोग के लिए ब्रांड से जुड़े वाहन मॉडल प्रबंधित करें।",
+    "searchPlaceholder": "मॉडल खोजें…",
+    "allStatuses": "सभी स्थितियां",
+    "allBrands": "सभी ब्रांड",
+    "count_one": "{{count}} मॉडल",
+    "count_other": "{{count}} मॉडल",
+    "columns": { "model": "मॉडल", "brand": "ब्रांड", "status": "स्थिति" },
+    "emptyNoResults": "कोई मॉडल नहीं मिला",
+    "emptyFilterHint": "अपनी खोज या फ़िल्टर समायोजित करें।",
+    "emptyNoData": "शुरुआत के लिए अपना पहला कार मॉडल जोड़ें।",
+    "loadError": "मॉडल लोड करना विफल हुआ",
+    "modal": {
+      "addTitle": "कार मॉडल जोड़ें",
+      "editTitle": "मॉडल संपादित करें — {{name}}",
+      "modelName": "मॉडल नाम",
+      "modelNamePlaceholder": "जैसे Swift",
+      "modelNameRequired": "मॉडल नाम आवश्यक है",
+      "compareName": "तुलना नाम",
+      "compareNamePlaceholder": "जैसे swift",
+      "compareNameHint": "लोअरकेस। मॉडल नाम से स्वचालित रूप से भरा जाता है।",
+      "compareNameRequired": "तुलना नाम आवश्यक है",
+      "brand": "ब्रांड",
+      "brandRequired": "ब्रांड आवश्यक है",
+      "status": "स्थिति",
+      "save": "परिवर्तन सहेजें",
+      "add": "मॉडल जोड़ें",
+      "deleteTitle": "मॉडल हटाएं",
+      "deleteMessage": "क्या आप वाकई {{name}} हटाना चाहते हैं?"
+    },
+    "actions": { "bulkUpload": "बल्क अपलोड", "add": "मॉडल जोड़ें", "retry": "पुनः प्रयास" },
+    "toast": {
+      "added": "मॉडल \"{{name}}\" जोड़ा गया।",
+      "updated": "मॉडल \"{{name}}\" अपडेट हुआ।",
+      "deleted": "मॉडल \"{{name}}\" हटाया गया।",
+      "notFound": "यह कार मॉडल अब मौजूद नहीं है।",
+      "updateFailed": "मॉडल अपडेट करना विफल। कृपया पुनः प्रयास करें।",
+      "addFailed": "मॉडल जोड़ना विफल। कृपया पुनः प्रयास करें।",
+      "deleteFailed": "मॉडल हटाना विफल। कृपया पुनः प्रयास करें।"
+    },
+    "statusLabels": { "active": "सक्रिय", "inactive": "निष्क्रिय" }
+  },
+  "insuranceRules": {
+    "heading": "बीमा नियम",
+    "description": "बीमा जॉब के लिए दावा पात्रता, आवश्यक दस्तावेज़ और अनुमोदन वर्कफ़्लो निर्धारित करें।",
+    "loadError": "बीमा नियम लोड करना विफल हुआ",
+    "emptyNoData": "अभी तक कोई बीमा नियम नहीं। पहला नियम जोड़ें।",
+    "columns": {
+      "boardType": "बोर्ड प्रकार",
+      "ccCondition": "CC स्थिति",
+      "extraCharges": "अतिरिक्त शुल्क",
+      "depreciation": "मूल्यह्रास",
+      "status": "स्थिति"
+    },
+    "drawer": {
+      "addTitle": "बीमा नियम जोड़ें",
+      "editTitle": "नियम संपादित करें",
+      "boardType": "बोर्ड प्रकार",
+      "ccCondition": "CC स्थिति",
+      "extraCharges": "अतिरिक्त शुल्क (₹)",
+      "extraChargesHint": "आधार मूल्य से ऊपर लागू अतिरिक्त शुल्क",
+      "extraChargesRequired": "अतिरिक्त शुल्क आवश्यक है",
+      "extraChargesInvalid": "एक वैध गैर-नकारात्मक संख्या दर्ज करें",
+      "depreciation": "मूल्यह्रास (%)",
+      "depreciationHint": "दावा राशि से घटाई जाने वाली प्रतिशत",
+      "depreciationRequired": "मूल्यह्रास आवश्यक है",
+      "depreciationInvalid": "0 से 100 के बीच की संख्या दर्ज करें",
+      "activeStatus": "सक्रिय",
+      "save": "नियम सहेजें",
+      "add": "नियम जोड़ें"
+    },
+    "deleteModal": {
+      "title": "नियम हटाएं",
+      "message": "क्या आप वाकई इस बीमा नियम को हटाना चाहते हैं?"
+    },
+    "actions": { "add": "नियम जोड़ें", "retry": "पुनः प्रयास" },
+    "toast": {
+      "added": "बीमा नियम जोड़ा गया।",
+      "updated": "बीमा नियम अपडेट हुआ।",
+      "deleted": "बीमा नियम हटाया गया।",
+      "addFailed": "नियम जोड़ना विफल। कृपया पुनः प्रयास करें।",
+      "updateFailed": "नियम अपडेट करना विफल। कृपया पुनः प्रयास करें।",
+      "deleteFailed": "नियम हटाना विफल। कृपया पुनः प्रयास करें।"
+    },
+    "boardOptions": { "yellow": "येलो बोर्ड", "white": "व्हाइट बोर्ड" },
+    "ccOptions": { "above": "1500cc से ऊपर", "below": "1500cc से नीचे" }
+  },
+  "users": {
+    "heading": "उपयोगकर्ता",
+    "description": "स्टाफ खाते, भूमिकाएं और शाखा असाइनमेंट प्रबंधित करें।",
+    "searchPlaceholder": "उपयोगकर्ता खोजें…",
+    "allRoles": "सभी भूमिकाएं",
+    "allBranches": "सभी शाखाएं",
+    "columns": {
+      "nameEmail": "नाम / ईमेल",
+      "role": "भूमिका",
+      "branch": "शाखा",
+      "inviteStatus": "आमंत्रण",
+      "status": "स्थिति"
+    },
+    "emptyNoResults": "आपकी खोज से मेल खाते उपयोगकर्ता नहीं मिले।",
+    "emptyNoData": "अभी तक कोई स्टाफ खाता नहीं।",
+    "modal": {
+      "title": "स्टाफ सदस्य को आमंत्रित करें",
+      "name": "पूरा नाम",
+      "namePlaceholder": "जैसे रवि कुमार",
+      "nameRequired": "नाम आवश्यक है",
+      "email": "ईमेल पता",
+      "emailPlaceholder": "जैसे ravi@example.com",
+      "emailRequired": "ईमेल आवश्यक है",
+      "emailInvalid": "एक वैध ईमेल पता दर्ज करें",
+      "role": "भूमिका",
+      "branch": "शाखा",
+      "branchRequired": "शाखा आवश्यक है",
+      "submit": "आमंत्रण भेजें",
+      "submitting": "भेज रहे हैं…"
+    },
+    "actions": { "invite": "उपयोगकर्ता आमंत्रित करें", "resendInvite": "आमंत्रण पुनः भेजें" },
+    "toast": {
+      "invited": "{{email}} को आमंत्रण भेजा गया।",
+      "inviteFailed": "आमंत्रण भेजना विफल। कृपया पुनः प्रयास करें।",
+      "resent": "{{name}} को आमंत्रण पुनः भेजा गया।",
+      "resentFailed": "आमंत्रण पुनः भेजना विफल।"
+    },
+    "roleLabels": {
+      "super_admin": "सुपर एडमिन",
+      "branch_manager": "शाखा प्रबंधक",
+      "operator": "ऑपरेटर",
+      "technician": "तकनीशियन"
+    },
+    "inviteStatus": {
+      "pending": "आमंत्रण लंबित",
+      "sent": "सेटअप लिंक भेजा गया",
+      "accepted": "आमंत्रण स्वीकार किया गया",
+      "expired": "आमंत्रण समाप्त हुआ"
+    }
+  },
+  "branches": {
+    "heading": "शाखाएं",
+    "description": "शाखा कार्यालय, संपर्क विवरण और कार्य समय प्रबंधित करें।",
+    "searchPlaceholder": "शाखाएं खोजें…",
+    "allStatuses": "सभी स्थितियां",
+    "columns": {
+      "branch": "शाखा",
+      "hours": "समय",
+      "phone": "फ़ोन",
+      "email": "ईमेल",
+      "status": "स्थिति"
+    },
+    "emptyNoResults": "कोई शाखा नहीं मिली।",
+    "emptyNoData": "अभी तक कोई शाखा नहीं। पहली शाखा जोड़ें।",
+    "loadError": "शाखाएं लोड करना विफल हुआ",
+    "modal": {
+      "addTitle": "शाखा जोड़ें",
+      "editTitle": "शाखा संपादित करें — {{name}}",
+      "name": "शाखा नाम",
+      "namePlaceholder": "जैसे बंजारा हिल्स",
+      "nameRequired": "शाखा नाम आवश्यक है",
+      "address": "पता",
+      "addressRequired": "पता आवश्यक है",
+      "city": "शहर",
+      "district": "जिला",
+      "state": "राज्य",
+      "pincode": "पिनकोड",
+      "phone": "फ़ोन नंबर",
+      "phoneRequired": "फ़ोन नंबर आवश्यक है",
+      "email": "ईमेल",
+      "emailRequired": "ईमेल आवश्यक है",
+      "openingTime": "खुलने का समय",
+      "closingTime": "बंद होने का समय",
+      "latitude": "अक्षांश",
+      "longitude": "देशांतर",
+      "status": "स्थिति",
+      "save": "परिवर्तन सहेजें",
+      "add": "शाखा जोड़ें"
+    },
+    "actions": { "add": "शाखा जोड़ें", "retry": "पुनः प्रयास", "detectLocation": "मेरी स्थान पता करें" },
+    "toast": {
+      "added": "शाखा \"{{name}}\" जोड़ी गई।",
+      "updated": "शाखा \"{{name}}\" अपडेट हुई।",
+      "deactivated": "शाखा निष्क्रिय की गई।",
+      "addFailed": "शाखा जोड़ना विफल। कृपया पुनः प्रयास करें।",
+      "updateFailed": "शाखा अपडेट करना विफल। कृपया पुनः प्रयास करें।"
+    },
+    "statusLabels": { "active": "सक्रिय", "inactive": "निष्क्रिय", "suspended": "निलंबित" }
+  },
+  "pricing": {
+    "heading": "मूल्य निर्धारण",
+    "description": "गुणवत्ता ग्रेड (OEM / OEE / AM) के अनुसार कांच के प्रकार के लिए आधार मूल्य निर्धारित करें।",
+    "columns": {
+      "glassType": "कांच का प्रकार",
+      "oem": "OEM",
+      "oee": "OEE",
+      "am": "AM",
+      "labour": "श्रम",
+      "sealant": "सीलेंट"
+    },
+    "actions": { "edit": "मूल्य संपादित करें", "save": "मूल्य सहेजें", "cancel": "रद्द करें", "saving": "सहेज रहे हैं…" },
+    "toast": { "saved": "मूल्य सफलतापूर्वक सहेजे गए।", "saveFailed": "मूल्य सहेजना विफल हुआ।" }
+  },
+  "bulkUpload": {
+    "title": "बल्क अपलोड {{entity}}",
+    "templateHint": "सफल आयात सुनिश्चित करने के लिए सही कॉलम हेडर का उपयोग करें।",
+    "downloadTemplate": "टेम्पलेट डाउनलोड करें",
+    "parsing": "फ़ाइल पार्स हो रही है…",
+    "detectedColumns": "पता चले कॉलम ({{count}})",
+    "columnValidation": "कॉलम सत्यापन",
+    "accepted": "स्वीकृत:",
+    "fixColumnsError": "आयात से पहले अपनी फ़ाइल में लापता कॉलम ठीक करें।",
+    "preview_one": "पूर्वावलोकन — {{total}} में से पहली {{count}} पंक्ति",
+    "preview_other": "पूर्वावलोकन — {{total}} में से पहली {{count}} पंक्तियां",
+    "import": "{{entity}} आयात करें",
+    "importDisabledTitle": "API एकीकरण जल्द आ रहा है",
+    "fileHint": "CSV या XLSX · अधिकतम 5 MB"
   }
 }

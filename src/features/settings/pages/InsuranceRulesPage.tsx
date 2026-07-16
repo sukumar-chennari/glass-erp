@@ -1,4 +1,5 @@
 import { useState, useMemo, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Plus, Pencil, Trash2, Shield, AlertCircle } from 'lucide-react';
 import { PageShell, SectionCard } from '@/components/layout/PageShell';
 import { DataTable }   from '@/components/ui/DataTable';
@@ -21,17 +22,6 @@ import { formatINR } from '@/services/mockUtils';
 import { AlertBanner }  from '@/components/ui/AlertBanner';
 import { TableSkeleton } from '@/components/ui/Skeleton';
 import styles from './InsuranceRulesPage.module.css';
-
-// ── Dropdown options ────────────────────────────────────────────────
-const BOARD_OPTIONS: SelectOption[] = [
-  { value: 'Yellow', label: 'Yellow Board' },
-  { value: 'White',  label: 'White Board'  },
-];
-
-const CC_OPTIONS: SelectOption[] = [
-  { value: 'Above 1500cc', label: 'Above 1500cc' },
-  { value: 'Below 1500cc', label: 'Below 1500cc' },
-];
 
 // ── Form state ──────────────────────────────────────────────────────
 interface RuleForm {
@@ -67,11 +57,23 @@ function ruleToForm(r: InsuranceRule): RuleForm {
 
 // ── Component ───────────────────────────────────────────────────────
 export function InsuranceRulesPage() {
+  const { t } = useTranslation(['settings', 'common']);
   const toast = useToast();
   const { data: rules = [], isLoading, isError, refetch } = useGetInsuranceRulesQuery();
   const [createRule,  { isLoading: creating }]  = useCreateInsuranceRuleMutation();
   const [updateRule,  { isLoading: updating }]  = useUpdateInsuranceRuleMutation();
   const [deleteRule,  { isLoading: deleting }]  = useDeleteInsuranceRuleMutation();
+
+  // ── Dropdown options ─────────────────────────────────────────────
+  const BOARD_OPTIONS = useMemo<SelectOption[]>(() => [
+    { value: 'Yellow', label: t('insuranceRules.boardOptions.yellow') },
+    { value: 'White',  label: t('insuranceRules.boardOptions.white')  },
+  ], [t]);
+
+  const CC_OPTIONS = useMemo<SelectOption[]>(() => [
+    { value: 'Above 1500cc', label: t('insuranceRules.ccOptions.above') },
+    { value: 'Below 1500cc', label: t('insuranceRules.ccOptions.below') },
+  ], [t]);
 
   // ── Drawer state ──────────────────────────────────────────────────
   const [drawerOpen,  setDrawerOpen]  = useState(false);
@@ -112,11 +114,11 @@ export function InsuranceRulesPage() {
     const errs: FormErrors = {};
     const charges = Number(form.extraCharges);
     if (!form.extraCharges.trim() || isNaN(charges) || charges < 0) {
-      errs.extraCharges = 'Enter a valid amount (0 or more)';
+      errs.extraCharges = t('insuranceRules.drawer.extraChargesInvalid');
     }
     const dep = Number(form.depreciation);
     if (!form.depreciation.trim() || isNaN(dep) || dep < 0 || dep > 100) {
-      errs.depreciation = 'Enter a percentage between 0 and 100';
+      errs.depreciation = t('insuranceRules.drawer.depreciationInvalid');
     }
     setFormErrors(errs);
     return Object.keys(errs).length === 0;
@@ -134,33 +136,33 @@ export function InsuranceRulesPage() {
     try {
       if (drawerMode === 'add') {
         await createRule(payload).unwrap();
-        toast.success('Insurance rule added.');
+        toast.success(t('insuranceRules.toast.added'));
       } else if (editingId) {
         await updateRule({ id: editingId, ...payload }).unwrap();
-        toast.success('Insurance rule updated.');
+        toast.success(t('insuranceRules.toast.updated'));
       }
       closeDrawer();
     } catch {
-      setApiError('Failed to save rule. Please try again.');
+      setApiError(drawerMode === 'add' ? t('insuranceRules.toast.addFailed') : t('insuranceRules.toast.updateFailed'));
     }
-  }, [form, drawerMode, editingId, createRule, updateRule, toast, closeDrawer]);
+  }, [form, drawerMode, editingId, createRule, updateRule, toast, closeDrawer, t]);
 
   const handleDeleteConfirm = useCallback(async () => {
     if (!deleteTarget) return;
     try {
       await deleteRule(deleteTarget.id).unwrap();
-      toast.success(`Rule for ${deleteTarget.boardType} / ${deleteTarget.ccCondition} deleted.`);
+      toast.success(t('insuranceRules.toast.deleted'));
       setDeleteTarget(null);
     } catch {
-      toast.error('Failed to delete rule. Please try again.');
+      toast.error(t('insuranceRules.toast.deleteFailed'));
     }
-  }, [deleteTarget, deleteRule, toast]);
+  }, [deleteTarget, deleteRule, toast, t]);
 
   // ── Table columns ─────────────────────────────────────────────────
   const columns = useMemo<TableColumn<InsuranceRule>[]>(() => [
     {
       key:    'boardType',
-      header: 'Board Type',
+      header: t('insuranceRules.columns.boardType'),
       render: (r) => (
         <Badge
           label={`${r.boardType} Board`}
@@ -171,24 +173,24 @@ export function InsuranceRulesPage() {
     },
     {
       key:    'ccCondition',
-      header: 'CC Condition',
+      header: t('insuranceRules.columns.ccCondition'),
       render: (r) => <span className={styles.mono}>{r.ccCondition}</span>,
     },
     {
       key:    'extraCharges',
-      header: 'Extra Charges',
+      header: t('insuranceRules.columns.extraCharges'),
       align:  'right',
       render: (r) => <span className={styles.num}>{formatINR(r.extraCharges)}</span>,
     },
     {
       key:    'depreciation',
-      header: 'Depreciation',
+      header: t('insuranceRules.columns.depreciation'),
       align:  'right',
       render: (r) => <span className={styles.num}>{r.depreciation}%</span>,
     },
     {
       key:    'isActive',
-      header: 'Active',
+      header: t('insuranceRules.columns.status'),
       render: (r) => (
         <Badge
           label={r.isActive ? 'Active' : 'Inactive'}
@@ -222,35 +224,31 @@ export function InsuranceRulesPage() {
         </div>
       ),
     },
-  ], [openEdit]);
+  ], [openEdit, t]);
 
   const isSaving = creating || updating;
 
   return (
     <>
       <PageShell
-        heading="Insurance Rules"
-        description="Configure extra charges and depreciation rates by board type and engine size."
-        actions={<Button leftIcon={<Plus size={15} />} onClick={openAdd}>Add Rule</Button>}
+        heading={t('insuranceRules.heading')}
+        description={t('insuranceRules.description')}
+        actions={<Button leftIcon={<Plus size={15} />} onClick={openAdd}>{t('insuranceRules.actions.add')}</Button>}
       >
       <SectionCard>
         {isLoading && <TableSkeleton rows={4} cols={5} />}
         {isError && (
           <div className={styles.emptyState}>
             <AlertCircle className={styles.emptyIcon} size={36} strokeWidth={1.4} />
-            <p className={styles.emptyTitle}>Failed to load rules</p>
-            <p className={styles.emptyDesc}>Could not fetch insurance rules. Please try again.</p>
-            <Button variant="secondary" size="sm" onClick={() => refetch()}>Retry</Button>
+            <p className={styles.emptyTitle}>{t('insuranceRules.loadError')}</p>
+            <Button variant="secondary" size="sm" onClick={() => refetch()}>{t('insuranceRules.actions.retry')}</Button>
           </div>
         )}
         {!isLoading && !isError && rules.length === 0 && (
           <div className={styles.emptyState}>
             <Shield className={styles.emptyIcon} size={40} strokeWidth={1.2} />
-            <p className={styles.emptyTitle}>No insurance rules yet</p>
-            <p className={styles.emptyDesc}>
-              Add rules to define extra charges and depreciation per board type and CC range.
-            </p>
-            <Button leftIcon={<Plus size={15} />} onClick={openAdd}>Add First Rule</Button>
+            <p className={styles.emptyTitle}>{t('insuranceRules.emptyNoData')}</p>
+            <Button leftIcon={<Plus size={15} />} onClick={openAdd}>{t('insuranceRules.actions.add')}</Button>
           </div>
         )}
         {!isLoading && !isError && rules.length > 0 && (
@@ -263,11 +261,13 @@ export function InsuranceRulesPage() {
       <Drawer
         isOpen={drawerOpen}
         onClose={closeDrawer}
-        title={drawerMode === 'add' ? 'Add Insurance Rule' : 'Edit Insurance Rule'}
+        title={drawerMode === 'add' ? t('insuranceRules.drawer.addTitle') : t('insuranceRules.drawer.editTitle')}
         footer={
           <>
-            <Button variant="ghost" onClick={closeDrawer}>Cancel</Button>
-            <Button onClick={handleSave} loading={isSaving}>Save Rule</Button>
+            <Button variant="ghost" onClick={closeDrawer}>{t('common:actions.cancel')}</Button>
+            <Button onClick={handleSave} loading={isSaving}>
+              {drawerMode === 'add' ? t('insuranceRules.drawer.add') : t('insuranceRules.drawer.save')}
+            </Button>
           </>
         }
       >
@@ -275,30 +275,30 @@ export function InsuranceRulesPage() {
           <AlertBanner message={apiError} onDismiss={() => setApiError('')} />
         )}
         <Select
-          label="Board Type"
+          label={t('insuranceRules.drawer.boardType')}
           options={BOARD_OPTIONS}
           value={form.boardType}
           onChange={(e) => setField('boardType', e.target.value as BoardType)}
         />
         <Select
-          label="CC Condition"
+          label={t('insuranceRules.drawer.ccCondition')}
           options={CC_OPTIONS}
           value={form.ccCondition}
           onChange={(e) => setField('ccCondition', e.target.value as CCCondition)}
         />
         <Input
-          label="Extra Charges (₹)"
+          label={t('insuranceRules.drawer.extraCharges')}
           type="number"
           min={0}
           value={form.extraCharges}
           onChange={(e) => setField('extraCharges', e.target.value)}
           error={formErrors.extraCharges}
           placeholder="e.g. 1500"
-          hint="Flat amount added on top of base claim"
+          hint={t('insuranceRules.drawer.extraChargesHint')}
           fullWidth
         />
         <Input
-          label="Depreciation (%)"
+          label={t('insuranceRules.drawer.depreciation')}
           type="number"
           min={0}
           max={100}
@@ -306,14 +306,14 @@ export function InsuranceRulesPage() {
           onChange={(e) => setField('depreciation', e.target.value)}
           error={formErrors.depreciation}
           placeholder="e.g. 15"
-          hint="Applied to the depreciated value of the glass"
+          hint={t('insuranceRules.drawer.depreciationHint')}
           fullWidth
         />
 
         {/* Active toggle */}
         <div className={styles.toggleRow}>
           <div className={styles.toggleLabel}>
-            <span className={styles.toggleTitle}>Active</span>
+            <span className={styles.toggleTitle}>{t('insuranceRules.drawer.activeStatus')}</span>
             <span className={styles.toggleHint}>Rule will be applied to matching claims</span>
           </div>
           <label className={styles.toggle} htmlFor="ir-isActive">
@@ -332,23 +332,20 @@ export function InsuranceRulesPage() {
       <Modal
         isOpen={!!deleteTarget}
         onClose={() => setDeleteTarget(null)}
-        title="Delete Insurance Rule?"
+        title={t('insuranceRules.deleteModal.title')}
         maxWidth="420px"
         footer={
           <div className={styles.deleteFooter}>
-            <Button variant="ghost" onClick={() => setDeleteTarget(null)}>Cancel</Button>
+            <Button variant="ghost" onClick={() => setDeleteTarget(null)}>{t('common:actions.cancel')}</Button>
             <Button variant="danger" onClick={handleDeleteConfirm} loading={deleting}>
-              Delete Rule
+              {t('common:actions.delete')}
             </Button>
           </div>
         }
       >
         {deleteTarget && (
           <p className={styles.deleteMsg}>
-            Are you sure you want to delete the rule for{' '}
-            <strong>{deleteTarget.boardType} Board</strong> /{' '}
-            <strong>{deleteTarget.ccCondition}</strong>?
-            This action cannot be undone.
+            {t('insuranceRules.deleteModal.message')}
           </p>
         )}
       </Modal>

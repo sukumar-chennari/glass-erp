@@ -89,5 +89,11 @@
     "rearRightWindow":      "पीछे दाईं विंडो",
     "sunroofGlass":         "सनरूफ ग्लास",
     "quarterGlass":         "क्वार्टर ग्लास"
+  },
+  "fileUpload": {
+    "clickToBrowse": "ब्राउज़ करने के लिए क्लिक करें",
+    "dragAndDrop": "या खींचें और छोड़ें",
+    "removeFile": "फ़ाइल हटाएं",
+    "ariaLabel": "फ़ाइल अपलोड करें — क्लिक करें या खींचें और छोड़ें"
   }
 }

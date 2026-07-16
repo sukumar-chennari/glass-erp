@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
 import { Upload, X, FileText } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import styles from './FileUpload.module.css';
 
 interface FileUploadProps {
@@ -22,9 +23,10 @@ export function FileUpload({
   file,
   onClear,
   accept = '.csv,.xlsx',
-  hint   = 'CSV or XLSX · max 5 MB',
+  hint,
   error,
 }: FileUploadProps) {
+  const { t } = useTranslation('common');
   const inputRef           = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
 
@@ -53,7 +55,7 @@ export function FileUpload({
           type="button"
           className={styles.clearBtn}
           onClick={onClear}
-          aria-label="Remove file"
+          aria-label={t('fileUpload.removeFile')}
         >
           <X size={14} />
         </button>
@@ -72,13 +74,13 @@ export function FileUpload({
         role="button"
         tabIndex={0}
         onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') inputRef.current?.click(); }}
-        aria-label="Upload file — click or drag and drop"
+        aria-label={t('fileUpload.ariaLabel')}
       >
         <Upload size={22} className={styles.dropIcon} />
         <span className={styles.dropText}>
-          <strong>Click to browse</strong> or drag and drop
+          <strong>{t('fileUpload.clickToBrowse')}</strong> {t('fileUpload.dragAndDrop')}
         </span>
-        <span className={styles.dropHint}>{hint}</span>
+        <span className={styles.dropHint}>{hint ?? t('fileUpload.ariaLabel')}</span>
       </div>
       {error && <p className={styles.errorMsg}>{error}</p>}
       <input

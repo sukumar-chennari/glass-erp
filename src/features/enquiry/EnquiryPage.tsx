@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { Plus, PhoneCall, CheckCircle, ClipboardList, Inbox, Image, Eye } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { PageShell, SectionCard } from '@/components/layout/PageShell';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -39,52 +40,6 @@ interface Enquiry {
 }
 
 // CustomerSubmission imported from ./types
-
-// ── Constants ──────────────────────────────────────────────────────────
-const GLASS_OPTIONS: SelectOption[] = [
-  { value: 'Front Windshield',      label: 'Front Windshield'      },
-  { value: 'Rear Windshield',       label: 'Rear Windshield'       },
-  { value: 'Driver Side Window',    label: 'Driver Side Window'    },
-  { value: 'Passenger Side Window', label: 'Passenger Side Window' },
-  { value: 'Rear Left Window',      label: 'Rear Left Window'      },
-  { value: 'Rear Right Window',     label: 'Rear Right Window'     },
-  { value: 'Sunroof Glass',         label: 'Sunroof Glass'         },
-  { value: 'Quarter Glass',         label: 'Quarter Glass'         },
-];
-
-const SOURCE_OPTIONS: SelectOption[] = [
-  { value: 'phone',    label: 'Phone Call' },
-  { value: 'walk_in',  label: 'Walk-in'    },
-  { value: 'whatsapp', label: 'WhatsApp'   },
-];
-
-const CLOSE_REASON_OPTIONS: SelectOption[] = [
-  { value: 'declined_price',  label: 'Customer declined price'       },
-  { value: 'found_vendor',    label: 'Found another vendor'          },
-  { value: 'wrong_number',    label: 'Wrong number'                  },
-  { value: 'test_spam',       label: 'Test / spam enquiry'           },
-  { value: 'other_channel',   label: 'Converted via other channel'  },
-  { value: 'other',           label: 'Other'                         },
-];
-
-const CLOSE_REASON_LABEL: Record<string, string> = Object.fromEntries(
-  CLOSE_REASON_OPTIONS.map((r) => [r.value, r.label]),
-);
-
-const STATUS_DISPLAY: Record<EnquiryStatus, { label: string; variant: 'info' | 'warning' | 'success' | 'neutral' }> = {
-  pending:         { label: 'Pending',         variant: 'info'    },
-  price_confirmed: { label: 'Price Confirmed', variant: 'warning' },
-  converted:       { label: 'Converted',       variant: 'success' },
-  closed:          { label: 'Closed',          variant: 'neutral' },
-};
-
-const FILTER_TABS: { id: StatusFilter; label: string }[] = [
-  { id: 'all',             label: 'All'             },
-  { id: 'pending',         label: 'Pending'         },
-  { id: 'price_confirmed', label: 'Price Confirmed' },
-  { id: 'converted',       label: 'Converted'       },
-  { id: 'closed',          label: 'Closed'          },
-];
 
 // ── Mock data ──────────────────────────────────────────────────────────
 let nextEnqNum = 1058;
@@ -202,10 +157,28 @@ interface CreateModalProps {
 }
 
 function CreateEnquiryModal({ isOpen, onClose, prefill, onSave }: CreateModalProps) {
+  const { t } = useTranslation(['enquiry', 'common']);
   const [form, setForm] = useState<CreateFormState>({
     phone: '', customerName: '', vehicleNumber: '', vehicleModel: '',
     glassType: 'Front Windshield', source: 'phone',
   });
+
+  const GLASS_OPTIONS: SelectOption[] = [
+    { value: 'Front Windshield',      label: t('page.glassOptions.frontWindshield')      },
+    { value: 'Rear Windshield',       label: t('page.glassOptions.rearWindshield')       },
+    { value: 'Driver Side Window',    label: t('page.glassOptions.driverSideWindow')    },
+    { value: 'Passenger Side Window', label: t('page.glassOptions.passengerSideWindow') },
+    { value: 'Rear Left Window',      label: t('page.glassOptions.rearLeftWindow')      },
+    { value: 'Rear Right Window',     label: t('page.glassOptions.rearRightWindow')     },
+    { value: 'Sunroof Glass',         label: t('page.glassOptions.sunroofGlass')         },
+    { value: 'Quarter Glass',         label: t('page.glassOptions.quarterGlass')         },
+  ];
+
+  const SOURCE_OPTIONS: SelectOption[] = [
+    { value: 'phone',    label: t('page.source.phone')    },
+    { value: 'walk_in',  label: t('page.source.walk_in')  },
+    { value: 'whatsapp', label: t('page.source.whatsapp') },
+  ];
 
   // Apply prefill when modal opens with it
   useState(() => {
@@ -232,11 +205,11 @@ function CreateEnquiryModal({ isOpen, onClose, prefill, onSave }: CreateModalPro
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="New Enquiry"
+      title={t('page.createModal.title')}
       footer={
         <div className={styles.modalFooter}>
-          <Button variant="ghost" onClick={onClose}>Cancel</Button>
-          <Button onClick={handleSave} disabled={!canSave}>Create Enquiry</Button>
+          <Button variant="ghost" onClick={onClose}>{t('common:actions.cancel')}</Button>
+          <Button onClick={handleSave} disabled={!canSave}>{t('page.createModal.create')}</Button>
         </div>
       }
     >
@@ -244,17 +217,17 @@ function CreateEnquiryModal({ isOpen, onClose, prefill, onSave }: CreateModalPro
         <div className={styles.phoneRow}>
           <span className={styles.phonePrefix}>+91</span>
           <Input
-            label="Phone Number"
+            label={t('page.createModal.phoneNumber')}
             type="tel"
             value={form.phone}
             onChange={(e) => f('phone', e.target.value.replace(/\D/g, '').slice(0, 10))}
-            placeholder="10-digit number"
+            placeholder={t('page.createModal.phonePlaceholder')}
             fullWidth
             autoFocus
           />
         </div>
         <Input
-          label="Customer Name"
+          label={t('page.createModal.customerName')}
           value={form.customerName}
           onChange={(e) => f('customerName', e.target.value)}
           fullWidth
@@ -262,21 +235,21 @@ function CreateEnquiryModal({ isOpen, onClose, prefill, onSave }: CreateModalPro
         />
         <div className={styles.twoCol}>
           <Input
-            label="Vehicle Number"
+            label={t('page.createModal.vehicleNumber')}
             value={form.vehicleNumber}
             onChange={(e) => f('vehicleNumber', e.target.value.toUpperCase())}
             placeholder="DL 01 AB 1234"
           />
           <Input
-            label="Vehicle Model"
+            label={t('page.createModal.vehicleModel')}
             value={form.vehicleModel}
             onChange={(e) => f('vehicleModel', e.target.value)}
             placeholder="Honda City 2020"
           />
         </div>
         <div className={styles.twoCol}>
-          <Select label="Glass Type" options={GLASS_OPTIONS} value={form.glassType} onChange={(e) => f('glassType', e.target.value)} />
-          <Select label="Source" options={SOURCE_OPTIONS} value={form.source} onChange={(e) => f('source', e.target.value as EnquirySource)} />
+          <Select label={t('page.createModal.glassType')} options={GLASS_OPTIONS} value={form.glassType} onChange={(e) => f('glassType', e.target.value)} />
+          <Select label={t('page.createModal.source')} options={SOURCE_OPTIONS} value={form.source} onChange={(e) => f('source', e.target.value as EnquirySource)} />
         </div>
       </div>
     </Modal>
@@ -292,6 +265,7 @@ interface ConfirmPriceModalProps {
 }
 
 function ConfirmPriceModal({ isOpen, onClose, enquiry, onSave }: ConfirmPriceModalProps) {
+  const { t } = useTranslation(['enquiry', 'common']);
   const [selectedPrice, setSelectedPrice] = useState<number | null>(null);
   const [selectedBrand, setSelectedBrand] = useState('');
 
@@ -312,15 +286,15 @@ function ConfirmPriceModal({ isOpen, onClose, enquiry, onSave }: ConfirmPriceMod
     <Modal
       isOpen={isOpen}
       onClose={handleClose}
-      title="Confirm Price"
+      title={t('page.confirmPriceModal.title')}
       maxWidth="640px"
       footer={
         <div className={styles.modalFooter}>
-          <Button variant="ghost" onClick={handleClose}>Cancel</Button>
+          <Button variant="ghost" onClick={handleClose}>{'Cancel'}</Button>
           <Button onClick={handleSave} disabled={!selectedPrice}>
             {selectedPrice
-              ? `Confirm ₹${selectedPrice.toLocaleString('en-IN')} (${selectedBrand})`
-              : 'Select a pricing tier above'}
+              ? t('page.confirmPriceModal.confirmWith', { price: selectedPrice.toLocaleString('en-IN'), brand: selectedBrand })
+              : t('page.confirmPriceModal.selectHint')}
           </Button>
         </div>
       }
@@ -354,8 +328,18 @@ interface CloseModalProps {
 }
 
 function CloseEnquiryModal({ isOpen, onClose, enquiry, onSave }: CloseModalProps) {
+  const { t } = useTranslation(['enquiry', 'common']);
   const [reason, setReason] = useState('declined_price');
   const [notes,  setNotes]  = useState('');
+
+  const CLOSE_REASON_OPTIONS: SelectOption[] = [
+    { value: 'declined_price',  label: t('page.closeReasons.declined_price')  },
+    { value: 'found_vendor',    label: t('page.closeReasons.found_vendor')    },
+    { value: 'wrong_number',    label: t('page.closeReasons.wrong_number')    },
+    { value: 'test_spam',       label: t('page.closeReasons.test_spam')       },
+    { value: 'other_channel',   label: t('page.closeReasons.other_channel')   },
+    { value: 'other',           label: t('page.closeReasons.other')           },
+  ];
 
   function handleSave() {
     onSave(reason, notes);
@@ -367,12 +351,12 @@ function CloseEnquiryModal({ isOpen, onClose, enquiry, onSave }: CloseModalProps
     <Modal
       isOpen={isOpen}
       onClose={() => { onClose(); setReason('declined_price'); setNotes(''); }}
-      title="Close Enquiry"
+      title={t('page.closeModal.title')}
       maxWidth="440px"
       footer={
         <div className={styles.modalFooter}>
-          <Button variant="ghost" onClick={onClose}>Cancel</Button>
-          <Button variant="danger" onClick={handleSave}>Close Enquiry</Button>
+          <Button variant="ghost" onClick={onClose}>{t('common:actions.cancel')}</Button>
+          <Button variant="danger" onClick={handleSave}>{t('page.closeModal.confirm')}</Button>
         </div>
       }
     >
@@ -384,16 +368,16 @@ function CloseEnquiryModal({ isOpen, onClose, enquiry, onSave }: CloseModalProps
           </div>
         )}
         <Select
-          label="Reason for closing"
+          label={t('page.closeModal.reasonLabel')}
           options={CLOSE_REASON_OPTIONS}
           value={reason}
           onChange={(e) => setReason(e.target.value)}
         />
         <Input
-          label="Notes (optional)"
+          label={t('page.closeModal.notesLabel')}
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
-          placeholder="Any additional context..."
+          placeholder={t('page.closeModal.notesPlaceholder')}
           fullWidth
         />
       </div>
@@ -403,6 +387,7 @@ function CloseEnquiryModal({ isOpen, onClose, enquiry, onSave }: CloseModalProps
 
 // ── Main Page ──────────────────────────────────────────────────────────
 export function EnquiryPage() {
+  const { t } = useTranslation(['enquiry', 'common']);
   const toast = useToast();
 
   const [viewTab,    setViewTab]   = useState<ViewTab>('enquiries');
@@ -414,6 +399,36 @@ export function EnquiryPage() {
   const [priceTgt,   setPriceTgt]  = useState<Enquiry | null>(null);
   const [closeTgt,   setCloseTgt]  = useState<Enquiry | null>(null);
   const [reviewSub,  setReviewSub] = useState<CustomerSubmission | null>(null);
+
+  // i18n-driven constants
+  const CLOSE_REASON_OPTIONS: SelectOption[] = useMemo(() => [
+    { value: 'declined_price',  label: t('page.closeReasons.declined_price')  },
+    { value: 'found_vendor',    label: t('page.closeReasons.found_vendor')    },
+    { value: 'wrong_number',    label: t('page.closeReasons.wrong_number')    },
+    { value: 'test_spam',       label: t('page.closeReasons.test_spam')       },
+    { value: 'other_channel',   label: t('page.closeReasons.other_channel')   },
+    { value: 'other',           label: t('page.closeReasons.other')           },
+  ], [t]);
+
+  const CLOSE_REASON_LABEL = useMemo(
+    () => Object.fromEntries(CLOSE_REASON_OPTIONS.map((r) => [r.value, r.label])),
+    [CLOSE_REASON_OPTIONS],
+  );
+
+  const STATUS_DISPLAY = useMemo(() => ({
+    pending:         { label: t('page.status.pending'),         variant: 'info'    as const },
+    price_confirmed: { label: t('page.status.priceConfirmed'),  variant: 'warning' as const },
+    converted:       { label: t('page.status.converted'),       variant: 'success' as const },
+    closed:          { label: t('page.status.closed'),          variant: 'neutral' as const },
+  }), [t]);
+
+  const FILTER_TABS: { id: StatusFilter; label: string }[] = useMemo(() => [
+    { id: 'all',             label: t('page.filters.all')           },
+    { id: 'pending',         label: t('page.filters.pending')       },
+    { id: 'price_confirmed', label: t('page.filters.priceConfirmed') },
+    { id: 'converted',       label: t('page.filters.converted')     },
+    { id: 'closed',          label: t('page.filters.closed')        },
+  ], [t]);
 
   const filtered = useMemo(
     () => filter === 'all' ? enquiries : enquiries.filter((e) => e.status === filter),
@@ -434,7 +449,7 @@ export function EnquiryPage() {
       jobRef:      null,
     };
     setEnquiries((prev) => [e, ...prev]);
-    toast.success(`Enquiry ${e.enquiryNo} created.`);
+    toast.success(t('page.toast.enquiryCreated', { enquiryNo: e.enquiryNo }));
     setCreate(false);
     setPrefill(null);
   }
@@ -448,7 +463,7 @@ export function EnquiryPage() {
           : e,
       ),
     );
-    toast.success(`₹${price.toLocaleString('en-IN')} (${brand}) confirmed for ${priceTgt.enquiryNo}.`);
+    toast.success(t('page.toast.priceConfirmed', { price: price.toLocaleString('en-IN'), brand, enquiryNo: priceTgt.enquiryNo }));
     setPriceTgt(null);
   }
 
@@ -461,7 +476,7 @@ export function EnquiryPage() {
           : e,
       ),
     );
-    toast.success(`${closeTgt.enquiryNo} closed.`);
+    toast.success(t('page.toast.enquiryClosed', { enquiryNo: closeTgt.enquiryNo }));
     setCloseTgt(null);
   }
 
@@ -471,7 +486,7 @@ export function EnquiryPage() {
     setEnquiries((prev) =>
       prev.map((e) => e.id === enquiry.id ? { ...e, status: 'converted', jobRef: mockRef } : e),
     );
-    toast.success(`${enquiry.enquiryNo} converted to job ${mockRef}.`);
+    toast.success(t('page.toast.converted', { enquiryNo: enquiry.enquiryNo, jobRef: mockRef }));
   }
 
   function handleCreateFromSubmission(sub: CustomerSubmission) {
@@ -487,17 +502,17 @@ export function EnquiryPage() {
 
   function handleDismissSubmission(id: string) {
     setSubs((prev) => prev.filter((s) => s.id !== id));
-    toast.success('Submission dismissed.');
+    toast.success(t('page.toast.submissionDismissed'));
   }
 
   const pendingCount   = enquiries.filter((e) => e.status === 'pending').length;
   const confirmedCount = enquiries.filter((e) => e.status === 'price_confirmed').length;
 
   // ── Enquiry table columns ──────────────────────────────────────────
-  const columns: TableColumn<Enquiry>[] = [
+  const columns: TableColumn<Enquiry>[] = useMemo(() => [
     {
       key: 'enquiryNo',
-      header: 'Enquiry',
+      header: t('page.columns.enquiry'),
       width: '115px',
       render: (e) => (
         <div>
@@ -508,7 +523,7 @@ export function EnquiryPage() {
     },
     {
       key: 'customerName',
-      header: 'Customer',
+      header: t('page.columns.customer'),
       render: (e) => (
         <div>
           <div className={styles.cellBold}>{e.customerName}</div>
@@ -518,7 +533,7 @@ export function EnquiryPage() {
     },
     {
       key: 'vehicleModel',
-      header: 'Vehicle',
+      header: t('page.columns.vehicle'),
       render: (e) => (
         <div>
           <div className={styles.cellBold}>{e.vehicleModel}</div>
@@ -526,10 +541,10 @@ export function EnquiryPage() {
         </div>
       ),
     },
-    { key: 'glassType', header: 'Glass Type' },
+    { key: 'glassType', header: t('page.columns.glassType') },
     {
       key: 'quotedPrice',
-      header: 'Price',
+      header: t('page.columns.price'),
       align: 'right' as const,
       render: (e) => (
         <div className={styles.priceGroup}>
@@ -544,7 +559,7 @@ export function EnquiryPage() {
     },
     {
       key: 'status',
-      header: 'Status',
+      header: t('page.columns.status'),
       render: (e) => {
         const d = STATUS_DISPLAY[e.status];
         return <Badge label={d.label} variant={d.variant} size="sm" />;
@@ -552,19 +567,19 @@ export function EnquiryPage() {
     },
     {
       key: 'id',
-      header: 'Actions',
+      header: t('page.columns.actions'),
       render: (e) => (
         <div className={styles.actionCell}>
           {e.status === 'pending' && (
             <>
-              <Button size="sm" onClick={() => setPriceTgt(e)}>Confirm Price</Button>
-              <Button size="sm" variant="ghost" onClick={() => setCloseTgt(e)}>Close</Button>
+              <Button size="sm" onClick={() => setPriceTgt(e)}>{t('page.actions.confirmPrice')}</Button>
+              <Button size="sm" variant="ghost" onClick={() => setCloseTgt(e)}>{t('page.actions.close')}</Button>
             </>
           )}
           {e.status === 'price_confirmed' && (
             <>
-              <Button size="sm" variant="primary" onClick={() => handleConvert(e)}>Convert to Job</Button>
-              <Button size="sm" variant="ghost" onClick={() => setCloseTgt(e)}>Close</Button>
+              <Button size="sm" variant="primary" onClick={() => handleConvert(e)}>{t('page.actions.convertToJob')}</Button>
+              <Button size="sm" variant="ghost" onClick={() => setCloseTgt(e)}>{t('page.actions.close')}</Button>
             </>
           )}
           {e.status === 'converted' && (
@@ -581,19 +596,20 @@ export function EnquiryPage() {
         </div>
       ),
     },
-  ];
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  ], [t, STATUS_DISPLAY, CLOSE_REASON_LABEL]);
 
   // ── Submission table columns ───────────────────────────────────────
-  const subColumns: TableColumn<CustomerSubmission>[] = [
+  const subColumns: TableColumn<CustomerSubmission>[] = useMemo(() => [
     {
       key: 'submittedAt',
-      header: 'Received',
+      header: t('page.columns.received'),
       width: '100px',
       render: (s) => <div className={styles.timeAgo}>{fmtDate(s.submittedAt)}</div>,
     },
     {
       key: 'name',
-      header: 'Customer',
+      header: t('page.columns.customer'),
       render: (s) => (
         <div>
           <div className={styles.cellBold}>{s.name}</div>
@@ -603,7 +619,7 @@ export function EnquiryPage() {
     },
     {
       key: 'vehicleModel',
-      header: 'Vehicle',
+      header: t('page.columns.vehicle'),
       render: (s) => (
         <div>
           <div className={styles.cellBold}>{s.vehicleMake} {s.vehicleModel} {s.vehicleYear}</div>
@@ -611,43 +627,44 @@ export function EnquiryPage() {
         </div>
       ),
     },
-    { key: 'glassType', header: 'Glass' },
+    { key: 'glassType', header: t('page.columns.glass') },
     {
       key: 'description',
-      header: 'Description',
+      header: t('page.columns.description'),
       render: (s) => (
         <div className={styles.subDesc}>
           <span>{s.description.slice(0, 70)}{s.description.length > 70 ? '…' : ''}</span>
           {s.photoCount > 0 && (
-            <span className={styles.photoChip}><Image size={11} /> {s.photoCount} photos</span>
+            <span className={styles.photoChip}><Image size={11} /> {s.photoCount} {t('page.columns.photos')}</span>
           )}
         </div>
       ),
     },
     {
       key: 'id',
-      header: 'Actions',
+      header: t('page.columns.actions'),
       render: (s) => (
         <div className={styles.actionCell}>
           <Button size="sm" variant="secondary" leftIcon={<Eye size={13} />} onClick={() => setReviewSub(s)}>
-            Review
+            {t('page.actions.review')}
           </Button>
           <Button size="sm" onClick={() => handleCreateFromSubmission(s)}>
-            Create Enquiry
+            {t('page.actions.createEnquiry')}
           </Button>
         </div>
       ),
     },
-  ];
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  ], [t]);
 
   return (
     <PageShell
-      heading="Enquiries"
-      description="Manage customer enquiries — confirm prices, convert to jobs and close lost leads."
+      heading={t('page.heading')}
+      description={t('page.description')}
       actions={
         viewTab === 'enquiries' ? (
           <Button leftIcon={<Plus size={16} />} onClick={() => setCreate(true)}>
-            New Enquiry
+            {t('page.actions.newEnquiry')}
           </Button>
         ) : undefined
       }
@@ -658,14 +675,14 @@ export function EnquiryPage() {
           className={`${styles.viewTab} ${viewTab === 'enquiries' ? styles.viewTabActive : ''}`}
           onClick={() => setViewTab('enquiries')}
         >
-          Enquiries
+          {t('page.tabs.enquiries')}
         </button>
         <button
           className={`${styles.viewTab} ${viewTab === 'submissions' ? styles.viewTabActive : ''}`}
           onClick={() => setViewTab('submissions')}
         >
           <Inbox size={14} />
-          Customer Submissions
+          {t('page.tabs.submissions')}
           {submissions.length > 0 && (
             <span className={styles.viewTabBadge}>{submissions.length}</span>
           )}
@@ -678,11 +695,11 @@ export function EnquiryPage() {
           <div className={styles.summaryRow}>
             <div className={styles.summaryChip}>
               <PhoneCall size={13} />
-              {pendingCount} pending
+              {t('page.summary.pending', { count: pendingCount })}
             </div>
             <div className={`${styles.summaryChip} ${styles.confirmedChip}`}>
               <CheckCircle size={13} />
-              {confirmedCount} price confirmed
+              {t('page.summary.confirmed', { count: confirmedCount })}
             </div>
           </div>
 
@@ -709,7 +726,7 @@ export function EnquiryPage() {
             <DataTable
               columns={columns}
               data={filtered}
-              emptyMessage="No enquiries match the selected filter."
+              emptyMessage={t('page.emptyFilter')}
             />
           </SectionCard>
         </>
@@ -718,13 +735,13 @@ export function EnquiryPage() {
           {submissions.length === 0 ? (
             <div className={styles.subEmpty}>
               <Inbox size={36} />
-              <p>No pending customer submissions.</p>
+              <p>{t('page.noSubmissions')}</p>
             </div>
           ) : (
             <DataTable
               columns={subColumns}
               data={submissions}
-              emptyMessage="No submissions."
+              emptyMessage={t('page.noSubmissions')}
             />
           )}
         </SectionCard>
