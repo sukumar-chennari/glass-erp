@@ -6,8 +6,9 @@ import { StatusBadge } from '@/components/ui/Badge';
 import { Button }      from '@/components/ui/Button';
 import { Input }       from '@/components/ui/Input';
 import { Select }      from '@/components/ui/Select';
-import { Modal }       from '@/components/ui/Modal';
-import { useToast }    from '@/components/ui/Toast';
+import { Modal }            from '@/components/ui/Modal';
+import { useToast }          from '@/components/ui/Toast';
+import { BulkUploadModal }   from './components/BulkUploadModal';
 import { TableSkeleton } from '@/components/ui/Skeleton';
 import {
   useGetCarBrandsQuery,
@@ -120,6 +121,7 @@ export function CarBrandsPage() {
   const [deleteBrand, { isLoading: deleting }] = useDeleteCarBrandMutation();
 
   // ── Modal state ──────────────────────────────────────────────────────
+  const [bulkOpen,     setBulkOpen]     = useState(false);
   const [modalOpen,    setModalOpen]    = useState(false);
   const [editTarget,   setEditTarget]   = useState<CarBrand | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<CarBrand | null>(null);
@@ -308,9 +310,14 @@ export function CarBrandsPage() {
       heading="Car Brands"
       description="Manage vehicle brands available across job cards and insurance workflows."
       actions={
-        <Button leftIcon={<Plus size={15} />} onClick={openAdd}>
-          Add Brand
-        </Button>
+        <>
+          <Button variant="secondary" leftIcon={<Upload size={15} />} onClick={() => setBulkOpen(true)}>
+            Bulk Upload
+          </Button>
+          <Button leftIcon={<Plus size={15} />} onClick={openAdd}>
+            Add Brand
+          </Button>
+        </>
       }
     >
 
@@ -363,6 +370,13 @@ export function CarBrandsPage() {
           <DataTable columns={columns} data={filtered} />
         )}
       </SectionCard>
+
+      {/* ── Bulk Upload Modal ────────────────────────────────────────── */}
+      <BulkUploadModal
+        isOpen={bulkOpen}
+        onClose={() => setBulkOpen(false)}
+        entityType="brands"
+      />
 
       {/* ── Add / Edit Modal ─────────────────────────────────────────── */}
       <Modal
