@@ -19,13 +19,15 @@ interface Confirmation {
   vehicleBrand: string;
   vehicleModel: string;
   phone:        string;
+  customerName: string;
 }
 
 interface FormErrors {
+  customerName?: string;
+  phone?:        string;
   branchId?:     string;
   vehicleBrand?: string;
   vehicleModel?: string;
-  phone?:        string;
 }
 
 // ── Top bar ──────────────────────────────────────────────────
@@ -111,16 +113,20 @@ function ConfirmationView({ confirmation, onReset }: ConfirmationViewProps) {
               <strong>{confirmation.jobNumber}</strong>
             </div>
             <div className={styles.confirmRow}>
+              <span>Name</span>
+              <strong>{confirmation.customerName}</strong>
+            </div>
+            <div className={styles.confirmRow}>
+              <span>Mobile</span>
+              <strong>+91 {confirmation.phone}</strong>
+            </div>
+            <div className={styles.confirmRow}>
               <span>Branch</span>
               <strong>{confirmation.branchName}</strong>
             </div>
             <div className={styles.confirmRow}>
               <span>Vehicle</span>
               <strong>{confirmation.vehicleBrand} {confirmation.vehicleModel}</strong>
-            </div>
-            <div className={styles.confirmRow}>
-              <span>Mobile</span>
-              <strong>+91 {confirmation.phone}</strong>
             </div>
           </div>
           <div className={styles.confirmActions}>
@@ -170,11 +176,12 @@ export function EntryPage() {
   const [createEnquiry, { isLoading: submitting }] = useCreateEnquiryMutation();
 
   // Main booking form state
+  const [customerName,   setCustomerName]   = useState('');
+  const [phone,          setPhone]          = useState('');
   const [branchId,       setBranchId]       = useState('');
   const [districtSearch, setDistrictSearch] = useState('');
   const [vehicleBrand,   setVehicleBrand]   = useState('');
   const [vehicleModel,   setVehicleModel]   = useState('');
-  const [phone,          setPhone]          = useState('');
   const [errors,         setErrors]         = useState<FormErrors>({});
   const [confirmation,   setConfirmation]   = useState<Confirmation | null>(null);
   const [locating,       setLocating]       = useState(false);
@@ -269,11 +276,12 @@ export function EntryPage() {
 
   function validate(): boolean {
     const errs: FormErrors = {};
-    if (!branchId)     errs.branchId     = 'Please select a branch';
-    if (!vehicleBrand) errs.vehicleBrand = 'Please select your car brand';
-    if (!vehicleModel) errs.vehicleModel = 'Please select your car model';
-    if (!phone)        errs.phone        = 'Mobile number is required';
+    if (!customerName.trim()) errs.customerName = 'Please enter your name';
+    if (!phone)               errs.phone        = 'Mobile number is required';
     else if (!/^\d{10}$/.test(phone)) errs.phone = 'Enter a valid 10-digit mobile number';
+    if (!branchId)            errs.branchId     = 'Please select a branch';
+    if (!vehicleBrand)        errs.vehicleBrand = 'Please select your car brand';
+    if (!vehicleModel)        errs.vehicleModel = 'Please select your car model';
     setErrors(errs);
     return Object.keys(errs).length === 0;
   }
@@ -284,7 +292,7 @@ export function EntryPage() {
     const result = await createEnquiry({ branchId, vehicleBrand, vehicleModel, customerPhone: phone });
     if ('data' in result && result.data) {
       const branchName = branches.find((b) => b.id === branchId)?.name ?? branchId;
-      setConfirmation({ jobNumber: result.data.jobNumber, branchName, vehicleBrand, vehicleModel, phone });
+      setConfirmation({ jobNumber: result.data.jobNumber, branchName, vehicleBrand, vehicleModel, phone, customerName });
     }
   }
 
@@ -333,7 +341,54 @@ export function EntryPage() {
           <form className={styles.form} onSubmit={(e) => void handleSubmit(e)} noValidate>
             <div className={styles.formHeader}>
               <h2 className={styles.formTitle}>Book a Service</h2>
-              <p className={styles.formSub}>Fill in 3 quick details to get started</p>
+              <p className={styles.formSub}>Fill in a few quick details to get started</p>
+            </div>
+
+            {/* Mobile */}
+            <div className={styles.fieldGroup}>
+              <label className={styles.label} htmlFor="entry-phone">
+                <Phone size={13} />
+                Mobile Number
+              </label>
+              <div className={styles.phoneRow}>
+                <span className={styles.dialCode}>+91</span>
+                <input
+                  id="entry-phone"
+                  type="tel"
+                  inputMode="numeric"
+                  className={`${styles.phoneInput} ${errors.phone ? styles.phoneInputError : ''}`}
+                  placeholder="10-digit mobile number"
+                  value={phone}
+                  maxLength={10}
+                  onChange={(e) => {
+                    setPhone(e.target.value.replace(/\D/g, '').slice(0, 10));
+                    clearError('phone');
+                  }}
+                  aria-invalid={!!errors.phone}
+                  aria-describedby={errors.phone ? 'err-phone' : undefined}
+                />
+              </div>
+              {errors.phone && (
+                <span id="err-phone" role="alert" className={styles.error}>{errors.phone}</span>
+              )}
+            </div>
+
+            {/* Name */}
+            <div className={styles.fieldGroup}>
+              <label className={styles.label} htmlFor="entry-name">Your Name</label>
+              <input
+                id="entry-name"
+                type="text"
+                className={`${styles.input} ${errors.customerName ? styles.inputError : ''}`}
+                placeholder="Full name"
+                value={customerName}
+                onChange={(e) => { setCustomerName(e.target.value); clearError('customerName'); }}
+                aria-invalid={!!errors.customerName}
+                aria-describedby={errors.customerName ? 'err-name' : undefined}
+              />
+              {errors.customerName && (
+                <span id="err-name" role="alert" className={styles.error}>{errors.customerName}</span>
+              )}
             </div>
 
             {/* Branch */}
@@ -447,35 +502,6 @@ export function EntryPage() {
               )}
             </div>
 
-            {/* Mobile */}
-            <div className={styles.fieldGroup}>
-              <label className={styles.label} htmlFor="entry-phone">
-                <Phone size={13} />
-                Mobile Number
-              </label>
-              <div className={styles.phoneRow}>
-                <span className={styles.dialCode}>+91</span>
-                <input
-                  id="entry-phone"
-                  type="tel"
-                  inputMode="numeric"
-                  className={`${styles.phoneInput} ${errors.phone ? styles.phoneInputError : ''}`}
-                  placeholder="10-digit mobile number"
-                  value={phone}
-                  maxLength={10}
-                  onChange={(e) => {
-                    setPhone(e.target.value.replace(/\D/g, '').slice(0, 10));
-                    clearError('phone');
-                  }}
-                  aria-invalid={!!errors.phone}
-                  aria-describedby={errors.phone ? 'err-phone' : undefined}
-                />
-              </div>
-              {errors.phone && (
-                <span id="err-phone" role="alert" className={styles.error}>{errors.phone}</span>
-              )}
-            </div>
-
             <button type="submit" className={styles.submitBtn} disabled={submitting}>
               {submitting ? 'Submitting…' : (
                 <>Request Service <ChevronRight size={16} /></>
@@ -534,21 +560,6 @@ export function EntryPage() {
               </div>
             ) : (
               <form className={styles.cbForm} onSubmit={handleCallbackSubmit} noValidate>
-                {/* Name */}
-                <div className={styles.fieldGroup}>
-                  <label className={styles.label} htmlFor="cb-name">Your Name</label>
-                  <input
-                    id="cb-name"
-                    type="text"
-                    className={`${styles.cbInput} ${cbErrors.name ? styles.cbInputError : ''}`}
-                    placeholder="Full name"
-                    value={cbName}
-                    onChange={(e) => { setCbName(e.target.value); setCbErrors((p) => ({ ...p, name: undefined })); }}
-                    aria-invalid={!!cbErrors.name}
-                  />
-                  {cbErrors.name && <span role="alert" className={styles.error}>{cbErrors.name}</span>}
-                </div>
-
                 {/* Phone */}
                 <div className={styles.fieldGroup}>
                   <label className={styles.label} htmlFor="cb-phone">
@@ -573,6 +584,21 @@ export function EntryPage() {
                     />
                   </div>
                   {cbErrors.phone && <span role="alert" className={styles.error}>{cbErrors.phone}</span>}
+                </div>
+
+                {/* Name */}
+                <div className={styles.fieldGroup}>
+                  <label className={styles.label} htmlFor="cb-name">Your Name</label>
+                  <input
+                    id="cb-name"
+                    type="text"
+                    className={`${styles.cbInput} ${cbErrors.name ? styles.cbInputError : ''}`}
+                    placeholder="Full name"
+                    value={cbName}
+                    onChange={(e) => { setCbName(e.target.value); setCbErrors((p) => ({ ...p, name: undefined })); }}
+                    aria-invalid={!!cbErrors.name}
+                  />
+                  {cbErrors.name && <span role="alert" className={styles.error}>{cbErrors.name}</span>}
                 </div>
 
                 {/* City */}

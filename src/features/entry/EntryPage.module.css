@@ -390,6 +390,37 @@
   border-color: var(--color-danger-text) !important;
 }
 
+/* ── Generic text input (e.g. Name field) ── */
+.input {
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--font-size-base);
+  background: var(--color-bg-input);
+  border: 1px solid var(--color-border-input);
+  border-radius: var(--radius-lg);
+  color: var(--color-text-primary);
+  outline: none;
+  transition: border-color var(--transition-fast);
+}
+
+.input:focus {
+  border-color: var(--color-primary);
+}
+
+.input:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+.input::placeholder {
+  color: var(--color-text-disabled);
+  font-size: var(--font-size-sm);
+}
+
+.inputError {
+  border-color: var(--color-danger-text) !important;
+}
+
 /* ── Error message ── */
 .error {
   font-size: var(--font-size-xs);

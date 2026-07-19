@@ -44,6 +44,7 @@ export function Sidebar() {
   }
 
   return (
+    <>
     <aside className={`${styles.sidebar} ${collapsed ? styles.collapsed : ''} ${mobileOpen ? styles.mobileOpen : ''}`}>
       {/* Brand */}
       <div className={styles.brand}>
@@ -151,16 +152,17 @@ export function Sidebar() {
           )}
         </div>
       </div>
-      <ConfirmDialog
-        isOpen={showConfirm}
-        title={t('sidebar.user.logoutConfirm.title')}
-        message={t('sidebar.user.logoutConfirm.message')}
-        confirmLabel={loggingOut ? t('sidebar.user.logoutConfirm.confirming') : t('sidebar.user.logoutConfirm.confirm')}
-        isLoading={loggingOut}
-        onConfirm={handleConfirmLogout}
-        onCancel={() => setShowConfirm(false)}
-      />
     </aside>
+    <ConfirmDialog
+      isOpen={showConfirm}
+      title={t('sidebar.user.logoutConfirm.title')}
+      message={t('sidebar.user.logoutConfirm.message')}
+      confirmLabel={loggingOut ? t('sidebar.user.logoutConfirm.confirming') : t('sidebar.user.logoutConfirm.confirm')}
+      isLoading={loggingOut}
+      onConfirm={handleConfirmLogout}
+      onCancel={() => setShowConfirm(false)}
+    />
+    </>
   );
 }
 
