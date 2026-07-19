@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Navigate, Link } from 'react-router-dom';
-import { MapPin, Phone, Car, ChevronRight, Locate, CheckCircle, Search } from 'lucide-react';
+import { MapPin, Phone, Car, ChevronRight, Locate, CheckCircle, Search, PhoneCall, X } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useLazyGetNearbyBranchesQuery } from './nearbyBranchesApi';
 import type { NearbyBranch } from './nearbyBranchesApi';
@@ -8,6 +8,7 @@ import { BRANDS, BRAND_MODEL_MAP } from '@/types/models/vehicleModel';
 import { useCreateEnquiryMutation } from './enquiryApi';
 import { getRoleDefaultRoute } from '@/utils/roleRouting';
 import { ROUTES } from '@/constants/routes';
+import { InsurancePartners } from './components/InsurancePartners';
 import styles from './EntryPage.module.css';
 
 // ── Types ────────────────────────────────────────────────────
@@ -45,9 +46,13 @@ function TopBar() {
 
 // ── Hero panel ───────────────────────────────────────────────
 
-function Hero() {
+interface HeroProps {
+  onEnquiryOpen: () => void;
+}
+
+function Hero({ onEnquiryOpen }: HeroProps) {
   return (
-    <div className={styles.hero} aria-hidden="true">
+    <div className={styles.hero}>
       <div className={styles.heroInner}>
         <div className={styles.heroLogoMark}>WX</div>
         <h1 className={styles.heroTitle}>
@@ -70,6 +75,10 @@ function Hero() {
             </li>
           ))}
         </ul>
+        <button type="button" className={styles.heroCta} onClick={onEnquiryOpen}>
+          <PhoneCall size={15} />
+          Request a Callback
+        </button>
       </div>
     </div>
   );
@@ -139,18 +148,28 @@ function branchLabel(b: NearbyBranch): string {
   return label;
 }
 
+// ── Enquiry types ─────────────────────────────────────────────
+
+const ENQUIRY_TYPES = [
+  'Windshield Replacement',
+  'Rear Glass Replacement',
+  'Side Glass Replacement',
+  'Glass Repair',
+  'Insurance Claim Assistance',
+  'General Enquiry',
+];
+
 // ── Main component ───────────────────────────────────────────
 
 export function EntryPage() {
   const { session, isLoading: authLoading } = useAuth();
 
-  // Public lazy query — fires only when GPS or district search is triggered.
-  // No auth header is attached for anonymous visitors (getToken() returns null).
   const [fetchNearby, { data: nearbyBranches, isFetching: loadingBranches }] =
     useLazyGetNearbyBranchesQuery();
 
   const [createEnquiry, { isLoading: submitting }] = useCreateEnquiryMutation();
 
+  // Main booking form state
   const [branchId,       setBranchId]       = useState('');
   const [districtSearch, setDistrictSearch] = useState('');
   const [vehicleBrand,   setVehicleBrand]   = useState('');
@@ -160,16 +179,54 @@ export function EntryPage() {
   const [confirmation,   setConfirmation]   = useState<Confirmation | null>(null);
   const [locating,       setLocating]       = useState(false);
 
-  // Wait for auth bootstrap — avoids a flash of the form before the session redirect.
-  if (authLoading) return null;
+  // Floating callback panel state (UI-only — no backend API wired yet)
+  const [panelOpen,   setPanelOpen]   = useState(false);
+  const [cbName,      setCbName]      = useState('');
+  const [cbPhone,     setCbPhone]     = useState('');
+  const [cbCity,      setCbCity]      = useState('');
+  const [cbType,      setCbType]      = useState('');
+  const [cbErrors,    setCbErrors]    = useState<Partial<Record<string, string>>>({});
+  const [cbSubmitted, setCbSubmitted] = useState(false);
 
-  // Authenticated users go straight to their role dashboard.
+  // Auto-detect nearest branch on mount.
+  const autoLocatedRef = useRef(false);
+  useEffect(() => {
+    if (authLoading || session) return;
+    if (autoLocatedRef.current || !navigator.geolocation) return;
+    autoLocatedRef.current = true;
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      ({ coords: { latitude, longitude } }) => {
+        void (async () => {
+          try {
+            const results = await fetchNearby({ lat: latitude, lng: longitude }).unwrap();
+            if (results.length > 0) setBranchId(results[0].id);
+          } finally {
+            setLocating(false);
+          }
+        })();
+      },
+      () => setLocating(false),
+    );
+  }, [authLoading, session, fetchNearby]);
+
+  // Auto-open the callback panel when an unauthenticated visitor lands on the page.
+  // Ref guard prevents re-opening after the user manually closes it.
+  const autoOpenedRef = useRef(false);
+  useEffect(() => {
+    if (authLoading || session) return;
+    if (autoOpenedRef.current) return;
+    autoOpenedRef.current = true;
+    setPanelOpen(true);
+  }, [authLoading, session]);
+
+  if (authLoading) return null;
   if (session) return <Navigate to={getRoleDefaultRoute(session.role)} replace />;
 
   const branches: NearbyBranch[] = nearbyBranches ?? [];
   const models: string[] = vehicleBrand ? (BRAND_MODEL_MAP[vehicleBrand] ?? []) : [];
 
-  // ── Helpers ──────────────────────────────────────────────
+  // ── Booking form helpers ────────────────────────────────────
 
   function clearError(key: keyof FormErrors) {
     setErrors((e) => ({ ...e, [key]: undefined }));
@@ -181,9 +238,6 @@ export function EntryPage() {
     setErrors((e) => ({ ...e, vehicleBrand: undefined, vehicleModel: undefined }));
   }
 
-  // GPS mode: GET /branches/nearby?lat=...&lng=...
-  // Server returns branches sorted by distanceKm ascending.
-  // Auto-select the nearest (first) result.
   function handleLocate() {
     if (!navigator.geolocation) return;
     setLocating(true);
@@ -205,8 +259,6 @@ export function EntryPage() {
     );
   }
 
-  // District mode: GET /branches/nearby?district=...
-  // No lat/lng sent. No auto-selection — user picks from the list.
   function handleDistrictSearch(e?: React.FormEvent) {
     e?.preventDefault();
     const term = districtSearch.trim();
@@ -215,14 +267,12 @@ export function EntryPage() {
     void fetchNearby({ district: term });
   }
 
-  // ── Validation & submit ──────────────────────────────────
-
   function validate(): boolean {
     const errs: FormErrors = {};
-    if (!branchId)     errs.branchId    = 'Please select a branch';
+    if (!branchId)     errs.branchId     = 'Please select a branch';
     if (!vehicleBrand) errs.vehicleBrand = 'Please select your car brand';
     if (!vehicleModel) errs.vehicleModel = 'Please select your car model';
-    if (!phone)        errs.phone       = 'Mobile number is required';
+    if (!phone)        errs.phone        = 'Mobile number is required';
     else if (!/^\d{10}$/.test(phone)) errs.phone = 'Enter a valid 10-digit mobile number';
     setErrors(errs);
     return Object.keys(errs).length === 0;
@@ -236,6 +286,29 @@ export function EntryPage() {
       const branchName = branches.find((b) => b.id === branchId)?.name ?? branchId;
       setConfirmation({ jobNumber: result.data.jobNumber, branchName, vehicleBrand, vehicleModel, phone });
     }
+  }
+
+  // ── Callback panel helpers ───────────────────────────────────
+
+  function openPanel() {
+    setCbName(''); setCbPhone(''); setCbCity(''); setCbType('');
+    setCbErrors({}); setCbSubmitted(false);
+    setPanelOpen(true);
+  }
+
+  function closePanel() {
+    setPanelOpen(false);
+  }
+
+  function handleCallbackSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    const errs: Partial<Record<string, string>> = {};
+    if (!cbName.trim())            errs.name  = 'Please enter your name';
+    if (!/^\d{10}$/.test(cbPhone)) errs.phone = 'Enter a valid 10-digit number';
+    if (!cbCity.trim())            errs.city  = 'Please enter your city';
+    if (!cbType)                   errs.type  = 'Please select an enquiry type';
+    setCbErrors(errs);
+    if (Object.keys(errs).length === 0) setCbSubmitted(true);
   }
 
   // ── Confirmation state ────────────────────────────────────
@@ -254,7 +327,7 @@ export function EntryPage() {
     <div className={styles.page}>
       <TopBar />
       <div className={styles.content}>
-        <Hero />
+        <Hero onEnquiryOpen={openPanel} />
 
         <div className={styles.formPanel}>
           <form className={styles.form} onSubmit={(e) => void handleSubmit(e)} noValidate>
@@ -263,14 +336,12 @@ export function EntryPage() {
               <p className={styles.formSub}>Fill in 3 quick details to get started</p>
             </div>
 
-            {/* Branch — district search + GPS, then branch select */}
+            {/* Branch */}
             <div className={styles.fieldGroup}>
               <label className={styles.label} htmlFor="entry-district">
                 <MapPin size={13} />
                 Nearest Branch
               </label>
-
-              {/* Search row: district input + search button + GPS button */}
               <div className={styles.districtRow}>
                 <input
                   id="entry-district"
@@ -303,8 +374,6 @@ export function EntryPage() {
                   <Locate size={15} />
                 </button>
               </div>
-
-              {/* Branch select — shown once a search or GPS has fired */}
               <select
                 id="entry-branch"
                 className={`${styles.select} ${errors.branchId ? styles.selectError : ''}`}
@@ -325,7 +394,6 @@ export function EntryPage() {
                   <option key={b.id} value={b.id}>{branchLabel(b)}</option>
                 ))}
               </select>
-
               {errors.branchId && (
                 <span id="err-branch" role="alert" className={styles.error}>{errors.branchId}</span>
               )}
@@ -414,12 +482,148 @@ export function EntryPage() {
               )}
             </button>
 
+            {/* Mobile-only enquiry trigger — hero CTA is not visible at ≤768px */}
+            <button type="button" className={styles.mobileEnquiryTrigger} onClick={openPanel}>
+              <PhoneCall size={14} />
+              Just need a callback?
+            </button>
+
             <p className={styles.privacy}>
               By submitting, you agree to be contacted by our service team.
             </p>
           </form>
         </div>
       </div>
+
+      <InsurancePartners />
+
+      {/* ── Floating callback panel — fixed top-right, auto-opens on page entry ── */}
+      {panelOpen && (
+        <div
+          className={styles.cbPanel}
+          role="dialog"
+          aria-modal="false"
+          aria-label="Request a Callback"
+        >
+          <div className={styles.cbPanelHeader}>
+            <span className={styles.cbPanelTitle}>
+              <PhoneCall size={13} className={styles.cbPanelIcon} />
+              Request a Callback
+            </span>
+            <button
+              type="button"
+              className={styles.cbPanelClose}
+              onClick={closePanel}
+              aria-label="Close callback panel"
+            >
+              <X size={14} />
+            </button>
+          </div>
+
+          <div className={styles.cbPanelBody}>
+            {cbSubmitted ? (
+              <div className={styles.cbSuccess}>
+                <CheckCircle size={32} className={styles.cbSuccessIcon} />
+                <p className={styles.cbSuccessTitle}>We&apos;ll call you back!</p>
+                <p className={styles.cbSuccessMsg}>
+                  Thanks, {cbName}. Our team will reach you on +91&nbsp;{cbPhone} shortly.
+                </p>
+                <button type="button" className={styles.cbDoneBtn} onClick={closePanel}>
+                  Close
+                </button>
+              </div>
+            ) : (
+              <form className={styles.cbForm} onSubmit={handleCallbackSubmit} noValidate>
+                {/* Name */}
+                <div className={styles.fieldGroup}>
+                  <label className={styles.label} htmlFor="cb-name">Your Name</label>
+                  <input
+                    id="cb-name"
+                    type="text"
+                    className={`${styles.cbInput} ${cbErrors.name ? styles.cbInputError : ''}`}
+                    placeholder="Full name"
+                    value={cbName}
+                    onChange={(e) => { setCbName(e.target.value); setCbErrors((p) => ({ ...p, name: undefined })); }}
+                    aria-invalid={!!cbErrors.name}
+                  />
+                  {cbErrors.name && <span role="alert" className={styles.error}>{cbErrors.name}</span>}
+                </div>
+
+                {/* Phone */}
+                <div className={styles.fieldGroup}>
+                  <label className={styles.label} htmlFor="cb-phone">
+                    <Phone size={13} />
+                    Mobile Number
+                  </label>
+                  <div className={styles.phoneRow}>
+                    <span className={styles.dialCode}>+91</span>
+                    <input
+                      id="cb-phone"
+                      type="tel"
+                      inputMode="numeric"
+                      className={`${styles.phoneInput} ${cbErrors.phone ? styles.phoneInputError : ''}`}
+                      placeholder="10-digit number"
+                      value={cbPhone}
+                      maxLength={10}
+                      onChange={(e) => {
+                        setCbPhone(e.target.value.replace(/\D/g, '').slice(0, 10));
+                        setCbErrors((p) => ({ ...p, phone: undefined }));
+                      }}
+                      aria-invalid={!!cbErrors.phone}
+                    />
+                  </div>
+                  {cbErrors.phone && <span role="alert" className={styles.error}>{cbErrors.phone}</span>}
+                </div>
+
+                {/* City */}
+                <div className={styles.fieldGroup}>
+                  <label className={styles.label} htmlFor="cb-city">
+                    <MapPin size={13} />
+                    City / District
+                  </label>
+                  <input
+                    id="cb-city"
+                    type="text"
+                    className={`${styles.cbInput} ${cbErrors.city ? styles.cbInputError : ''}`}
+                    placeholder="e.g. Hyderabad"
+                    value={cbCity}
+                    onChange={(e) => { setCbCity(e.target.value); setCbErrors((p) => ({ ...p, city: undefined })); }}
+                    aria-invalid={!!cbErrors.city}
+                  />
+                  {cbErrors.city && <span role="alert" className={styles.error}>{cbErrors.city}</span>}
+                </div>
+
+                {/* Enquiry type */}
+                <div className={styles.fieldGroup}>
+                  <label className={styles.label} htmlFor="cb-type">Enquiry Type</label>
+                  <select
+                    id="cb-type"
+                    className={`${styles.select} ${cbErrors.type ? styles.selectError : ''}`}
+                    value={cbType}
+                    onChange={(e) => { setCbType(e.target.value); setCbErrors((p) => ({ ...p, type: undefined })); }}
+                    aria-invalid={!!cbErrors.type}
+                  >
+                    <option value="">Select type</option>
+                    {ENQUIRY_TYPES.map((t) => (
+                      <option key={t} value={t}>{t}</option>
+                    ))}
+                  </select>
+                  {cbErrors.type && <span role="alert" className={styles.error}>{cbErrors.type}</span>}
+                </div>
+
+                <div className={styles.cbFooter}>
+                  <button type="button" className={styles.cbCancelBtn} onClick={closePanel}>
+                    Cancel
+                  </button>
+                  <button type="submit" className={styles.cbSubmitBtn}>
+                    Request Callback
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
