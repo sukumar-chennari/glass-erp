@@ -48,7 +48,7 @@ function WhatsAppIcon({ className }: { className?: string }) {
 function ContactStrip() {
   return (
     <div className={styles.contactStrip}>
-      <a href="tel:18001204567" className={styles.contactItem}>
+      <a href="tel:18001204567" className={`${styles.contactItem} ${styles.contactItemTollFree}`}>
         <Phone size={14} className={styles.contactIcon} />
         <span className={styles.contactLabel}>Toll-Free</span>
         <span className={styles.contactValue}>1800-120-4567</span>
@@ -56,7 +56,7 @@ function ContactStrip() {
       <span className={styles.contactDivider} aria-hidden="true" />
       <a
         href="https://wa.me/919848000000"
-        className={styles.contactItem}
+        className={`${styles.contactItem} ${styles.contactItemWhatsApp}`}
         target="_blank"
         rel="noopener noreferrer"
       >
