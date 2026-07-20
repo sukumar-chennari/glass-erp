@@ -4,8 +4,9 @@ import { MapPin, Phone, Car, ChevronRight, Locate, CheckCircle, Search } from 'l
 import { useAuth } from '@/context/AuthContext';
 import { useLazyGetNearbyBranchesQuery } from './nearbyBranchesApi';
 import type { NearbyBranch } from './nearbyBranchesApi';
-import { BRANDS, BRAND_MODEL_MAP } from '@/types/models/vehicleModel';
 import { useCreateEnquiryMutation } from './enquiryApi';
+import { useGetCarBrandsQuery } from '@/features/settings/services/carBrandsApi';
+import { useGetCarModelsQuery } from '@/features/settings/services/carModelsApi';
 import { getRoleDefaultRoute } from '@/utils/roleRouting';
 import { ROUTES } from '@/constants/routes';
 import { InsurancePartners } from './components/InsurancePartners';
@@ -194,45 +195,74 @@ export function EntryPage() {
 
   const [createEnquiry, { isLoading: submitting }] = useCreateEnquiryMutation();
 
+  // Brand + model ID state (must precede the queries that depend on vehicleBrandId)
+  const [vehicleBrandId, setVehicleBrandId] = useState('');
+
+  // Car brands and models from API
+  const { data: carBrandsData, isLoading: loadingBrands } = useGetCarBrandsQuery({ status: 'ACTIVE' });
+  const { data: carModelsData, isLoading: loadingModels } = useGetCarModelsQuery(
+    { brandId: vehicleBrandId, status: 'ACTIVE' },
+    { skip: !vehicleBrandId },
+  );
+
   // Main booking form state
   const [customerName,   setCustomerName]   = useState('');
   const [phone,          setPhone]          = useState('');
   const [branchId,       setBranchId]       = useState('');
   const [districtSearch, setDistrictSearch] = useState('');
-  const [vehicleBrand,   setVehicleBrand]   = useState('');
-  const [vehicleModel,   setVehicleModel]   = useState('');
+  const [vehicleBrand,   setVehicleBrand]   = useState('');  // brand display name — sent in enquiry
+  const [vehicleModel,   setVehicleModel]   = useState('');  // model display name — sent in enquiry
   const [errors,         setErrors]         = useState<FormErrors>({});
   const [confirmation,   setConfirmation]   = useState<Confirmation | null>(null);
   const [locating,       setLocating]       = useState(false);
+  const [gpsError,       setGpsError]       = useState<string | null>(null);
 
-  // Auto-detect nearest branch on mount (ref guard prevents React StrictMode double-invoke).
-  // The ref resets on every unmount/remount, so GPS fires on every page visit.
+  // Auto-detect nearest branch on mount.
+  // Ref guard prevents React StrictMode double-invoke within one mount cycle;
+  // the ref resets on every unmount/remount so GPS fires on every page visit.
   const autoLocatedRef = useRef(false);
   useEffect(() => {
-    if (authLoading || session) return;
-    if (autoLocatedRef.current || !navigator.geolocation) return;
+    if (authLoading || session || !navigator.geolocation) return;
+    if (autoLocatedRef.current) return;
     autoLocatedRef.current = true;
     setLocating(true);
     navigator.geolocation.getCurrentPosition(
       ({ coords: { latitude, longitude } }) => {
+        if (!isFinite(latitude) || !isFinite(longitude)) {
+          setLocating(false);
+          return;
+        }
         void (async () => {
           try {
             const results = await fetchNearby({ lat: latitude, lng: longitude }).unwrap();
             if (results.length > 0) setBranchId(results[0].id);
+          } catch {
+            // Silent on auto-locate failure — user can use the manual GPS button or search
           } finally {
             setLocating(false);
           }
         })();
       },
-      () => setLocating(false),
+      (err: GeolocationPositionError) => {
+        setLocating(false);
+        if (err.code === 1) {
+          setGpsError('Location access was denied. Allow location in your browser settings, or search manually.');
+        } else if (err.code === 2) {
+          setGpsError('Your location could not be determined. Try searching by city or district.');
+        } else {
+          setGpsError('Location request timed out. Please try again or search manually.');
+        }
+      },
+      { timeout: 10_000 },
     );
   }, [authLoading, session, fetchNearby]);
 
   if (authLoading) return null;
   if (session) return <Navigate to={getRoleDefaultRoute(session.role)} replace />;
 
-  const branches: NearbyBranch[] = nearbyBranches ?? [];
-  const models: string[] = vehicleBrand ? (BRAND_MODEL_MAP[vehicleBrand] ?? []) : [];
+  const branches  = nearbyBranches ?? [];
+  const carBrands = carBrandsData   ?? [];
+  const carModels = carModelsData   ?? [];
 
   // ── Booking form helpers ────────────────────────────────────
 
@@ -240,30 +270,55 @@ export function EntryPage() {
     setErrors((e) => ({ ...e, [key]: undefined }));
   }
 
-  function handleBrandChange(brand: string) {
-    setVehicleBrand(brand);
+  function handleBrandChange(brandId: string) {
+    const brand = carBrands.find((b) => b.id === brandId);
+    setVehicleBrandId(brandId);
+    setVehicleBrand(brand?.name ?? '');
     setVehicleModel('');
     setErrors((e) => ({ ...e, vehicleBrand: undefined, vehicleModel: undefined }));
   }
 
   function handleLocate() {
-    if (!navigator.geolocation) return;
+    if (!navigator.geolocation) {
+      setGpsError('Geolocation is not supported by your browser.');
+      return;
+    }
     setLocating(true);
+    setGpsError(null);
     navigator.geolocation.getCurrentPosition(
       ({ coords: { latitude, longitude } }) => {
+        if (!isFinite(latitude) || !isFinite(longitude)) {
+          setLocating(false);
+          setGpsError('Received invalid location data. Please try again.');
+          return;
+        }
         void (async () => {
           try {
             const results = await fetchNearby({ lat: latitude, lng: longitude }).unwrap();
             if (results.length > 0) {
               setBranchId(results[0].id);
               setErrors((e) => ({ ...e, branchId: undefined }));
+            } else {
+              setGpsError('No branches found near your location. Try searching by city or district.');
             }
+          } catch {
+            setGpsError('Could not fetch nearby branches. Please search by city or district.');
           } finally {
             setLocating(false);
           }
         })();
       },
-      () => setLocating(false),
+      (err: GeolocationPositionError) => {
+        setLocating(false);
+        if (err.code === 1) {
+          setGpsError('Location access was denied. Allow location in your browser settings, or search manually.');
+        } else if (err.code === 2) {
+          setGpsError('Your location could not be determined. Try searching by city or district.');
+        } else {
+          setGpsError('Location request timed out. Please try again or search manually.');
+        }
+      },
+      { timeout: 10_000 },
     );
   }
 
@@ -272,6 +327,7 @@ export function EntryPage() {
     const term = districtSearch.trim();
     if (!term) return;
     setBranchId('');
+    setGpsError(null);
     void fetchNearby({ district: term });
   }
 
@@ -412,7 +468,7 @@ export function EntryPage() {
                 id="entry-branch"
                 className={`${styles.select} ${errors.branchId ? styles.selectError : ''}`}
                 value={branchId}
-                onChange={(e) => { setBranchId(e.target.value); clearError('branchId'); }}
+                onChange={(e) => { setBranchId(e.target.value); clearError('branchId'); setGpsError(null); }}
                 disabled={loadingBranches || locating || branches.length === 0}
                 aria-invalid={!!errors.branchId}
                 aria-describedby={errors.branchId ? 'err-branch' : undefined}
@@ -428,8 +484,10 @@ export function EntryPage() {
                   <option key={b.id} value={b.id}>{branchLabel(b)}</option>
                 ))}
               </select>
-              {errors.branchId && (
-                <span id="err-branch" role="alert" className={styles.error}>{errors.branchId}</span>
+              {(errors.branchId ?? gpsError) && (
+                <span id="err-branch" role="alert" className={styles.error}>
+                  {errors.branchId ?? gpsError}
+                </span>
               )}
             </div>
 
@@ -442,14 +500,17 @@ export function EntryPage() {
               <select
                 id="entry-brand"
                 className={`${styles.select} ${errors.vehicleBrand ? styles.selectError : ''}`}
-                value={vehicleBrand}
+                value={vehicleBrandId}
                 onChange={(e) => handleBrandChange(e.target.value)}
+                disabled={loadingBrands}
                 aria-invalid={!!errors.vehicleBrand}
                 aria-describedby={errors.vehicleBrand ? 'err-brand' : undefined}
               >
-                <option value="">Select car brand</option>
-                {BRANDS.map((b) => (
-                  <option key={b} value={b}>{b}</option>
+                <option value="">
+                  {loadingBrands ? 'Loading brands…' : 'Select car brand'}
+                </option>
+                {carBrands.map((b) => (
+                  <option key={b.id} value={b.id}>{b.name}</option>
                 ))}
               </select>
               {errors.vehicleBrand && (
@@ -467,13 +528,21 @@ export function EntryPage() {
                 className={`${styles.select} ${errors.vehicleModel ? styles.selectError : ''}`}
                 value={vehicleModel}
                 onChange={(e) => { setVehicleModel(e.target.value); clearError('vehicleModel'); }}
-                disabled={!vehicleBrand}
+                disabled={!vehicleBrandId || loadingModels}
                 aria-invalid={!!errors.vehicleModel}
                 aria-describedby={errors.vehicleModel ? 'err-model' : undefined}
               >
-                <option value="">{vehicleBrand ? 'Select car model' : 'Select brand first'}</option>
-                {models.map((m) => (
-                  <option key={m} value={m}>{m}</option>
+                <option value="">
+                  {!vehicleBrandId
+                    ? 'Select brand first'
+                    : loadingModels
+                      ? 'Loading models…'
+                      : carModels.length === 0
+                        ? 'No models available'
+                        : 'Select car model'}
+                </option>
+                {carModels.map((m) => (
+                  <option key={m.id} value={m.name}>{m.name}</option>
                 ))}
               </select>
               {errors.vehicleModel && (
