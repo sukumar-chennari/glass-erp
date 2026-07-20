@@ -73,6 +73,64 @@
   outline-offset: 2px;
 }
 
+/* ── Contact strip ── */
+.contactStrip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-8);
+  padding: var(--space-2) var(--space-8);
+  background: var(--color-bg-subtle);
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.contactItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  text-decoration: none;
+  color: inherit;
+  transition: color var(--transition-fast);
+}
+
+.contactItem:hover {
+  color: var(--color-primary);
+}
+
+.contactItem:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 4px;
+  border-radius: var(--radius-sm);
+}
+
+.contactIcon {
+  flex-shrink: 0;
+  color: var(--color-primary);
+}
+
+.contactLabel {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-widest);
+}
+
+.contactValue {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.contactDivider {
+  width: 1px;
+  height: 20px;
+  background: var(--color-border-strong);
+  flex-shrink: 0;
+}
+
 /* ── Main split layout ── */
 .content {
   flex: 1;
@@ -296,7 +354,7 @@
   font-size: var(--font-size-sm);
 }
 
-/* ── Branch row (kept for layout reference — select now sits below districtRow) ── */
+/* ── Branch row (layout reference) ── */
 .branchRow {
   display: flex;
   gap: var(--space-2);
@@ -606,256 +664,6 @@
   outline-offset: 2px;
 }
 
-/* ── Hero callback CTA ── */
-.heroCta {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  margin-top: var(--space-8);
-  padding: var(--space-3) var(--space-5);
-  border: 1.5px solid var(--color-primary-border);
-  border-radius: var(--radius-lg);
-  background: var(--color-primary-subtle);
-  color: var(--color-primary);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
-  cursor: pointer;
-  transition: border-color var(--transition-fast), opacity var(--transition-fast);
-}
-
-.heroCta:hover {
-  border-color: var(--color-primary);
-  opacity: 0.88;
-}
-
-.heroCta:focus-visible {
-  outline: 2px solid var(--color-border-focus);
-  outline-offset: 2px;
-}
-
-/* Mobile enquiry trigger (hidden on desktop — hero provides the CTA there) */
-.mobileEnquiryTrigger {
-  display: none;
-}
-
-/* ── Floating callback panel ── */
-@keyframes cbPanelIn {
-  from { opacity: 0; transform: translateY(-6px) scale(0.98); }
-  to   { opacity: 1; transform: translateY(0)    scale(1);    }
-}
-
-.cbPanel {
-  position: fixed;
-  top: 76px;          /* clears the sticky topbar (~60px) */
-  right: var(--space-5);
-  width: 320px;
-  background: var(--color-glass-bg);
-  border: 1px solid var(--color-glass-border);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-xl);
-  backdrop-filter: var(--surface-blur);
-  -webkit-backdrop-filter: var(--surface-blur);
-  z-index: 400;
-  animation: cbPanelIn 0.18s ease both;
-  overflow: hidden;
-}
-
-.cbPanelHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--space-3) var(--space-4);
-  border-bottom: 1px solid var(--color-border);
-  background: var(--color-bg-subtle);
-}
-
-.cbPanelTitle {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text-primary);
-}
-
-.cbPanelIcon {
-  color: var(--color-primary);
-  flex-shrink: 0;
-}
-
-.cbPanelClose {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 26px;
-  height: 26px;
-  border: none;
-  border-radius: var(--radius-md);
-  background: transparent;
-  color: var(--color-text-muted);
-  cursor: pointer;
-  flex-shrink: 0;
-  transition: background var(--transition-fast), color var(--transition-fast);
-}
-
-.cbPanelClose:hover {
-  background: var(--color-bg-elevated);
-  color: var(--color-text-primary);
-}
-
-.cbPanelClose:focus-visible {
-  outline: 2px solid var(--color-border-focus);
-  outline-offset: 2px;
-}
-
-.cbPanelBody {
-  padding: var(--space-4);
-  max-height: calc(100vh - 120px);
-  overflow-y: auto;
-}
-
-/* ── Callback panel form ── */
-.cbForm {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-}
-
-.cbInput {
-  width: 100%;
-  padding: var(--space-3) var(--space-4);
-  font-size: var(--font-size-base);
-  background: var(--color-bg-input);
-  border: 1px solid var(--color-border-input);
-  border-radius: var(--radius-lg);
-  color: var(--color-text-primary);
-  outline: none;
-  transition: border-color var(--transition-fast);
-}
-
-.cbInput:focus {
-  border-color: var(--color-primary);
-}
-
-.cbInput:focus-visible {
-  outline: 2px solid var(--color-border-focus);
-  outline-offset: 2px;
-}
-
-.cbInput::placeholder {
-  color: var(--color-text-disabled);
-  font-size: var(--font-size-sm);
-}
-
-.cbInputError {
-  border-color: var(--color-danger-text) !important;
-}
-
-.cbFooter {
-  display: flex;
-  gap: var(--space-3);
-  margin-top: var(--space-1);
-}
-
-.cbCancelBtn {
-  flex: 0 0 auto;
-  padding: var(--space-3) var(--space-5);
-  border: 1px solid var(--color-border-strong);
-  border-radius: var(--radius-lg);
-  background: var(--color-btn-secondary-bg);
-  color: var(--color-btn-secondary-text);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-  cursor: pointer;
-  transition: background var(--transition-fast);
-}
-
-.cbCancelBtn:hover {
-  background: var(--color-btn-secondary-hover-bg);
-}
-
-.cbCancelBtn:focus-visible {
-  outline: 2px solid var(--color-border-focus);
-  outline-offset: 2px;
-}
-
-.cbSubmitBtn {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--space-3) var(--space-6);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
-  background: var(--color-brand-gradient);
-  color: #fff;
-  border: none;
-  border-radius: var(--radius-lg);
-  cursor: pointer;
-  transition: opacity var(--transition-fast);
-  box-shadow: 0 4px 12px var(--color-brand-gradient-shadow);
-}
-
-.cbSubmitBtn:hover {
-  opacity: 0.92;
-}
-
-.cbSubmitBtn:focus-visible {
-  outline: 2px solid var(--color-border-focus);
-  outline-offset: 2px;
-}
-
-/* ── Callback modal success state ── */
-.cbSuccess {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  padding: var(--space-4) 0 var(--space-2);
-  gap: var(--space-3);
-}
-
-.cbSuccessIcon {
-  color: var(--color-success-text);
-}
-
-.cbSuccessTitle {
-  font-size: var(--font-size-xl);
-  font-weight: var(--font-weight-bold);
-  color: var(--color-text-primary);
-  margin: 0;
-}
-
-.cbSuccessMsg {
-  font-size: var(--font-size-sm);
-  color: var(--color-text-muted);
-  line-height: var(--line-height-relaxed);
-  margin: 0;
-}
-
-.cbDoneBtn {
-  margin-top: var(--space-2);
-  padding: var(--space-3) var(--space-8);
-  border: none;
-  border-radius: var(--radius-lg);
-  background: var(--color-brand-gradient);
-  color: #fff;
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
-  cursor: pointer;
-  transition: opacity var(--transition-fast);
-  box-shadow: 0 4px 12px var(--color-brand-gradient-shadow);
-}
-
-.cbDoneBtn:hover {
-  opacity: 0.92;
-}
-
-.cbDoneBtn:focus-visible {
-  outline: 2px solid var(--color-border-focus);
-  outline-offset: 2px;
-}
-
 /* ── Responsive ── */
 @media (max-width: 768px) {
   .content {
@@ -870,6 +678,11 @@
     padding: var(--space-3) var(--space-4);
   }
 
+  .contactStrip {
+    gap: var(--space-4);
+    padding: var(--space-2) var(--space-4);
+  }
+
   .formPanel {
     padding: var(--space-6) var(--space-4);
     align-items: flex-start;
@@ -882,43 +695,17 @@
   .confirmCard {
     padding: var(--space-6) var(--space-4);
   }
+}
 
-  .mobileEnquiryTrigger {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+@media (max-width: 400px) {
+  .contactStrip {
+    flex-direction: column;
     gap: var(--space-2);
-    width: 100%;
     padding: var(--space-3) var(--space-4);
-    border: 1.5px solid var(--color-primary-border);
-    border-radius: var(--radius-lg);
-    background: var(--color-primary-subtle);
-    color: var(--color-primary);
-    font-size: var(--font-size-sm);
-    font-weight: var(--font-weight-semibold);
-    cursor: pointer;
-    transition: border-color var(--transition-fast), opacity var(--transition-fast);
+    align-items: flex-start;
   }
 
-  .mobileEnquiryTrigger:hover {
-    border-color: var(--color-primary);
-    opacity: 0.88;
-  }
-
-  .mobileEnquiryTrigger:focus-visible {
-    outline: 2px solid var(--color-border-focus);
-    outline-offset: 2px;
-  }
-
-  /* Panel takes most of the screen width on mobile */
-  .cbPanel {
-    right: var(--space-3);
-    left: var(--space-3);
-    width: auto;
-    top: 72px;
-  }
-
-  .cbPanelBody {
-    max-height: calc(100vh - 140px);
+  .contactDivider {
+    display: none;
   }
 }
