@@ -13,11 +13,13 @@ import { PricingBreakdown } from './components/PricingBreakdown';
 import { SubmissionReviewModal } from './components/SubmissionReviewModal';
 import type { CustomerSubmission } from './types';
 import type { TableColumn, SelectOption } from '@/types/ui';
+import { EnquiryFormDrawer } from './components/EnquiryFormDrawer';
+import type { EnquiryFormValues } from './components/EnquiryFormDrawer';
 import styles from './EnquiryPage.module.css';
 
 // ── Types ──────────────────────────────────────────────────────────────
 type EnquiryStatus  = 'pending' | 'price_confirmed' | 'converted' | 'closed';
-type EnquirySource  = 'phone' | 'walk_in' | 'whatsapp';
+type EnquirySource  = 'phone' | 'walk_in' | 'whatsapp' | 'google' | 'referral' | 'insurance_agent' | 'mechanic' | 'other';
 type ViewTab        = 'enquiries' | 'submissions';
 type StatusFilter   = 'all' | EnquiryStatus;
 
@@ -37,6 +39,14 @@ interface Enquiry {
   closeNotes:   string | null;
   createdAt:    string;
   jobRef:       string | null;
+  vehicleBrandId?: string;
+  vehicleBrand?:   string;
+  vehicleYear?:    string;
+  vehicleType?:    'Private' | 'Commercial';
+  paymentType?:    'Cash' | 'Insurance';
+  insurerName?:    string;
+  damageNotes?:    string;
+  branchId?:       string;
 }
 
 // CustomerSubmission imported from ./types
@@ -141,119 +151,6 @@ function fmtDate(iso: string) {
   return new Date(iso).toLocaleDateString('en-IN', {
     month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit',
   });
-}
-
-// ── Create Enquiry Modal ───────────────────────────────────────────────
-interface CreateFormState {
-  phone: string; customerName: string; vehicleNumber: string;
-  vehicleModel: string; glassType: string; source: EnquirySource;
-}
-
-interface CreateModalProps {
-  isOpen:    boolean;
-  onClose:   () => void;
-  prefill?:  Partial<CreateFormState> | null;
-  onSave:    (d: CreateFormState) => void;
-}
-
-function CreateEnquiryModal({ isOpen, onClose, prefill, onSave }: CreateModalProps) {
-  const { t } = useTranslation(['enquiry', 'common']);
-  const [form, setForm] = useState<CreateFormState>({
-    phone: '', customerName: '', vehicleNumber: '', vehicleModel: '',
-    glassType: 'Front Windshield', source: 'phone',
-  });
-
-  const GLASS_OPTIONS: SelectOption[] = [
-    { value: 'Front Windshield',      label: t('page.glassOptions.frontWindshield')      },
-    { value: 'Rear Windshield',       label: t('page.glassOptions.rearWindshield')       },
-    { value: 'Driver Side Window',    label: t('page.glassOptions.driverSideWindow')    },
-    { value: 'Passenger Side Window', label: t('page.glassOptions.passengerSideWindow') },
-    { value: 'Rear Left Window',      label: t('page.glassOptions.rearLeftWindow')      },
-    { value: 'Rear Right Window',     label: t('page.glassOptions.rearRightWindow')     },
-    { value: 'Sunroof Glass',         label: t('page.glassOptions.sunroofGlass')         },
-    { value: 'Quarter Glass',         label: t('page.glassOptions.quarterGlass')         },
-  ];
-
-  const SOURCE_OPTIONS: SelectOption[] = [
-    { value: 'phone',    label: t('page.source.phone')    },
-    { value: 'walk_in',  label: t('page.source.walk_in')  },
-    { value: 'whatsapp', label: t('page.source.whatsapp') },
-  ];
-
-  // Apply prefill when modal opens with it
-  useState(() => {
-    if (isOpen && prefill) setForm((p) => ({ ...p, ...prefill }));
-  });
-
-  function f(k: keyof CreateFormState, v: string) {
-    setForm((prev) => ({ ...prev, [k]: v }));
-  }
-
-  function handleSave() {
-    if (!form.phone || !form.customerName.trim() || !form.vehicleNumber.trim() || !form.vehicleModel.trim()) return;
-    onSave(form);
-    setForm({ phone: '', customerName: '', vehicleNumber: '', vehicleModel: '', glassType: 'Front Windshield', source: 'phone' });
-  }
-
-  const canSave =
-    form.phone.length === 10 &&
-    !!form.customerName.trim() &&
-    !!form.vehicleNumber.trim() &&
-    !!form.vehicleModel.trim();
-
-  return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      title={t('page.createModal.title')}
-      footer={
-        <div className={styles.modalFooter}>
-          <Button variant="ghost" onClick={onClose}>{t('common:actions.cancel')}</Button>
-          <Button onClick={handleSave} disabled={!canSave}>{t('page.createModal.create')}</Button>
-        </div>
-      }
-    >
-      <div className={styles.form}>
-        <div className={styles.phoneRow}>
-          <span className={styles.phonePrefix}>+91</span>
-          <Input
-            label={t('page.createModal.phoneNumber')}
-            type="tel"
-            value={form.phone}
-            onChange={(e) => f('phone', e.target.value.replace(/\D/g, '').slice(0, 10))}
-            placeholder={t('page.createModal.phonePlaceholder')}
-            fullWidth
-            autoFocus
-          />
-        </div>
-        <Input
-          label={t('page.createModal.customerName')}
-          value={form.customerName}
-          onChange={(e) => f('customerName', e.target.value)}
-          fullWidth
-          required
-        />
-        <div className={styles.twoCol}>
-          <Input
-            label={t('page.createModal.vehicleNumber')}
-            value={form.vehicleNumber}
-            onChange={(e) => f('vehicleNumber', e.target.value.toUpperCase())}
-            placeholder="DL 01 AB 1234"
-          />
-          <Input
-            label={t('page.createModal.vehicleModel')}
-            value={form.vehicleModel}
-            onChange={(e) => f('vehicleModel', e.target.value)}
-            placeholder="Honda City 2020"
-          />
-        </div>
-        <div className={styles.twoCol}>
-          <Select label={t('page.createModal.glassType')} options={GLASS_OPTIONS} value={form.glassType} onChange={(e) => f('glassType', e.target.value)} />
-          <Select label={t('page.createModal.source')} options={SOURCE_OPTIONS} value={form.source} onChange={(e) => f('source', e.target.value as EnquirySource)} />
-        </div>
-      </div>
-    </Modal>
-  );
 }
 
 // ── Confirm Price Modal ───────────────────────────────────────────────
@@ -394,8 +291,10 @@ export function EnquiryPage() {
   const [enquiries,  setEnquiries] = useState<Enquiry[]>(INITIAL_ENQUIRIES);
   const [submissions,setSubs]      = useState<CustomerSubmission[]>(INITIAL_SUBMISSIONS);
   const [filter,     setFilter]    = useState<StatusFilter>('all');
-  const [createOpen, setCreate]    = useState(false);
-  const [prefill,    setPrefill]   = useState<Partial<CreateFormState> | null>(null);
+  const [formOpen,    setFormOpen]  = useState(false);
+  const [formMode,    setFormMode]  = useState<'create' | 'complete' | 'update'>('create');
+  const [formInitial, setFormInit]  = useState<Partial<EnquiryFormValues> | undefined>();
+  const [formEnqId,   setFormEnqId] = useState<string | undefined>();
   const [priceTgt,   setPriceTgt]  = useState<Enquiry | null>(null);
   const [closeTgt,   setCloseTgt]  = useState<Enquiry | null>(null);
   const [reviewSub,  setReviewSub] = useState<CustomerSubmission | null>(null);
@@ -435,23 +334,87 @@ export function EnquiryPage() {
     [enquiries, filter],
   );
 
-  function handleCreate(data: CreateFormState) {
-    const e: Enquiry = {
-      ...data,
-      id:          `enq-${Date.now()}`,
-      enquiryNo:   `ENQ-${nextEnqNum++}`,
-      status:      'pending',
-      quotedPrice: null,
-      priceBrand:  null,
-      closeReason: null,
-      closeNotes:  null,
-      createdAt:   new Date().toISOString(),
-      jobRef:      null,
-    };
-    setEnquiries((prev) => [e, ...prev]);
-    toast.success(t('page.toast.enquiryCreated', { enquiryNo: e.enquiryNo }));
-    setCreate(false);
-    setPrefill(null);
+  function handleFormSave(values: EnquiryFormValues) {
+    if (formMode === 'update' && formEnqId) {
+      const target = enquiries.find((e) => e.id === formEnqId);
+      setEnquiries((prev) =>
+        prev.map((e) => {
+          if (e.id !== formEnqId) return e;
+          return {
+            ...e,
+            customerName:   values.customerName,
+            phone:          values.phone,
+            vehicleNumber:  values.vehicleNumber,
+            vehicleModel:   [values.vehicleBrand, values.vehicleModel, values.vehicleYear].filter(Boolean).join(' ') || e.vehicleModel,
+            glassType:      values.glassType   || e.glassType,
+            source:         (values.source as EnquirySource) || e.source,
+            vehicleBrandId: values.vehicleBrandId || undefined,
+            vehicleBrand:   values.vehicleBrand   || undefined,
+            vehicleYear:    values.vehicleYear     || undefined,
+            vehicleType:    values.vehicleType     || undefined,
+            paymentType:    values.paymentType     || undefined,
+            insurerName:    values.insurerName     || undefined,
+            damageNotes:    values.damageNotes     || undefined,
+            branchId:       values.branchId        || undefined,
+          };
+        }),
+      );
+      if (target) toast.success(`${target.enquiryNo} updated`);
+    } else {
+      const displayModel = [values.vehicleBrand, values.vehicleModel, values.vehicleYear].filter(Boolean).join(' ') || 'TBD';
+      const e: Enquiry = {
+        id:            `enq-${Date.now()}`,
+        enquiryNo:     `ENQ-${nextEnqNum++}`,
+        phone:         values.phone,
+        customerName:  values.customerName,
+        vehicleNumber: values.vehicleNumber,
+        vehicleModel:  displayModel,
+        glassType:     values.glassType || 'Front Windshield',
+        source:        (values.source as EnquirySource) || 'phone',
+        status:        'pending',
+        quotedPrice:   null,
+        priceBrand:    null,
+        closeReason:   null,
+        closeNotes:    null,
+        createdAt:     new Date().toISOString(),
+        jobRef:        null,
+        vehicleBrandId: values.vehicleBrandId || undefined,
+        vehicleBrand:   values.vehicleBrand   || undefined,
+        vehicleYear:    values.vehicleYear     || undefined,
+        vehicleType:    values.vehicleType     || undefined,
+        paymentType:    values.paymentType     || undefined,
+        insurerName:    values.insurerName     || undefined,
+        damageNotes:    values.damageNotes     || undefined,
+        branchId:       values.branchId        || undefined,
+      };
+      setEnquiries((prev) => [e, ...prev]);
+      toast.success(t('page.toast.enquiryCreated', { enquiryNo: e.enquiryNo }));
+    }
+    setFormOpen(false);
+    setFormInit(undefined);
+    setFormEnqId(undefined);
+  }
+
+  function openEditForm(enq: Enquiry) {
+    setFormInit({
+      customerName:   enq.customerName,
+      phone:          enq.phone,
+      branchId:       enq.branchId       ?? '',
+      source:         enq.source,
+      vehicleBrandId: enq.vehicleBrandId ?? '',
+      vehicleBrand:   enq.vehicleBrand   ?? '',
+      vehicleModel:   enq.vehicleModel,
+      vehicleYear:    enq.vehicleYear    ?? '',
+      vehicleNumber:  enq.vehicleNumber,
+      vehicleType:    enq.vehicleType    ?? '',
+      glassType:      enq.glassType,
+      paymentType:    enq.paymentType    ?? '',
+      insurerName:    enq.insurerName    ?? '',
+      damageNotes:    enq.damageNotes    ?? '',
+    });
+    setFormMode('update');
+    setFormEnqId(enq.id);
+    setFormOpen(true);
   }
 
   function handleConfirmPrice(price: number, brand: string) {
@@ -490,14 +453,24 @@ export function EnquiryPage() {
   }
 
   function handleCreateFromSubmission(sub: CustomerSubmission) {
-    setPrefill({
-      phone: sub.phone, customerName: sub.name,
-      vehicleNumber: sub.vehicleNo, vehicleModel: sub.vehicleModel,
-      glassType: sub.glassType, source: 'whatsapp',
+    setFormInit({
+      customerName:  sub.name,
+      phone:         sub.phone,
+      vehicleNumber: sub.vehicleNo,
+      vehicleModel:  sub.vehicleModel,
+      vehicleYear:   String(sub.vehicleYear),
+      glassType:     sub.glassPosition ?? sub.glassType,
+      paymentType:   sub.paymentPreference === 'cash'      ? 'Cash'
+                   : sub.paymentPreference === 'insurance' ? 'Insurance' : '',
+      insurerName:   sub.insuranceInsurer ?? '',
+      damageNotes:   sub.description,
+      source:        'whatsapp',
     });
+    setFormMode('complete');
+    setFormEnqId(undefined);
     setSubs((prev) => prev.filter((s) => s.id !== sub.id));
     setViewTab('enquiries');
-    setCreate(true);
+    setFormOpen(true);
   }
 
   function handleDismissSubmission(id: string) {
@@ -572,12 +545,14 @@ export function EnquiryPage() {
         <div className={styles.actionCell}>
           {e.status === 'pending' && (
             <>
+              <Button size="sm" variant="ghost" onClick={() => openEditForm(e)}>Edit</Button>
               <Button size="sm" onClick={() => setPriceTgt(e)}>{t('page.actions.confirmPrice')}</Button>
               <Button size="sm" variant="ghost" onClick={() => setCloseTgt(e)}>{t('page.actions.close')}</Button>
             </>
           )}
           {e.status === 'price_confirmed' && (
             <>
+              <Button size="sm" variant="ghost" onClick={() => openEditForm(e)}>Edit</Button>
               <Button size="sm" variant="primary" onClick={() => handleConvert(e)}>{t('page.actions.convertToJob')}</Button>
               <Button size="sm" variant="ghost" onClick={() => setCloseTgt(e)}>{t('page.actions.close')}</Button>
             </>
@@ -663,7 +638,7 @@ export function EnquiryPage() {
       description={t('page.description')}
       actions={
         viewTab === 'enquiries' ? (
-          <Button leftIcon={<Plus size={16} />} onClick={() => setCreate(true)}>
+          <Button leftIcon={<Plus size={16} />} onClick={() => { setFormMode('create'); setFormInit(undefined); setFormEnqId(undefined); setFormOpen(true); }}>
             {t('page.actions.newEnquiry')}
           </Button>
         ) : undefined
@@ -747,11 +722,13 @@ export function EnquiryPage() {
         </SectionCard>
       )}
 
-      <CreateEnquiryModal
-        isOpen={createOpen}
-        onClose={() => { setCreate(false); setPrefill(null); }}
-        prefill={prefill}
-        onSave={handleCreate}
+      <EnquiryFormDrawer
+        isOpen={formOpen}
+        onClose={() => { setFormOpen(false); setFormInit(undefined); setFormEnqId(undefined); }}
+        onSave={handleFormSave}
+        initialValues={formInitial}
+        mode={formMode}
+        enquiryNo={formMode === 'update' ? enquiries.find((e) => e.id === formEnqId)?.enquiryNo : undefined}
       />
       <ConfirmPriceModal
         isOpen={!!priceTgt}
