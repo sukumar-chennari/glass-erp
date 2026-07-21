@@ -43,9 +43,9 @@ export function ConfirmDialog({
       }
     >
       <div className={styles.body}>
-        <span className={styles.icon}>
-          <AlertTriangle size={22} />
-        </span>
+        <div className={styles.iconWrap}>
+          <AlertTriangle size={24} />
+        </div>
         <p className={styles.message}>{message}</p>
       </div>
     </Modal>
