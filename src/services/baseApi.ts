@@ -128,6 +128,7 @@ export const baseApi = createApi({
     'VehicleModel',
     'CarBrand',
     'CarModel',
+    'Enquiry',
     'AuthSession',
   ],
   endpoints: () => ({}),

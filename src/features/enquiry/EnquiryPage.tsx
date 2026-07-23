@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Plus, PhoneCall, CheckCircle, ClipboardList, Inbox, Image, Eye } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { PageShell, SectionCard } from '@/components/layout/PageShell';
@@ -8,6 +8,7 @@ import { Select } from '@/components/ui/Select';
 import { DataTable } from '@/components/ui/DataTable';
 import { Badge } from '@/components/ui/Badge';
 import { Modal } from '@/components/ui/Modal';
+import { AlertBanner } from '@/components/ui/AlertBanner';
 import { useToast } from '@/components/ui/Toast';
 import { PricingBreakdown } from './components/PricingBreakdown';
 import { SubmissionReviewModal } from './components/SubmissionReviewModal';
@@ -15,6 +16,11 @@ import type { CustomerSubmission } from './types';
 import type { TableColumn, SelectOption } from '@/types/ui';
 import { EnquiryFormDrawer } from './components/EnquiryFormDrawer';
 import type { EnquiryFormValues } from './components/EnquiryFormDrawer';
+import {
+  useGetEnquiriesQuery,
+  useLazyGetEnquiryByIdQuery,
+} from './services/enquiriesListApi';
+import type { BackendEnquiry, BackendEnquiryStatus } from './services/enquiriesListApi';
 import styles from './EnquiryPage.module.css';
 
 // ── Types ──────────────────────────────────────────────────────────────
@@ -51,65 +57,69 @@ interface Enquiry {
 
 // CustomerSubmission imported from ./types
 
-// ── Mock data ──────────────────────────────────────────────────────────
-let nextEnqNum = 1058;
+// ── Backend → frontend mapping ─────────────────────────────────────────
+const VALID_SOURCES = new Set<string>([
+  'phone', 'walk_in', 'whatsapp', 'google', 'referral', 'insurance_agent', 'mechanic', 'other',
+]);
 
-const INITIAL_ENQUIRIES: Enquiry[] = [
-  {
-    id: 'enq-001', enquiryNo: 'ENQ-1057',
-    phone: '9876543210', customerName: 'Ravi Kumar',
-    vehicleNumber: 'DL 01 AB 1234', vehicleModel: 'Honda City 2020',
-    glassType: 'Front Windshield', source: 'phone',
-    status: 'pending', quotedPrice: null, priceBrand: null,
-    closeReason: null, closeNotes: null,
-    createdAt: '2026-06-29T09:15:00Z', jobRef: null,
-  },
-  {
-    id: 'enq-002', enquiryNo: 'ENQ-1056',
-    phone: '9876543211', customerName: 'Priya Sharma',
-    vehicleNumber: 'HR 26 CD 5678', vehicleModel: 'Maruti Swift 2018',
-    glassType: 'Rear Windshield', source: 'whatsapp',
-    status: 'price_confirmed', quotedPrice: 4400, priceBrand: 'OEE',
-    closeReason: null, closeNotes: null,
-    createdAt: '2026-06-29T08:30:00Z', jobRef: null,
-  },
-  {
-    id: 'enq-003', enquiryNo: 'ENQ-1055',
-    phone: '9876543212', customerName: 'Mohan Singh',
-    vehicleNumber: 'UP 07 EF 9012', vehicleModel: 'Hyundai i20 2021',
-    glassType: 'Driver Side Window', source: 'walk_in',
-    status: 'converted', quotedPrice: 3100, priceBrand: 'OEM',
-    closeReason: null, closeNotes: null,
-    createdAt: '2026-06-29T07:45:00Z', jobRef: 'JC-2025-0847',
-  },
-  {
-    id: 'enq-004', enquiryNo: 'ENQ-1054',
-    phone: '9876543213', customerName: 'Anjali Verma',
-    vehicleNumber: 'MH 02 GH 3456', vehicleModel: 'Toyota Innova 2022',
-    glassType: 'Sunroof Glass', source: 'phone',
-    status: 'closed', quotedPrice: 16200, priceBrand: 'OEM',
-    closeReason: 'declined_price', closeNotes: 'Too expensive',
-    createdAt: '2026-06-28T16:00:00Z', jobRef: null,
-  },
-  {
-    id: 'enq-005', enquiryNo: 'ENQ-1053',
-    phone: '9876543214', customerName: 'Suresh Reddy',
-    vehicleNumber: 'TS 09 IJ 7890', vehicleModel: 'Kia Seltos 2023',
-    glassType: 'Front Windshield', source: 'whatsapp',
-    status: 'pending', quotedPrice: null, priceBrand: null,
-    closeReason: null, closeNotes: null,
-    createdAt: '2026-06-28T14:20:00Z', jobRef: null,
-  },
-  {
-    id: 'enq-006', enquiryNo: 'ENQ-1052',
-    phone: '9876543215', customerName: 'Kavita Nair',
-    vehicleNumber: 'KL 07 MN 2345', vehicleModel: 'Tata Nexon EV 2023',
-    glassType: 'Quarter Glass', source: 'phone',
-    status: 'price_confirmed', quotedPrice: 2100, priceBrand: 'OEE',
-    closeReason: null, closeNotes: null,
-    createdAt: '2026-06-28T11:30:00Z', jobRef: null,
-  },
-];
+function mapBackendStatus(s: BackendEnquiryStatus): EnquiryStatus {
+  if (s === 'CONVERTED') return 'converted';
+  if (s === 'LOST')      return 'closed';
+  return 'pending';
+}
+
+function mapBackendToFrontend(b: BackendEnquiry): Enquiry {
+  const srcRaw = b.source ?? '';
+  return {
+    id:            b.id,
+    enquiryNo:     b.enquiryNo ?? `#${b.id.slice(-6).toUpperCase()}`,
+    phone:         b.phone,
+    customerName:  b.customerName,
+    vehicleNumber: b.vehicleNumber ?? '',
+    vehicleModel:  [b.vehicleBrand, b.vehicleModel, b.vehicleYear].filter(Boolean).join(' '),
+    glassType:     b.glassType    ?? '',
+    source:        (VALID_SOURCES.has(srcRaw) ? srcRaw : 'other') as EnquirySource,
+    status:        mapBackendStatus(b.status),
+    quotedPrice:   b.quotedPrice  ?? null,
+    priceBrand:    b.priceBrand   ?? null,
+    closeReason:   b.closeReason  ?? null,
+    closeNotes:    b.closeNotes   ?? null,
+    createdAt:     b.createdAt,
+    jobRef:        b.jobRef       ?? null,
+    vehicleBrandId: b.vehicleBrandId ?? undefined,
+    vehicleBrand:   b.vehicleBrand   ?? undefined,
+    vehicleYear:    b.vehicleYear    ?? undefined,
+    vehicleType:    (b.vehicleType as Enquiry['vehicleType']) ?? undefined,
+    paymentType:    (b.paymentType as Enquiry['paymentType']) ?? undefined,
+    insurerName:    b.insurerName    ?? undefined,
+    damageNotes:    b.damageNotes    ?? undefined,
+    branchId:       b.branchId       ?? undefined,
+  };
+}
+
+function mapBackendToFormValues(b: BackendEnquiry): Partial<EnquiryFormValues> {
+  return {
+    customerName:    b.customerName    ?? '',
+    phone:           b.phone           ?? '',
+    branchId:        b.branchId        ?? '',
+    source:          b.source          ?? '',
+    vehicleBrandId:  b.vehicleBrandId  ?? '',
+    vehicleBrand:    b.vehicleBrand    ?? '',
+    vehicleModel:    b.vehicleModel    ?? '',
+    vehicleYear:     b.vehicleYear     ?? '',
+    vehicleNumber:   b.vehicleNumber   ?? '',
+    vehicleType:     (b.vehicleType as EnquiryFormValues['vehicleType']) ?? '',
+    glassType:       b.glassType       ?? '',
+    paymentType:     (b.paymentType as EnquiryFormValues['paymentType']) ?? '',
+    insurerName:     b.insurerName     ?? '',
+    accidentDate:    b.accidentDate    ?? '',
+    appointmentDate: b.appointmentDate ?? '',
+    damageNotes:     b.damageNotes     ?? '',
+  };
+}
+
+// ── Counter for locally-created enquiries (pre-write-API) ──────────────
+let nextEnqNum = 1058;
 
 const INITIAL_SUBMISSIONS: CustomerSubmission[] = [
   {
@@ -288,18 +298,49 @@ export function EnquiryPage() {
   const toast = useToast();
 
   const [viewTab,    setViewTab]   = useState<ViewTab>('enquiries');
-  const [enquiries,  setEnquiries] = useState<Enquiry[]>(INITIAL_ENQUIRIES);
+  const [enquiries,  setEnquiries] = useState<Enquiry[]>([]);
   const [submissions,setSubs]      = useState<CustomerSubmission[]>(INITIAL_SUBMISSIONS);
   const [filter,     setFilter]    = useState<StatusFilter>('all');
+  const [page,       setPage]      = useState(1);
   const [formOpen,    setFormOpen]  = useState(false);
   const [formMode,    setFormMode]  = useState<'create' | 'complete' | 'update'>('create');
   const [formInitial, setFormInit]  = useState<Partial<EnquiryFormValues> | undefined>();
   const [formEnqId,   setFormEnqId] = useState<string | undefined>();
+  const [formEnqNo,   setFormEnqNo] = useState<string | undefined>();
+  const [editLoading, setEditLoading] = useState(false);
   const [priceTgt,   setPriceTgt]  = useState<Enquiry | null>(null);
   const [closeTgt,   setCloseTgt]  = useState<Enquiry | null>(null);
   const [reviewSub,  setReviewSub] = useState<CustomerSubmission | null>(null);
 
-  // i18n-driven constants
+  // ── List API ──────────────────────────────────────────────────────────
+  const LIMIT = 20;
+
+  const apiStatus: BackendEnquiryStatus | undefined =
+    filter === 'pending'   ? 'SUBMITTED' :
+    filter === 'converted' ? 'CONVERTED' :
+    filter === 'closed'    ? 'LOST'      : undefined;
+
+  const {
+    data:      listResponse,
+    isLoading: listLoading,
+    isError:   listError,
+  } = useGetEnquiriesQuery({
+    page,
+    limit:     LIMIT,
+    sortBy:    'createdAt',
+    sortOrder: 'desc',
+    ...(apiStatus ? { status: apiStatus } : {}),
+  });
+
+  const [triggerGetById] = useLazyGetEnquiryByIdQuery();
+
+  useEffect(() => {
+    if (listResponse?.data) {
+      setEnquiries(listResponse.data.map(mapBackendToFrontend));
+    }
+  }, [listResponse]);
+
+  // ── i18n-driven constants ─────────────────────────────────────────────
   const CLOSE_REASON_OPTIONS: SelectOption[] = useMemo(() => [
     { value: 'declined_price',  label: t('page.closeReasons.declined_price')  },
     { value: 'found_vendor',    label: t('page.closeReasons.found_vendor')    },
@@ -393,28 +434,37 @@ export function EnquiryPage() {
     setFormOpen(false);
     setFormInit(undefined);
     setFormEnqId(undefined);
+    setFormEnqNo(undefined);
   }
 
-  function openEditForm(enq: Enquiry) {
-    setFormInit({
-      customerName:   enq.customerName,
-      phone:          enq.phone,
-      branchId:       enq.branchId       ?? '',
-      source:         enq.source,
-      vehicleBrandId: enq.vehicleBrandId ?? '',
-      vehicleBrand:   enq.vehicleBrand   ?? '',
-      vehicleModel:   enq.vehicleModel,
-      vehicleYear:    enq.vehicleYear    ?? '',
-      vehicleNumber:  enq.vehicleNumber,
-      vehicleType:    enq.vehicleType    ?? '',
-      glassType:      enq.glassType,
-      paymentType:    enq.paymentType    ?? '',
-      insurerName:    enq.insurerName    ?? '',
-      damageNotes:    enq.damageNotes    ?? '',
-    });
-    setFormMode('update');
-    setFormEnqId(enq.id);
-    setFormOpen(true);
+  async function openEditForm(enq: Enquiry) {
+    setEditLoading(true);
+    try {
+      const result = await triggerGetById(enq.id);
+      if (result.isError) {
+        const err = result.error as { status?: number };
+        if (err?.status === 404) {
+          toast.error('Enquiry not found — it may have been removed.');
+        } else {
+          toast.error('Could not load enquiry details. Please try again.');
+        }
+        return;
+      }
+      const detail = result.data!;
+      const mapped = mapBackendToFrontend(detail);
+      setFormInit(mapBackendToFormValues(detail));
+      setFormMode('update');
+      setFormEnqId(detail.id);
+      setFormEnqNo(mapped.enquiryNo);
+      setFormOpen(true);
+    } finally {
+      setEditLoading(false);
+    }
+  }
+
+  function handleFilterChange(newFilter: StatusFilter) {
+    setFilter(newFilter);
+    setPage(1);
   }
 
   function handleConfirmPrice(price: number, brand: string) {
@@ -545,14 +595,14 @@ export function EnquiryPage() {
         <div className={styles.actionCell}>
           {e.status === 'pending' && (
             <>
-              <Button size="sm" variant="ghost" onClick={() => openEditForm(e)}>Edit</Button>
+              <Button size="sm" variant="ghost" onClick={() => { void openEditForm(e); }} disabled={editLoading}>Edit</Button>
               <Button size="sm" onClick={() => setPriceTgt(e)}>{t('page.actions.confirmPrice')}</Button>
               <Button size="sm" variant="ghost" onClick={() => setCloseTgt(e)}>{t('page.actions.close')}</Button>
             </>
           )}
           {e.status === 'price_confirmed' && (
             <>
-              <Button size="sm" variant="ghost" onClick={() => openEditForm(e)}>Edit</Button>
+              <Button size="sm" variant="ghost" onClick={() => { void openEditForm(e); }} disabled={editLoading}>Edit</Button>
               <Button size="sm" variant="primary" onClick={() => handleConvert(e)}>{t('page.actions.convertToJob')}</Button>
               <Button size="sm" variant="ghost" onClick={() => setCloseTgt(e)}>{t('page.actions.close')}</Button>
             </>
@@ -683,13 +733,13 @@ export function EnquiryPage() {
             <div className={styles.filterBar}>
               {FILTER_TABS.map((tab) => {
                 const count = tab.id === 'all'
-                  ? enquiries.length
+                  ? (listResponse?.total ?? enquiries.length)
                   : enquiries.filter((e) => e.status === tab.id).length;
                 return (
                   <button
                     key={tab.id}
                     className={`${styles.filterTab} ${filter === tab.id ? styles.filterActive : ''}`}
-                    onClick={() => setFilter(tab.id)}
+                    onClick={() => handleFilterChange(tab.id)}
                   >
                     {tab.label}
                     <span className={styles.tabCount}>{count}</span>
@@ -698,11 +748,43 @@ export function EnquiryPage() {
               })}
             </div>
 
+            {listError && (
+              <AlertBanner
+                variant="error"
+                message="Failed to load enquiries. Please check your connection and try again."
+              />
+            )}
+
             <DataTable
               columns={columns}
               data={filtered}
+              isLoading={listLoading}
               emptyMessage={t('page.emptyFilter')}
             />
+
+            {!listLoading && !listError && listResponse && listResponse.total > LIMIT && (
+              <div className={styles.paginationRow}>
+                <span className={styles.paginationInfo}>
+                  {`${Math.min((page - 1) * LIMIT + 1, listResponse.total)}–${Math.min(page * LIMIT, listResponse.total)} of ${listResponse.total}`}
+                </span>
+                <div className={styles.paginationBtns}>
+                  <button
+                    className={styles.pageBtn}
+                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    disabled={page <= 1}
+                  >
+                    ← Prev
+                  </button>
+                  <button
+                    className={styles.pageBtn}
+                    onClick={() => setPage((p) => p + 1)}
+                    disabled={page * LIMIT >= listResponse.total}
+                  >
+                    Next →
+                  </button>
+                </div>
+              </div>
+            )}
           </SectionCard>
         </>
       ) : (
@@ -724,11 +806,11 @@ export function EnquiryPage() {
 
       <EnquiryFormDrawer
         isOpen={formOpen}
-        onClose={() => { setFormOpen(false); setFormInit(undefined); setFormEnqId(undefined); }}
+        onClose={() => { setFormOpen(false); setFormInit(undefined); setFormEnqId(undefined); setFormEnqNo(undefined); }}
         onSave={handleFormSave}
         initialValues={formInitial}
         mode={formMode}
-        enquiryNo={formMode === 'update' ? enquiries.find((e) => e.id === formEnqId)?.enquiryNo : undefined}
+        enquiryNo={formMode === 'update' ? formEnqNo : undefined}
       />
       <ConfirmPriceModal
         isOpen={!!priceTgt}

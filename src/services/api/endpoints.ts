@@ -155,4 +155,13 @@ export const ENDPOINTS = {
   reports: {
     branchSummary: '/reports/branch-summary',
   },
+
+  // ── Enquiries ───────────────────────────────────────────────────────
+  // quick: unauthenticated fast-capture (Entry Page, POST only).
+  // list/byId: authenticated branch-admin read endpoints.
+  enquiries: {
+    quick: 'enquiries/quick',
+    list:  '/enquiries',
+    byId:  (id: string) => `/enquiries/${id}`,
+  },
 } as const;

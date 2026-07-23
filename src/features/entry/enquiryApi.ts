@@ -1,46 +1,30 @@
 import { baseApi } from '@/services/baseApi';
-import { mockableMutation } from '@/services/mockUtils';
+import { ENDPOINTS } from '@/services/api/endpoints';
 
-export interface EnquiryPayload {
-  branchId:      string;
-  vehicleBrand:  string;
-  vehicleModel:  string;
-  customerPhone: string;
+// POST /api/v1/enquiries/quick — unauthenticated quick-capture endpoint.
+// Only three fields are sent; vehicle details are added later by branch staff.
+export interface QuickEnquiryPayload {
+  customerName: string;
+  phone:        string;
+  branchId:     string;
 }
 
-export interface EnquiryResponse {
-  id:            string;
-  jobNumber:     string;
-  branchId:      string;
-  vehicleBrand:  string;
-  vehicleModel:  string;
-  customerPhone: string;
-  status:        string;
+// 201 response shape.
+export interface QuickEnquiryResponse {
+  enquiryId: string;
 }
 
-// TODO_ACTIVATE_ME: probe POST /api/v1/enquiries on the live backend before removing the mock path.
-// POST /api/v1/enquiries endpoint existence is unconfirmed as of Phase 13B.9.
-// Mock returns a plausible response shape so the UI flow is fully testable in mock mode.
 export const enquiryApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    createEnquiry: builder.mutation<EnquiryResponse, EnquiryPayload>({
-      ...mockableMutation<EnquiryResponse, EnquiryPayload>({
-        mockFn: (payload) => ({
-          id:            `enq-${Date.now()}`,
-          jobNumber:     `WX-${Math.floor(100000 + Math.random() * 900000)}`,
-          branchId:      payload.branchId,
-          vehicleBrand:  payload.vehicleBrand,
-          vehicleModel:  payload.vehicleModel,
-          customerPhone: payload.customerPhone,
-          status:        'PENDING',
-        }),
-        url:    '/enquiries',
+    createQuickEnquiry: builder.mutation<QuickEnquiryResponse, QuickEnquiryPayload>({
+      query: (body) => ({
+        url:    ENDPOINTS.enquiries.quick,
         method: 'POST',
-        body:   (payload) => payload,
+        body,
       }),
     }),
   }),
   overrideExisting: false,
 });
 
-export const { useCreateEnquiryMutation } = enquiryApi;
+export const { useCreateQuickEnquiryMutation } = enquiryApi;

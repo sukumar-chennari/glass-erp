@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { Navigate, Link } from 'react-router-dom';
-import { MapPin, Phone, Car, ChevronRight, Locate, CheckCircle, Search } from 'lucide-react';
+import { MapPin, Phone, ChevronRight, Locate, CheckCircle, Search, Car } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useLazyGetNearbyBranchesQuery } from './nearbyBranchesApi';
 import type { NearbyBranch } from './nearbyBranchesApi';
-import { useCreateEnquiryMutation } from './enquiryApi';
+import { useCreateQuickEnquiryMutation } from './enquiryApi';
 import { useGetCarBrandsQuery } from '@/features/settings/services/carBrandsApi';
 import { useGetCarModelsQuery } from '@/features/settings/services/carModelsApi';
 import { getRoleDefaultRoute } from '@/utils/roleRouting';
@@ -15,11 +15,9 @@ import styles from './EntryPage.module.css';
 // ── Types ────────────────────────────────────────────────────
 
 interface Confirmation {
-  jobNumber:    string;
-  branchName:   string;
-  vehicleBrand: string;
-  vehicleModel: string;
-  phone:        string;
+  enquiryId:   string;
+  branchName:  string;
+  phone:       string;
   customerName: string;
 }
 
@@ -27,8 +25,6 @@ interface FormErrors {
   customerName?: string;
   phone?:        string;
   branchId?:     string;
-  vehicleBrand?: string;
-  vehicleModel?: string;
 }
 
 // ── WhatsApp icon (inline SVG — lucide has no WhatsApp brand icon) ──
@@ -141,7 +137,7 @@ function ConfirmationView({ confirmation, onReset }: ConfirmationViewProps) {
           <div className={styles.confirmDetails}>
             <div className={styles.confirmRow}>
               <span>Reference</span>
-              <strong>{confirmation.jobNumber}</strong>
+              <strong>{confirmation.enquiryId || '—'}</strong>
             </div>
             <div className={styles.confirmRow}>
               <span>Name</span>
@@ -154,10 +150,6 @@ function ConfirmationView({ confirmation, onReset }: ConfirmationViewProps) {
             <div className={styles.confirmRow}>
               <span>Branch</span>
               <strong>{confirmation.branchName}</strong>
-            </div>
-            <div className={styles.confirmRow}>
-              <span>Vehicle</span>
-              <strong>{confirmation.vehicleBrand} {confirmation.vehicleModel}</strong>
             </div>
           </div>
           <div className={styles.confirmActions}>
@@ -193,29 +185,26 @@ export function EntryPage() {
   const [fetchNearby, { data: nearbyBranches, isFetching: loadingBranches }] =
     useLazyGetNearbyBranchesQuery();
 
-  const [createEnquiry, { isLoading: submitting }] = useCreateEnquiryMutation();
+  const [createQuickEnquiry, { isLoading: submitting }] = useCreateQuickEnquiryMutation();
 
-  // Brand + model ID state (must precede the queries that depend on vehicleBrandId)
-  const [vehicleBrandId, setVehicleBrandId] = useState('');
+  const { data: carBrands = [] } = useGetCarBrandsQuery({ status: 'ACTIVE' });
 
-  // Car brands and models from API
-  const { data: carBrandsData, isLoading: loadingBrands } = useGetCarBrandsQuery({ status: 'ACTIVE' });
-  const { data: carModelsData, isLoading: loadingModels } = useGetCarModelsQuery(
-    { brandId: vehicleBrandId, status: 'ACTIVE' },
-    { skip: !vehicleBrandId },
-  );
-
-  // Main booking form state
+  // Quick enquiry form state — only customerName/phone/branchId sent to POST /api/v1/enquiries/quick
   const [customerName,   setCustomerName]   = useState('');
   const [phone,          setPhone]          = useState('');
   const [branchId,       setBranchId]       = useState('');
+  const [vehicleBrandId, setVehicleBrandId] = useState('');
+  const [vehicleModelId, setVehicleModelId] = useState('');
   const [districtSearch, setDistrictSearch] = useState('');
-  const [vehicleBrand,   setVehicleBrand]   = useState('');  // brand display name — sent in enquiry
-  const [vehicleModel,   setVehicleModel]   = useState('');  // model display name — sent in enquiry
   const [errors,         setErrors]         = useState<FormErrors>({});
   const [confirmation,   setConfirmation]   = useState<Confirmation | null>(null);
   const [locating,       setLocating]       = useState(false);
   const [gpsError,       setGpsError]       = useState<string | null>(null);
+
+  const { data: carModels = [] } = useGetCarModelsQuery(
+    vehicleBrandId ? { brandId: vehicleBrandId, status: 'ACTIVE' } : undefined,
+    { skip: !vehicleBrandId },
+  );
 
   // Auto-detect nearest branch on mount.
   // Ref guard prevents React StrictMode double-invoke within one mount cycle;
@@ -260,22 +249,12 @@ export function EntryPage() {
   if (authLoading) return null;
   if (session) return <Navigate to={getRoleDefaultRoute(session.role)} replace />;
 
-  const branches  = nearbyBranches ?? [];
-  const carBrands = carBrandsData   ?? [];
-  const carModels = carModelsData   ?? [];
+  const branches = nearbyBranches ?? [];
 
   // ── Booking form helpers ────────────────────────────────────
 
   function clearError(key: keyof FormErrors) {
     setErrors((e) => ({ ...e, [key]: undefined }));
-  }
-
-  function handleBrandChange(brandId: string) {
-    const brand = carBrands.find((b) => b.id === brandId);
-    setVehicleBrandId(brandId);
-    setVehicleBrand(brand?.name ?? '');
-    setVehicleModel('');
-    setErrors((e) => ({ ...e, vehicleBrand: undefined, vehicleModel: undefined }));
   }
 
   function handleLocate() {
@@ -333,24 +312,42 @@ export function EntryPage() {
 
   function validate(): boolean {
     const errs: FormErrors = {};
-    if (!customerName.trim()) errs.customerName = 'Please enter your name';
-    if (!phone)               errs.phone        = 'Mobile number is required';
-    else if (!/^\d{10}$/.test(phone)) errs.phone = 'Enter a valid 10-digit mobile number';
-    if (!branchId)            errs.branchId     = 'Please select a branch';
-    if (!vehicleBrand)        errs.vehicleBrand = 'Please select your car brand';
-    if (!vehicleModel)        errs.vehicleModel = 'Please select your car model';
+    if (!customerName.trim())           errs.customerName = 'Please enter your name';
+    if (!phone)                         errs.phone        = 'Mobile number is required';
+    else if (!/^\d{10}$/.test(phone))   errs.phone        = 'Enter a valid 10-digit mobile number';
+    if (!branchId)                      errs.branchId     = 'Please select a branch';
     setErrors(errs);
     return Object.keys(errs).length === 0;
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (submitting) return;                          // double-submit guard
     if (!validate()) return;
-    const result = await createEnquiry({ branchId, vehicleBrand, vehicleModel, customerPhone: phone });
-    if ('data' in result && result.data) {
-      const branchName = branches.find((b) => b.id === branchId)?.name ?? branchId;
-      setConfirmation({ jobNumber: result.data.jobNumber, branchName, vehicleBrand, vehicleModel, phone, customerName });
+
+    setErrors({});                                   // clear any previous API errors
+
+    const result = await createQuickEnquiry({
+      customerName: customerName.trim(),
+      phone,
+      branchId,
+    });
+
+    if ('error' in result) {
+      const err = result.error as { status?: number; data?: { message?: string } };
+      if (err?.status === 400) {
+        // 400 means branch is no longer available
+        setErrors({ branchId: 'Selected branch is not available. Please choose another.' });
+      } else {
+        // Network / server error
+        setErrors({ branchId: 'Submission failed — please check your connection and try again.' });
+      }
+      return;
     }
+
+    const enquiryId = result.data?.enquiryId ?? '';   // defensive: show confirmation even if missing
+    const branchName = branches.find((b) => b.id === branchId)?.name ?? branchId;
+    setConfirmation({ enquiryId, branchName, phone, customerName: customerName.trim() });
   }
 
   // ── Confirmation state ────────────────────────────────────
@@ -426,6 +423,46 @@ export function EntryPage() {
               )}
             </div>
 
+            {/* Car Brand (optional) */}
+            <div className={styles.fieldGroup}>
+              <label className={styles.label} htmlFor="entry-brand">
+                <Car size={13} />
+                Car Brand <span style={{ fontWeight: 400, opacity: 0.6, fontSize: '0.75em' }}>(optional)</span>
+              </label>
+              <select
+                id="entry-brand"
+                className={styles.select}
+                value={vehicleBrandId}
+                onChange={(e) => { setVehicleBrandId(e.target.value); setVehicleModelId(''); }}
+              >
+                <option value="">Select brand</option>
+                {carBrands.map((b) => (
+                  <option key={b.id} value={b.id}>{b.name}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Car Model (optional, cascades from brand) */}
+            <div className={styles.fieldGroup}>
+              <label className={styles.label} htmlFor="entry-model">
+                Car Model <span style={{ fontWeight: 400, opacity: 0.6, fontSize: '0.75em' }}>(optional)</span>
+              </label>
+              <select
+                id="entry-model"
+                className={styles.select}
+                value={vehicleModelId}
+                onChange={(e) => setVehicleModelId(e.target.value)}
+                disabled={!vehicleBrandId || carModels.length === 0}
+              >
+                <option value="">
+                  {!vehicleBrandId ? 'Select brand first' : carModels.length === 0 ? 'No models available' : 'Select model'}
+                </option>
+                {carModels.map((m) => (
+                  <option key={m.id} value={m.id}>{m.name}</option>
+                ))}
+              </select>
+            </div>
+
             {/* Branch */}
             <div className={styles.fieldGroup}>
               <label className={styles.label} htmlFor="entry-district">
@@ -488,65 +525,6 @@ export function EntryPage() {
                 <span id="err-branch" role="alert" className={styles.error}>
                   {errors.branchId ?? gpsError}
                 </span>
-              )}
-            </div>
-
-            {/* Car Brand */}
-            <div className={styles.fieldGroup}>
-              <label className={styles.label} htmlFor="entry-brand">
-                <Car size={13} />
-                Car Brand
-              </label>
-              <select
-                id="entry-brand"
-                className={`${styles.select} ${errors.vehicleBrand ? styles.selectError : ''}`}
-                value={vehicleBrandId}
-                onChange={(e) => handleBrandChange(e.target.value)}
-                disabled={loadingBrands}
-                aria-invalid={!!errors.vehicleBrand}
-                aria-describedby={errors.vehicleBrand ? 'err-brand' : undefined}
-              >
-                <option value="">
-                  {loadingBrands ? 'Loading brands…' : 'Select car brand'}
-                </option>
-                {carBrands.map((b) => (
-                  <option key={b.id} value={b.id}>{b.name}</option>
-                ))}
-              </select>
-              {errors.vehicleBrand && (
-                <span id="err-brand" role="alert" className={styles.error}>{errors.vehicleBrand}</span>
-              )}
-            </div>
-
-            {/* Car Model */}
-            <div className={styles.fieldGroup}>
-              <label className={styles.label} htmlFor="entry-model">
-                Car Model
-              </label>
-              <select
-                id="entry-model"
-                className={`${styles.select} ${errors.vehicleModel ? styles.selectError : ''}`}
-                value={vehicleModel}
-                onChange={(e) => { setVehicleModel(e.target.value); clearError('vehicleModel'); }}
-                disabled={!vehicleBrandId || loadingModels}
-                aria-invalid={!!errors.vehicleModel}
-                aria-describedby={errors.vehicleModel ? 'err-model' : undefined}
-              >
-                <option value="">
-                  {!vehicleBrandId
-                    ? 'Select brand first'
-                    : loadingModels
-                      ? 'Loading models…'
-                      : carModels.length === 0
-                        ? 'No models available'
-                        : 'Select car model'}
-                </option>
-                {carModels.map((m) => (
-                  <option key={m.id} value={m.name}>{m.name}</option>
-                ))}
-              </select>
-              {errors.vehicleModel && (
-                <span id="err-model" role="alert" className={styles.error}>{errors.vehicleModel}</span>
               )}
             </div>
 
