@@ -50,6 +50,31 @@ export interface GetEnquiriesResponse {
   limit: number;
 }
 
+// PATCH /enquiries/:id — fill in or update details on a SUBMITTED enquiry.
+// Only include fields that have a value; omitted fields are not overwritten.
+// Frontend field → backend field name mapping:
+//   vehicleBrand    → vehicleMake
+//   vehicleNumber   → vehicleReg
+//   appointmentDate → preferredDate
+//   damageNotes     → notes
+export interface UpdateEnquiryPayload {
+  id:            string;
+  customerName?: string;
+  phone?:        string;
+  vehicleMake?:  string;
+  vehicleModel?: string;
+  vehicleYear?:  string;
+  vehicleReg?:   string;
+  glassType?:    string;
+  vehicleType?:  string;
+  source?:       string;
+  paymentType?:  string;
+  insurerName?:  string;
+  accidentDate?: string;
+  preferredDate?: string;
+  notes?:        string;
+}
+
 export const enquiriesListApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getEnquiries: builder.query<GetEnquiriesResponse, GetEnquiriesParams>({
@@ -67,8 +92,24 @@ export const enquiriesListApi = baseApi.injectEndpoints({
       }),
       providesTags: (_result, _error, id) => [{ type: 'Enquiry' as const, id }],
     }),
+
+    updateEnquiry: builder.mutation<BackendEnquiry, UpdateEnquiryPayload>({
+      query: ({ id, ...body }) => ({
+        url:    ENDPOINTS.enquiries.update(id),
+        method: 'PATCH',
+        body,
+      }),
+      invalidatesTags: (_result, _error, arg) => [
+        { type: 'Enquiry' as const, id: arg.id },
+        'Enquiry',
+      ],
+    }),
   }),
   overrideExisting: false,
 });
 
-export const { useGetEnquiriesQuery, useLazyGetEnquiryByIdQuery } = enquiriesListApi;
+export const {
+  useGetEnquiriesQuery,
+  useLazyGetEnquiryByIdQuery,
+  useUpdateEnquiryMutation,
+} = enquiriesListApi;

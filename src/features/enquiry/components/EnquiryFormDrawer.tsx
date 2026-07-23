@@ -36,6 +36,7 @@ interface EnquiryFormDrawerProps {
   initialValues?: Partial<EnquiryFormValues>;
   mode:          'create' | 'complete' | 'update';
   enquiryNo?:    string;
+  isSaving?:     boolean;
 }
 
 const GLASS_TYPES = [
@@ -75,7 +76,7 @@ const STEP_LABELS = ['Contact', 'Vehicle', 'Service', 'Docs'];
 type FormErrors = Partial<Record<keyof EnquiryFormValues, string>>;
 
 export function EnquiryFormDrawer({
-  isOpen, onClose, onSave, initialValues, mode, enquiryNo,
+  isOpen, onClose, onSave, initialValues, mode, enquiryNo, isSaving = false,
 }: EnquiryFormDrawerProps) {
   const [step,   setStep]   = useState(1);
   const [form,   setForm]   = useState<EnquiryFormValues>({ ...EMPTY_FORM, ...initialValues });
@@ -480,9 +481,10 @@ export function EnquiryFormDrawer({
                 <ChevronRight size={15} />
               </button>
             ) : (
-              <button type="button" className={styles.btnPrimary} onClick={handleSubmit}>
-                <Check size={15} />
-                {mode === 'update' ? 'Update Enquiry' : 'Create Enquiry'}
+              <button type="button" className={styles.btnPrimary} onClick={handleSubmit} disabled={isSaving}>
+                {isSaving ? 'Saving…' : (
+                  <><Check size={15} />{mode === 'update' ? 'Update Enquiry' : 'Create Enquiry'}</>
+                )}
               </button>
             )}
           </div>

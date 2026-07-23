@@ -19,8 +19,9 @@ import type { EnquiryFormValues } from './components/EnquiryFormDrawer';
 import {
   useGetEnquiriesQuery,
   useLazyGetEnquiryByIdQuery,
+  useUpdateEnquiryMutation,
 } from './services/enquiriesListApi';
-import type { BackendEnquiry, BackendEnquiryStatus } from './services/enquiriesListApi';
+import type { BackendEnquiry, BackendEnquiryStatus, UpdateEnquiryPayload } from './services/enquiriesListApi';
 import styles from './EnquiryPage.module.css';
 
 // ── Types ──────────────────────────────────────────────────────────────
@@ -333,6 +334,7 @@ export function EnquiryPage() {
   });
 
   const [triggerGetById] = useLazyGetEnquiryByIdQuery();
+  const [updateEnquiry, { isLoading: updateSaving }] = useUpdateEnquiryMutation();
 
   useEffect(() => {
     if (listResponse?.data) {
@@ -375,32 +377,58 @@ export function EnquiryPage() {
     [enquiries, filter],
   );
 
-  function handleFormSave(values: EnquiryFormValues) {
+  async function handleFormSave(values: EnquiryFormValues) {
     if (formMode === 'update' && formEnqId) {
-      const target = enquiries.find((e) => e.id === formEnqId);
-      setEnquiries((prev) =>
-        prev.map((e) => {
-          if (e.id !== formEnqId) return e;
-          return {
-            ...e,
-            customerName:   values.customerName,
-            phone:          values.phone,
-            vehicleNumber:  values.vehicleNumber,
-            vehicleModel:   [values.vehicleBrand, values.vehicleModel, values.vehicleYear].filter(Boolean).join(' ') || e.vehicleModel,
-            glassType:      values.glassType   || e.glassType,
-            source:         (values.source as EnquirySource) || e.source,
-            vehicleBrandId: values.vehicleBrandId || undefined,
-            vehicleBrand:   values.vehicleBrand   || undefined,
-            vehicleYear:    values.vehicleYear     || undefined,
-            vehicleType:    values.vehicleType     || undefined,
-            paymentType:    values.paymentType     || undefined,
-            insurerName:    values.insurerName     || undefined,
-            damageNotes:    values.damageNotes     || undefined,
-            branchId:       values.branchId        || undefined,
-          };
-        }),
-      );
-      if (target) toast.success(`${target.enquiryNo} updated`);
+      // Build payload: only include non-empty fields to avoid overwriting existing data.
+      // Map frontend field names → backend field names where they differ.
+      const patch: UpdateEnquiryPayload = { id: formEnqId };
+      if (values.customerName.trim()) patch.customerName = values.customerName.trim();
+      if (values.phone)               patch.phone        = values.phone;
+      if (values.vehicleBrand)        patch.vehicleMake  = values.vehicleBrand;
+      if (values.vehicleModel)        patch.vehicleModel = values.vehicleModel;
+      if (values.vehicleYear)         patch.vehicleYear  = values.vehicleYear;
+      if (values.vehicleNumber)       patch.vehicleReg   = values.vehicleNumber;
+      if (values.glassType)           patch.glassType    = values.glassType;
+      if (values.vehicleType)         patch.vehicleType  = values.vehicleType;
+      if (values.source)              patch.source       = values.source;
+      if (values.paymentType)         patch.paymentType  = values.paymentType;
+      if (values.insurerName)         patch.insurerName  = values.insurerName;
+      if (values.accidentDate)        patch.accidentDate = values.accidentDate;
+      if (values.appointmentDate)     patch.preferredDate = values.appointmentDate;
+      if (values.damageNotes)         patch.notes        = values.damageNotes;
+
+      const result = await updateEnquiry(patch);
+
+      if ('error' in result) {
+        const err = result.error as { status?: number; data?: { message?: string } };
+        if (err?.status === 404) {
+          toast.error('Enquiry not found — it may have been removed.');
+          setFormOpen(false);
+          setFormInit(undefined);
+          setFormEnqId(undefined);
+          setFormEnqNo(undefined);
+        } else if (err?.status === 400) {
+          toast.error('Only submitted enquiries can be updated.');
+        } else {
+          toast.error('Update failed — please check your connection and try again.');
+        }
+        return;
+      }
+
+      // Merge server response into local row, preserving local-only workflow state
+      // (price_confirmed status, quotedPrice, closeReason, jobRef) that has no write API yet.
+      const serverRow = mapBackendToFrontend(result.data);
+      setEnquiries((prev) => prev.map((e) =>
+        e.id === serverRow.id
+          ? { ...serverRow, status: e.status, quotedPrice: e.quotedPrice, priceBrand: e.priceBrand, closeReason: e.closeReason, closeNotes: e.closeNotes, jobRef: e.jobRef }
+          : e,
+      ));
+      toast.success(`${formEnqNo ?? serverRow.enquiryNo} updated`);
+      setFormOpen(false);
+      setFormInit(undefined);
+      setFormEnqId(undefined);
+      setFormEnqNo(undefined);
+      return;
     } else {
       const displayModel = [values.vehicleBrand, values.vehicleModel, values.vehicleYear].filter(Boolean).join(' ') || 'TBD';
       const e: Enquiry = {
@@ -807,10 +835,11 @@ export function EnquiryPage() {
       <EnquiryFormDrawer
         isOpen={formOpen}
         onClose={() => { setFormOpen(false); setFormInit(undefined); setFormEnqId(undefined); setFormEnqNo(undefined); }}
-        onSave={handleFormSave}
+        onSave={(v) => { void handleFormSave(v); }}
         initialValues={formInitial}
         mode={formMode}
         enquiryNo={formMode === 'update' ? formEnqNo : undefined}
+        isSaving={formMode === 'update' && updateSaving}
       />
       <ConfirmPriceModal
         isOpen={!!priceTgt}
