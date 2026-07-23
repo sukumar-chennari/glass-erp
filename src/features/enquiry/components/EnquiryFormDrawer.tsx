@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react';
 import { X, ChevronRight, ChevronLeft, Check } from 'lucide-react';
+import { useGetCarBrandsQuery } from '@/features/settings/services/carBrandsApi';
+import { useGetCarModelsQuery } from '@/features/settings/services/carModelsApi';
+import type { CarBrand } from '@/types/models/carBrand';
 import styles from './EnquiryFormDrawer.module.css';
 
 export interface EnquiryFormValues {
@@ -100,11 +103,32 @@ export function EnquiryFormDrawer({
     return () => window.removeEventListener('keydown', onKey);
   }, [isOpen, onClose]);
 
+  // Hooks must be called before any conditional return.
+  const { data: carBrands = [], isLoading: brandsLoading } = useGetCarBrandsQuery({ status: 'ACTIVE' });
+  const { data: carModels = [], isLoading: modelsLoading } = useGetCarModelsQuery(
+    form.vehicleBrandId ? { brandId: form.vehicleBrandId, status: 'ACTIVE' } : undefined,
+    { skip: !form.vehicleBrandId },
+  );
+
   if (!isOpen) return null;
 
   function set<K extends keyof EnquiryFormValues>(key: K, value: EnquiryFormValues[K]) {
     setForm((p) => ({ ...p, [key]: value }));
     setErrors((e) => ({ ...e, [key]: undefined }));
+  }
+
+  // Brand change resets model — must update three fields atomically.
+  // RC autofill entry point: pass a matched brand and set vehicleModel separately
+  // to prefill from extracted RC data while keeping fields user-editable.
+  function handleBrandChange(brandId: string) {
+    const brand: CarBrand | undefined = carBrands.find((b) => b.id === brandId);
+    setForm((p) => ({
+      ...p,
+      vehicleBrandId: brandId,
+      vehicleBrand:   brand?.name ?? '',
+      vehicleModel:   '',
+    }));
+    setErrors((e) => ({ ...e, vehicleBrand: undefined, vehicleModel: undefined }));
   }
 
   function validateStep(s: number): boolean {
@@ -255,21 +279,41 @@ export function EnquiryFormDrawer({
               <div className={styles.twoCol}>
                 <div className={styles.grp}>
                   <label className={styles.lbl}>Car Brand</label>
-                  <input
+                  <select
                     className={styles.input}
-                    value={form.vehicleBrand}
-                    onChange={(e) => set('vehicleBrand', e.target.value)}
-                    placeholder="e.g. Maruti Suzuki"
-                  />
+                    value={form.vehicleBrandId}
+                    onChange={(e) => handleBrandChange(e.target.value)}
+                    disabled={brandsLoading}
+                  >
+                    <option value="">
+                      {brandsLoading ? 'Loading brands…' : 'Select brand'}
+                    </option>
+                    {carBrands.map((b) => (
+                      <option key={b.id} value={b.id}>{b.name}</option>
+                    ))}
+                  </select>
                 </div>
                 <div className={styles.grp}>
                   <label className={styles.lbl}>Model</label>
-                  <input
+                  <select
                     className={styles.input}
                     value={form.vehicleModel}
                     onChange={(e) => set('vehicleModel', e.target.value)}
-                    placeholder="e.g. Swift"
-                  />
+                    disabled={!form.vehicleBrandId || modelsLoading}
+                  >
+                    <option value="">
+                      {!form.vehicleBrandId
+                        ? 'Select brand first'
+                        : modelsLoading
+                          ? 'Loading models…'
+                          : carModels.length === 0
+                            ? 'No models available'
+                            : 'Select model'}
+                    </option>
+                    {carModels.map((m) => (
+                      <option key={m.id} value={m.name}>{m.name}</option>
+                    ))}
+                  </select>
                 </div>
               </div>
 

@@ -307,14 +307,15 @@ select.input option {
   align-items: center;
   gap: 3px;
   padding: 10px var(--space-2);
-  background: var(--form-drawer-surface);
-  border: 1.5px solid var(--form-drawer-divider-strong);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1.5px solid rgba(255, 255, 255, 0.13);
   border-radius: 10px;
   cursor: pointer;
   transition: all var(--transition-fast);
   font-size: var(--font-size-base);
   color: var(--form-drawer-text-secondary);
   user-select: none;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 .radioOpt input[type='radio'] {
@@ -322,14 +323,17 @@ select.input option {
 }
 
 .radioOpt:hover {
-  background: var(--form-drawer-surface-hover);
-  border-color: var(--form-drawer-border);
+  background: rgba(255, 255, 255, 0.10);
+  border-color: rgba(255, 255, 255, 0.22);
+  color: var(--form-drawer-text);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
 }
 
 .radioOptActive {
-  background: var(--form-drawer-accent-bg);
-  border-color: var(--form-drawer-accent-border);
+  background: rgba(99, 102, 241, 0.16);
+  border-color: rgba(99, 102, 241, 0.60);
   color: var(--form-drawer-accent-text);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.10), inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .radioSub {
@@ -338,7 +342,7 @@ select.input option {
 }
 
 .radioOptActive .radioSub {
-  color: var(--form-drawer-text-muted);
+  color: rgba(167, 139, 250, 0.75);
 }
 
 /* ── Glass selection grid ── */
@@ -354,27 +358,30 @@ select.input option {
   align-items: center;
   gap: 4px;
   padding: 10px 5px 9px;
-  background: var(--form-drawer-surface);
-  border: 1.5px solid var(--form-drawer-divider-strong);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1.5px solid rgba(255, 255, 255, 0.13);
   border-radius: 10px;
   cursor: pointer;
   transition: all var(--transition-fast);
   font-size: var(--font-size-2xs);
-  color: var(--form-drawer-text-faint);
+  color: rgba(255, 255, 255, 0.55);
   text-align: center;
   line-height: var(--line-height-snug);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 .glassOpt:hover {
-  background: var(--form-drawer-surface-hover);
-  border-color: var(--form-drawer-border);
-  color: var(--form-drawer-text-secondary);
+  background: rgba(255, 255, 255, 0.10);
+  border-color: rgba(255, 255, 255, 0.22);
+  color: rgba(255, 255, 255, 0.85);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
 }
 
 .glassOptActive {
-  background: var(--form-drawer-accent-bg);
-  border-color: var(--form-drawer-accent-border);
+  background: rgba(99, 102, 241, 0.16);
+  border-color: rgba(99, 102, 241, 0.60);
   color: var(--form-drawer-accent-text);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.10), inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .glassIcon {
@@ -490,6 +497,7 @@ select.input option {
 
 .btnPrimary:hover { opacity: 0.88; }
 .btnPrimary:active { transform: scale(0.98); }
+.btnPrimary:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
 
 .btnSecondary {
   padding: var(--space-2) 14px;

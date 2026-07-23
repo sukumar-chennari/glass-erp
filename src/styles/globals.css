@@ -240,11 +240,11 @@ ul, ol { list-style: none; }
   --form-drawer-border:           rgba(255, 255, 255, 0.08);
   --form-drawer-border-focus:     rgba(99, 102, 241, 0.5);
   --form-drawer-divider:          rgba(255, 255, 255, 0.05);
-  --form-drawer-divider-strong:   rgba(255, 255, 255, 0.06);
+  --form-drawer-divider-strong:   rgba(255, 255, 255, 0.11);
   --form-drawer-text:             #e2e8f0;
   --form-drawer-text-secondary:   #94a3b8;
   --form-drawer-text-muted:       #64748b;
-  --form-drawer-text-faint:       #3d4f66;
+  --form-drawer-text-faint:       rgba(255, 255, 255, 0.38);
   --form-drawer-accent-bg:        rgba(99, 102, 241, 0.12);
   --form-drawer-accent-border:    rgba(99, 102, 241, 0.45);
   --form-drawer-accent-text:      #a78bfa;
