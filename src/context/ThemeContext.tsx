@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 
-export type ThemeId = 'purple' | 'light' | 'orange' | 'dark' | 'system';
+export type ThemeId = 'windx' | 'purple' | 'light' | 'orange' | 'dark' | 'system';
 
 interface ThemeContextValue {
   theme:    ThemeId;
@@ -8,20 +8,20 @@ interface ThemeContextValue {
 }
 
 const ThemeContext = createContext<ThemeContextValue>({
-  theme:    'purple',
+  theme:    'windx',
   setTheme: () => {},
 });
 
 const STORAGE_KEY = 'erp-theme';
 
-const VALID: ReadonlySet<string> = new Set(['purple', 'light', 'orange', 'dark', 'system']);
+const VALID: ReadonlySet<string> = new Set(['windx', 'purple', 'light', 'orange', 'dark', 'system']);
 
 function getSavedTheme(): ThemeId {
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved && VALID.has(saved)) return saved as ThemeId;
   } catch { /* localStorage unavailable */ }
-  return 'purple';
+  return 'windx';
 }
 
 function resolveDataTheme(theme: ThemeId): string {

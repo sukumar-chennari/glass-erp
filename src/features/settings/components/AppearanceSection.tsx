@@ -17,6 +17,10 @@ interface Preset {
 
 const PRESETS: Preset[] = [
   {
+    id: 'windx',
+    swatch: { sidebar: '#ffffff', header: '#ffffff', body: '#f8fafc', card: '#ffffff', primary: 'linear-gradient(135deg, #dc2626, #f59e0b)' },
+  },
+  {
     id: 'purple',
     swatch: { sidebar: '#1a1a3e', header: '#0f1b3c', body: '#0a0e27', card: 'rgba(255,255,255,0.05)', primary: '#6366f1' },
   },
@@ -38,7 +42,7 @@ const PRESETS: Preset[] = [
   },
 ];
 
-const LIGHT_SURFACE_IDS: ReadonlySet<ThemeId> = new Set(['light', 'orange', 'system']);
+const LIGHT_SURFACE_IDS: ReadonlySet<ThemeId> = new Set(['windx', 'light', 'orange', 'system']);
 
 export function AppearanceSection() {
   const { theme, setTheme } = useTheme();

@@ -71,6 +71,7 @@
       "trigger": "Change theme",
       "menu": "Appearance"
     },
+    "windx": "WindX",
     "light": "Light",
     "dark": "Dark",
     "system": "System",

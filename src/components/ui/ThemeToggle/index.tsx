@@ -1,12 +1,13 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { SunMoon, Sun, Moon, Monitor, Palette, Check, ChevronRight, type LucideIcon } from 'lucide-react';
+import { SunMoon, Sun, Moon, Monitor, Palette, Check, ChevronRight, Zap, type LucideIcon } from 'lucide-react';
 import { useTheme, type ThemeId } from '@/context/ThemeContext';
 import { ROUTES } from '@/constants/routes';
 import styles from './ThemeToggle.module.css';
 
 const QUICK_OPTIONS: { id: ThemeId; Icon: LucideIcon }[] = [
+  { id: 'windx',  Icon: Zap     },
   { id: 'light',  Icon: Sun     },
   { id: 'dark',   Icon: Moon    },
   { id: 'system', Icon: Monitor },

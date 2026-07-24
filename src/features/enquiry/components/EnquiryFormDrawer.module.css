@@ -1,6 +1,6 @@
-/* EnquiryFormDrawer — dark glass-morphism 4-step wizard.
+/* EnquiryFormDrawer — 4-step wizard form.
    All values come from CSS custom properties defined in globals.css.
-   The --form-drawer-* group is always-dark (theme-independent by design). */
+   --form-drawer-* tokens are dark by default; [data-theme="windx"] overrides them to light. */
 
 .overlay {
   position: fixed;
@@ -149,9 +149,9 @@
 /* ── Step error: validation failed on current step ── */
 .stepError .stepDot {
   border-color: var(--form-drawer-error);
-  background: rgba(248, 113, 113, 0.14);
+  background: var(--form-drawer-err-dot-bg);
   color: var(--form-drawer-error);
-  box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.10);
+  box-shadow: var(--form-drawer-err-dot-glow);
 }
 
 .stepError .stepLabel {
@@ -258,12 +258,12 @@
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--form-drawer-readonly-bg);
+  border: 1px solid var(--form-drawer-readonly-border);
   border-radius: var(--radius-lg);
   padding: var(--space-2) var(--space-3);
   font-size: var(--font-size-base);
-  color: rgba(255, 255, 255, 0.45);
+  color: var(--form-drawer-text-muted);
   cursor: default;
   user-select: none;
 }
@@ -278,7 +278,7 @@
 .inputReadonlyIcon {
   flex-shrink: 0;
   margin-left: var(--space-2);
-  color: rgba(255, 255, 255, 0.25);
+  color: var(--form-drawer-readonly-icon);
 }
 
 .err {
@@ -354,15 +354,15 @@ select.input option {
   align-items: center;
   gap: 3px;
   padding: 10px var(--space-2);
-  background: rgba(255, 255, 255, 0.06);
-  border: 1.5px solid rgba(255, 255, 255, 0.13);
+  background: var(--form-drawer-opt-bg);
+  border: 1.5px solid var(--form-drawer-opt-border);
   border-radius: 10px;
   cursor: pointer;
   transition: all var(--transition-fast);
   font-size: var(--font-size-base);
   color: var(--form-drawer-text-secondary);
   user-select: none;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  box-shadow: var(--form-drawer-opt-inset);
 }
 
 .radioOpt input[type='radio'] {
@@ -370,17 +370,17 @@ select.input option {
 }
 
 .radioOpt:hover {
-  background: rgba(255, 255, 255, 0.10);
-  border-color: rgba(255, 255, 255, 0.22);
+  background: var(--form-drawer-opt-hover-bg);
+  border-color: var(--form-drawer-opt-hover-border);
   color: var(--form-drawer-text);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  box-shadow: var(--form-drawer-opt-hover-inset);
 }
 
 .radioOptActive {
-  background: rgba(99, 102, 241, 0.16);
-  border-color: rgba(99, 102, 241, 0.60);
+  background: var(--form-drawer-opt-active-bg);
+  border-color: var(--form-drawer-opt-active-border);
   color: var(--form-drawer-accent-text);
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.10), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  box-shadow: var(--form-drawer-opt-active-glow);
 }
 
 .radioSub {
@@ -389,7 +389,7 @@ select.input option {
 }
 
 .radioOptActive .radioSub {
-  color: rgba(167, 139, 250, 0.75);
+  color: var(--form-drawer-opt-active-sub);
 }
 
 /* ── Glass selection grid ── */
@@ -411,30 +411,30 @@ select.input option {
   align-items: center;
   gap: 4px;
   padding: 10px 5px 9px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1.5px solid rgba(255, 255, 255, 0.13);
+  background: var(--form-drawer-opt-bg);
+  border: 1.5px solid var(--form-drawer-opt-border);
   border-radius: 10px;
   cursor: pointer;
   transition: all var(--transition-fast);
   font-size: var(--font-size-2xs);
-  color: rgba(255, 255, 255, 0.55);
+  color: var(--form-drawer-opt-text);
   text-align: center;
   line-height: var(--line-height-snug);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  box-shadow: var(--form-drawer-opt-inset);
 }
 
 .glassOpt:hover {
-  background: rgba(255, 255, 255, 0.10);
-  border-color: rgba(255, 255, 255, 0.22);
-  color: rgba(255, 255, 255, 0.85);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  background: var(--form-drawer-opt-hover-bg);
+  border-color: var(--form-drawer-opt-hover-border);
+  color: var(--form-drawer-opt-hover-text);
+  box-shadow: var(--form-drawer-opt-hover-inset);
 }
 
 .glassOptActive {
-  background: rgba(99, 102, 241, 0.16);
-  border-color: rgba(99, 102, 241, 0.60);
+  background: var(--form-drawer-opt-active-bg);
+  border-color: var(--form-drawer-opt-active-border);
   color: var(--form-drawer-accent-text);
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.10), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  box-shadow: var(--form-drawer-opt-active-glow);
 }
 
 .glassIcon {
@@ -542,7 +542,7 @@ select.input option {
   border-radius: var(--radius-lg);
   font-size: var(--font-size-base);
   font-weight: var(--font-weight-medium);
-  color: var(--form-drawer-text);
+  color: var(--form-drawer-btn-primary-color);
   cursor: pointer;
   transition: opacity var(--transition-fast), transform 0.1s;
   font-family: var(--font-family);

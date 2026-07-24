@@ -47,6 +47,7 @@
   "appearance": {
     "description": "Choose a colour theme. Your selection is saved automatically and persists across sessions.",
     "themes": {
+      "windx": "WindX",
       "purple": "Purple",
       "light": "Light",
       "dark": "Dark",
@@ -54,6 +55,7 @@
       "system": "System"
     },
     "descs": {
+      "windx": "WindX brand — amber-gold CTAs, red accents, dark slate sidebar",
       "purple": "Dark glassmorphic with deep indigo & violet",
       "light": "Clean white surfaces with purple sidebar accents",
       "dark": "Neutral dark slate with softer indigo accents",

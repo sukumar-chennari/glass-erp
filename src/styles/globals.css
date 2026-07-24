@@ -1,6 +1,6 @@
 /* ============================================================
    GLOBAL STYLES — Glass ERP Admin
-   Token-based theming: data-theme="purple" | "light" | "orange" | "dark" | "system"
+   Token-based theming: data-theme="windx" | "purple" | "light" | "orange" | "dark" | "system"
    ============================================================ */
 
 /* ── Reset ─────────────────────────────────────────────── */
@@ -260,6 +260,24 @@ ul, ol { list-style: none; }
   --form-drawer-btn-primary:      linear-gradient(135deg, #6366f1, #7c3aed);
   --form-drawer-insurance-bg:     rgba(99, 102, 241, 0.05);
   --form-drawer-insurance-border: rgba(99, 102, 241, 0.12);
+  --form-drawer-btn-primary-color: #e2e8f0;
+  --form-drawer-readonly-bg:       rgba(255, 255, 255, 0.03);
+  --form-drawer-readonly-border:   rgba(255, 255, 255, 0.08);
+  --form-drawer-readonly-icon:     rgba(255, 255, 255, 0.25);
+  --form-drawer-err-dot-bg:        rgba(248, 113, 113, 0.14);
+  --form-drawer-err-dot-glow:      0 0 0 3px rgba(248, 113, 113, 0.10);
+  --form-drawer-opt-bg:            rgba(255, 255, 255, 0.06);
+  --form-drawer-opt-border:        rgba(255, 255, 255, 0.13);
+  --form-drawer-opt-text:          rgba(255, 255, 255, 0.55);
+  --form-drawer-opt-inset:         inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  --form-drawer-opt-hover-bg:      rgba(255, 255, 255, 0.10);
+  --form-drawer-opt-hover-border:  rgba(255, 255, 255, 0.22);
+  --form-drawer-opt-hover-text:    rgba(255, 255, 255, 0.85);
+  --form-drawer-opt-hover-inset:   inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  --form-drawer-opt-active-bg:     rgba(99, 102, 241, 0.16);
+  --form-drawer-opt-active-border: rgba(99, 102, 241, 0.60);
+  --form-drawer-opt-active-glow:   0 0 0 3px rgba(99, 102, 241, 0.10), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  --form-drawer-opt-active-sub:    rgba(167, 139, 250, 0.75);
 
   /* ── Typography ── */
   --font-family:            -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
@@ -787,6 +805,239 @@ ul, ol { list-style: none; }
 
   /* Accent-2 (hot-pink KPI) — same as purple theme */
   --color-accent-2: #ec4899;
+}
+
+/* ============================================================
+   WINDX BRAND THEME — RED brand identity + YELLOW accent highlights
+   Red primary (logo/brand color) · Yellow CTA gradient · Dark slate sidebar
+   Distinctly different from orange theme: red-dominant, not amber-orange
+   ============================================================ */
+[data-theme="windx"] {
+  --body-bg: #f8fafc;
+
+  /* ── Brand — RED as primary identity (WINDX logo color) ── */
+  --color-primary:        #dc2626;
+  --color-primary-hover:  #b91c1c;
+  --color-primary-active: #991b1b;
+  --color-primary-subtle: rgba(220, 38, 38, 0.10);
+  --color-primary-border: rgba(220, 38, 38, 0.35);
+
+  /* ── Accent — Yellow-Gold for CTA highlights ── */
+  --color-accent:         #f59e0b;
+  --color-accent-hover:   #d97706;
+  --color-accent-subtle:  rgba(245, 158, 11, 0.10);
+
+  /* ── Brand gradient — RED → YELLOW (distinctive, reads as WindX not orange) ── */
+  --color-brand-gradient:          linear-gradient(135deg, #dc2626, #f59e0b);
+  --color-brand-gradient-shadow:   rgba(220, 38, 38, 0.30);
+  --color-brand-gradient-shadow-h: rgba(220, 38, 38, 0.42);
+
+  /* ── Backgrounds — clean light surfaces ── */
+  --color-bg-page:          #f8fafc;
+  --color-bg-surface:       #ffffff;
+  --color-bg-surface-hover: rgba(220, 38, 38, 0.03);
+  --color-bg-input:         #ffffff;
+  --color-bg-disabled:      #f1f5f9;
+  --color-bg-subtle:        #f8fafc;
+  --color-bg-light:         #ffffff;
+
+  /* ── Text — dark for readability on white surfaces ── */
+  --color-text-primary:    #0f172a;
+  --color-text-secondary:  #334155;
+  --color-text-muted:      #64748b;
+  --color-text-disabled:   #94a3b8;
+  --color-text-on-primary: #ffffff;
+  --color-text-inverse:    #f8fafc;
+  --color-text-link:       #dc2626;
+  --color-text-link-hover: #b91c1c;
+
+  /* ── Borders ── */
+  --color-border:       #e2e8f0;
+  --color-border-strong:#cbd5e1;
+  --color-border-focus: rgba(220, 38, 38, 0.55);
+  --color-border-input: #d1d5db;
+
+  /* ── Status — keep rose/pink (#f43f5e) for danger to stay distinct from brand-red ── */
+  --color-success-bg:  rgba(16, 185, 129, 0.12);
+  --color-warning-bg:  rgba(245, 158, 11, 0.12);
+  --color-danger-bg:   rgba(244, 63, 94, 0.12);
+  --color-info-text:   #dc2626;
+  --color-info-bg:     rgba(220, 38, 38, 0.10);
+  --color-info-border: rgba(220, 38, 38, 0.28);
+  --color-neutral-text:   #64748b;
+  --color-neutral-bg:     #f1f5f9;
+  --color-neutral-border: #e2e8f0;
+
+  /* ── Sidebar — white / light with RED active states (matches reference brand) ── */
+  --sidebar-bg:           #ffffff;
+  --sidebar-border:       #e2e8f0;
+  --sidebar-text:         #475569;
+  --sidebar-text-hover:   #0f172a;
+  --sidebar-text-active:  #dc2626;
+  --sidebar-active-bg:    rgba(220, 38, 38, 0.08);
+  --sidebar-active-border:#dc2626;
+  --sidebar-icon:         #94a3b8;
+  --sidebar-label:        #94a3b8;
+  --sidebar-hover-bg:     rgba(220, 38, 38, 0.04);
+  --sidebar-brand-bg:     #f8fafc;
+  --sidebar-blur:         none;
+  --sidebar-glass-bg:     rgba(220, 38, 38, 0.04);
+  --sidebar-glass-border: #e2e8f0;
+  --sidebar-collapse-bg:       #ffffff;
+  --sidebar-collapse-text:     #64748b;
+  --sidebar-collapse-border:   #e2e8f0;
+  --sidebar-collapse-hover-bg: rgba(220, 38, 38, 0.08);
+  --sidebar-collapse-shadow:   rgba(0, 0, 0, 0.10);
+
+  /* ── Header — white / clean ── */
+  --header-bg:     #ffffff;
+  --header-border: #e2e8f0;
+  --header-blur:   none;
+
+  /* ── Shadows — crisp, light ── */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.10);
+  --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.12);
+  --shadow-xl: 0 8px 32px rgba(0, 0, 0, 0.16);
+
+  /* ── Glass → Solid (light theme: no blur) ── */
+  --color-glass-bg:            #ffffff;
+  --color-glass-bg-subtle:     #f8fafc;
+  --color-glass-border:        #e2e8f0;
+  --color-glass-border-subtle: #f1f5f9;
+  --surface-blur:              none;
+
+  /* ── Buttons ── */
+  --color-btn-secondary-bg:           #f8fafc;
+  --color-btn-secondary-text:         #334155;
+  --color-btn-secondary-border:       #d1d5db;
+  --color-btn-secondary-hover-bg:     #f1f5f9;
+  --color-btn-secondary-hover-border: #94a3b8;
+  --color-btn-secondary-hover-text:   #0f172a;
+  --color-btn-ghost-text:             #64748b;
+  --color-btn-ghost-hover-bg:         rgba(220, 38, 38, 0.07);
+  --color-btn-ghost-hover-text:       #0f172a;
+  --color-danger-hover-bg:     rgba(244, 63, 94, 0.10);
+  --color-danger-hover-border: rgba(244, 63, 94, 0.30);
+
+  /* ── Cards ── */
+  --color-card-bg:     #ffffff;
+  --color-card-border: #e2e8f0;
+  --color-card-hover:  rgba(220, 38, 38, 0.03);
+
+  /* ── KPI cards — yellow icon ring (CTA accent color) ── */
+  --color-kpi-border:  #e2e8f0;
+  --color-kpi-icon-bg: rgba(245, 158, 11, 0.12);
+  --color-kpi-label:   #64748b;
+
+  /* ── Table — very subtle red row hover ── */
+  --color-table-head-bg:    #f8fafc;
+  --color-table-head-text:  #374151;
+  --color-table-row-border: #f1f5f9;
+  --color-table-row-hover:  rgba(220, 38, 38, 0.04);
+  --color-table-cell-text:  #334155;
+
+  /* ── Icon buttons — yellow hover (distinct from red focus) ── */
+  --color-icon-btn-bg:       #f8fafc;
+  --color-icon-btn-border:   #e2e8f0;
+  --color-icon-btn-text:     #64748b;
+  --color-icon-btn-hover-bg: rgba(245, 158, 11, 0.10);
+
+  /* ── Focus ring — red ── */
+  --color-focus-ring: rgba(220, 38, 38, 0.12);
+
+  /* ── Modal ── */
+  --color-modal-bg:            #ffffff;
+  --color-modal-border:        #e2e8f0;
+  --color-modal-header-border: #f1f5f9;
+  --modal-blur:                none;
+
+  /* ── Section card ── */
+  --color-section-card-bg:     #ffffff;
+  --color-section-card-border: #e2e8f0;
+  --section-blur:              none;
+
+  /* ── Overlay ── */
+  --overlay: rgba(15, 23, 42, 0.50);
+
+  /* ── Scrollbar ── */
+  --scrollbar-thumb:       rgba(0, 0, 0, 0.14);
+  --scrollbar-thumb-hover: rgba(0, 0, 0, 0.24);
+
+  /* ── Select option ── */
+  --select-option-bg:   #ffffff;
+  --select-option-text: #0f172a;
+
+  /* ── Tab / filter-pill — RED active (brand primary) ── */
+  --color-tab-bg:            #f8fafc;
+  --color-tab-border:        #e2e8f0;
+  --color-tab-text:          #64748b;
+  --color-tab-hover-bg:      #f1f5f9;
+  --color-tab-hover-text:    #334155;
+  --color-tab-active-bg:     rgba(220, 38, 38, 0.10);
+  --color-tab-active-border: rgba(220, 38, 38, 0.40);
+  --color-tab-active-text:   #dc2626;
+  --color-tab-count-bg:      rgba(220, 38, 38, 0.08);
+  --color-tab-count-active:  rgba(220, 38, 38, 0.16);
+
+  /* ── Skeleton shimmer ── */
+  --color-skeleton-from: #f1f5f9;
+  --color-skeleton-mid:  #e8edf5;
+
+  /* ── Accent border / accent-2 — yellow for secondary highlights ── */
+  --color-accent-border: rgba(245, 158, 11, 0.30);
+  --color-accent-2:      #f59e0b;
+
+  /* ── Form Drawer — LIGHT card for WindX brand ── */
+  --form-drawer-overlay:           rgba(15, 23, 42, 0.55);
+  --form-drawer-card-bg:           #ffffff;
+  --form-drawer-card-border:       rgba(220, 38, 38, 0.15);
+  --form-drawer-card-shadow:       0 32px 80px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(220, 38, 38, 0.06);
+  --form-drawer-surface:           #f8fafc;
+  --form-drawer-surface-hover:     #f1f5f9;
+  --form-drawer-surface-active:    #e2e8f0;
+  --form-drawer-border:            #e2e8f0;
+  --form-drawer-border-focus:      rgba(220, 38, 38, 0.55);
+  --form-drawer-divider:           #f1f5f9;
+  --form-drawer-divider-strong:    #e2e8f0;
+  --form-drawer-text:              #0f172a;
+  --form-drawer-text-secondary:    #334155;
+  --form-drawer-text-muted:        #64748b;
+  --form-drawer-text-faint:        #94a3b8;
+  --form-drawer-accent-bg:         rgba(220, 38, 38, 0.08);
+  --form-drawer-accent-border:     rgba(220, 38, 38, 0.30);
+  --form-drawer-accent-text:       #dc2626;
+  --form-drawer-accent-section:    #dc2626;
+  --form-drawer-progress:          linear-gradient(90deg, #dc2626, #f59e0b);
+  --form-drawer-step-active-glow:  0 0 0 4px rgba(220, 38, 38, 0.12);
+  --form-drawer-step-done-bg:      rgba(16, 185, 129, 0.10);
+  --form-drawer-step-done-border:  #10b981;
+  --form-drawer-step-done-text:    #059669;
+  --form-drawer-step-done-line:    rgba(16, 185, 129, 0.30);
+  --form-drawer-error:             #dc2626;
+  --form-drawer-select-option:     #ffffff;
+  --form-drawer-btn-primary:       linear-gradient(135deg, #dc2626, #f59e0b);
+  --form-drawer-btn-primary-color: #ffffff;
+  --form-drawer-insurance-bg:      rgba(245, 158, 11, 0.06);
+  --form-drawer-insurance-border:  rgba(245, 158, 11, 0.22);
+  --form-drawer-readonly-bg:       #f1f5f9;
+  --form-drawer-readonly-border:   #e2e8f0;
+  --form-drawer-readonly-icon:     #94a3b8;
+  --form-drawer-err-dot-bg:        rgba(220, 38, 38, 0.10);
+  --form-drawer-err-dot-glow:      0 0 0 3px rgba(220, 38, 38, 0.08);
+  --form-drawer-opt-bg:            #f8fafc;
+  --form-drawer-opt-border:        #e2e8f0;
+  --form-drawer-opt-text:          #64748b;
+  --form-drawer-opt-inset:         none;
+  --form-drawer-opt-hover-bg:      #f1f5f9;
+  --form-drawer-opt-hover-border:  #cbd5e1;
+  --form-drawer-opt-hover-text:    #334155;
+  --form-drawer-opt-hover-inset:   none;
+  --form-drawer-opt-active-bg:     rgba(220, 38, 38, 0.08);
+  --form-drawer-opt-active-border: rgba(220, 38, 38, 0.55);
+  --form-drawer-opt-active-glow:   0 0 0 3px rgba(220, 38, 38, 0.08);
+  --form-drawer-opt-active-sub:    #b91c1c;
 }
 
 /* ── Scrollbar (Webkit) ── */
