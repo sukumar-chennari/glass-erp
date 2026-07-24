@@ -10,6 +10,7 @@ import { useGetCarModelsQuery } from '@/features/settings/services/carModelsApi'
 import { getRoleDefaultRoute } from '@/utils/roleRouting';
 import { ROUTES } from '@/constants/routes';
 import { InsurancePartners } from './components/InsurancePartners';
+import windexLogo from '../../../assets/images/windex-transparent-logo.png';
 import styles from './EntryPage.module.css';
 
 // ── Types ────────────────────────────────────────────────────
@@ -40,39 +41,29 @@ function WhatsAppIcon({ className }: { className?: string }) {
   );
 }
 
-// ── Contact strip ─────────────────────────────────────────────
-
-function ContactStrip() {
-  return (
-    <div className={styles.contactStrip}>
-      <a href="tel:18001204567" className={`${styles.contactItem} ${styles.contactItemTollFree}`}>
-        <Phone size={14} className={styles.contactIcon} />
-        <span className={styles.contactLabel}>Toll-Free</span>
-        <span className={styles.contactValue}>1800-120-4567</span>
-      </a>
-      <span className={styles.contactDivider} aria-hidden="true" />
-      <a
-        href="https://wa.me/919848000000"
-        className={`${styles.contactItem} ${styles.contactItemWhatsApp}`}
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        <WhatsAppIcon className={styles.contactIcon} />
-        <span className={styles.contactLabel}>WhatsApp</span>
-        <span className={styles.contactValue}>+91 98480 00000</span>
-      </a>
-    </div>
-  );
-}
-
 // ── Top bar ──────────────────────────────────────────────────
 
 function TopBar() {
   return (
     <header className={styles.topBar}>
       <div className={styles.brand}>
-        <span className={styles.brandIcon}>WX</span>
-        <span className={styles.brandName}>WindX</span>
+        <img src={windexLogo} alt="WindX" className={styles.brandLogo} />
+      </div>
+      <div className={styles.headerContacts}>
+        <a href="tel:18001204567" className={styles.headerTollFree}>
+          <Phone size={12} />
+          1800-120-4567
+        </a>
+        <span className={styles.headerContactSep} aria-hidden="true">|</span>
+        <a
+          href="https://wa.me/919848000000"
+          className={styles.headerWhatsApp}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <WhatsAppIcon />
+          +91 98480 00000
+        </a>
       </div>
       <Link to={ROUTES.LOGIN} className={styles.loginBtn}>
         Staff Login
@@ -87,7 +78,9 @@ function Hero() {
   return (
     <div className={styles.hero}>
       <div className={styles.heroInner}>
-        <div className={styles.heroLogoMark}>WX</div>
+        <div className={styles.heroLogoMark}>
+          <img src={windexLogo} alt="WindX" className={styles.heroLogoImg} />
+        </div>
         <h1 className={styles.heroTitle}>
           Premium Glass<br />Replacement
         </h1>
@@ -365,7 +358,6 @@ export function EntryPage() {
   return (
     <div className={styles.page}>
       <TopBar />
-      <ContactStrip />
       <div className={styles.content}>
         <Hero />
 

@@ -1,23 +1,35 @@
+import { useState, useEffect, useRef } from 'react';
+import ackoLogo       from '../../../../assets/insurance_images/acko.webp';
+import bajajLogo      from '../../../../assets/insurance_images/bajajnew.jpg';
+import goDigitLogo    from '../../../../assets/insurance_images/go-digit.webp';
+import partner1Logo   from '../../../../assets/insurance_images/insurance-partner1.webp';
+import logo3          from '../../../../assets/insurance_images/insurance-logo-3.webp';
+import logo8          from '../../../../assets/insurance_images/insurance-logo-8.webp';
+import logo9          from '../../../../assets/insurance_images/insurance-logo-9.webp';
+import logo10         from '../../../../assets/insurance_images/insurance-logo-10.webp';
+import logo15         from '../../../../assets/insurance_images/insurance-logo-15.webp';
+import logo16         from '../../../../assets/insurance_images/insurance-logo-16.webp';
 import styles from './InsurancePartners.module.css';
 
 interface Insurer {
-  name:  string;
-  abbr:  string;
-  color: string; // brand accent color for the badge
+  name: string;
+  logo: string;
 }
 
 const INSURERS: Insurer[] = [
-  { name: 'Bajaj Allianz',        abbr: 'BA',  color: '#DC2626' },
-  { name: 'ICICI Lombard',        abbr: 'IL',  color: '#EA580C' },
-  { name: 'HDFC ERGO',            abbr: 'HE',  color: '#1D4ED8' },
-  { name: 'National Insurance',   abbr: 'NI',  color: '#1E40AF' },
-  { name: 'United India',         abbr: 'UI',  color: '#15803D' },
-  { name: 'Oriental Insurance',   abbr: 'OI',  color: '#6D28D9' },
-  { name: 'New India Assurance',  abbr: 'NIA', color: '#0369A1' },
-  { name: 'Reliance General',     abbr: 'RG',  color: '#0E7490' },
+  { name: 'Bajaj Allianz',    logo: bajajLogo },
+  { name: 'Acko Insurance',   logo: ackoLogo },
+  { name: 'Go Digit',         logo: goDigitLogo },
+  { name: 'Insurance Partner', logo: partner1Logo },
+  { name: 'Insurance Partner', logo: logo3 },
+  { name: 'Insurance Partner', logo: logo8 },
+  { name: 'Insurance Partner', logo: logo9 },
+  { name: 'Insurance Partner', logo: logo10 },
+  { name: 'Insurance Partner', logo: logo15 },
+  { name: 'Insurance Partner', logo: logo16 },
 ];
 
-// Duplicate the list so the marquee loops seamlessly
+// Duplicate for seamless infinite marquee loop
 const TRACK_ITEMS = [...INSURERS, ...INSURERS];
 
 const FEATURE_PILLS = [
@@ -28,8 +40,26 @@ const FEATURE_PILLS = [
 ];
 
 export function InsurancePartners() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setVisible(true); obs.disconnect(); } },
+      { threshold: 0.1 },
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
   return (
-    <section className={styles.section} aria-labelledby="insurer-heading">
+    <section
+      ref={sectionRef}
+      className={`${styles.section} ${visible ? styles.sectionVisible : ''}`}
+      aria-labelledby="insurer-heading"
+    >
       {/* Decorative blobs */}
       <div className={styles.blob1} aria-hidden="true" />
       <div className={styles.blob2} aria-hidden="true" />
@@ -56,14 +86,13 @@ export function InsurancePartners() {
       <div className={styles.marqueeWrap} aria-hidden="true">
         <div className={styles.track}>
           {TRACK_ITEMS.map((ins, i) => (
-            <div key={`${ins.abbr}-${i}`} className={styles.logoCard}>
-              <div
-                className={styles.logoBadge}
-                style={{ background: ins.color }}
-              >
-                {ins.abbr}
-              </div>
-              <span className={styles.logoName}>{ins.name}</span>
+            <div key={`${ins.name}-${i}`} className={styles.logoCard}>
+              <img
+                src={ins.logo}
+                alt={ins.name}
+                className={styles.logoImg}
+                loading="lazy"
+              />
             </div>
           ))}
         </div>

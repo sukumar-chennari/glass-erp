@@ -7,6 +7,17 @@
   background-attachment: fixed;
 }
 
+/* ── Mount animations ── */
+@keyframes entryFadeUp {
+  from { opacity: 0; transform: translateY(32px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes entryFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
 /* ── Top bar ── */
 .topBar {
   display: flex;
@@ -26,28 +37,50 @@
 .brand {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
 }
 
-.brandIcon {
+.brandLogo {
+  height: 40px;
+  width: auto;
+  display: block;
+  object-fit: contain;
+}
+
+/* ── Header contact strip (inline in topBar) ── */
+.headerContacts {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: var(--font-size-sm);
+}
+
+.headerTollFree {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: var(--radius-md);
-  background: var(--color-brand-gradient);
-  color: var(--color-text-on-primary);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-bold);
-  letter-spacing: var(--letter-spacing-wide);
+  gap: 5px;
+  color: #fbbf24;
+  text-decoration: none;
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
 }
 
-.brandName {
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-bold);
-  color: var(--color-text-primary);
-  letter-spacing: var(--letter-spacing-tight);
+.headerTollFree:hover { color: #fde68a; }
+
+.headerWhatsApp {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #ef4444;
+  text-decoration: none;
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
+}
+
+.headerWhatsApp:hover { color: #fca5a5; }
+
+.headerContactSep {
+  color: rgba(255, 255, 255, 0.18);
+  user-select: none;
 }
 
 .loginBtn {
@@ -205,22 +238,27 @@
   position: relative;
   z-index: 1;
   max-width: 420px;
+  animation: entryFadeUp 0.85s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .heroLogoMark {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 60px;
-  height: 60px;
+  width: 80px;
+  height: 80px;
   border-radius: var(--radius-xl);
-  background: var(--color-brand-gradient);
-  color: var(--color-text-on-primary);
-  font-size: var(--font-size-xl);
-  font-weight: var(--font-weight-extrabold);
-  letter-spacing: var(--letter-spacing-wide);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow: 0 8px 24px var(--color-brand-gradient-shadow);
   margin-bottom: var(--space-6);
+  overflow: hidden;
+}
+
+.heroLogoImg {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
 }
 
 .heroTitle {
@@ -265,6 +303,7 @@
   justify-content: center;
   padding: var(--space-10) var(--space-8);
   overflow-y: auto;
+  animation: entryFadeUp 0.85s 0.14s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .form {
@@ -579,6 +618,7 @@
   backdrop-filter: var(--surface-blur);
   -webkit-backdrop-filter: var(--surface-blur);
   box-shadow: var(--shadow-xl);
+  animation: entryFadeUp 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .confirmIconWrap {
@@ -747,9 +787,8 @@
     padding: var(--space-3) var(--space-4);
   }
 
-  .contactStrip {
-    gap: var(--space-4);
-    padding: var(--space-2) var(--space-4);
+  .headerContacts {
+    display: none;
   }
 
   .formPanel {
@@ -766,15 +805,12 @@
   }
 }
 
-@media (max-width: 400px) {
-  .contactStrip {
-    flex-direction: column;
-    gap: var(--space-2);
-    padding: var(--space-3) var(--space-4);
-    align-items: flex-start;
-  }
-
-  .contactDivider {
-    display: none;
+@media (prefers-reduced-motion: reduce) {
+  .heroInner,
+  .formPanel,
+  .confirmCard {
+    animation: none;
+    opacity: 1;
+    transform: none;
   }
 }

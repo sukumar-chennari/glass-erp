@@ -42,6 +42,12 @@
   background: radial-gradient(circle, rgba(168, 85, 247, 0.25) 0%, transparent 70%);
 }
 
+/* ── Scroll-in animation keyframe ── */
+@keyframes insuranceFadeUp {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 /* ── Inner text content ── */
 .inner {
   position: relative;
@@ -50,6 +56,36 @@
   margin: 0 auto;
   text-align: center;
   padding: 0 var(--space-6);
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.65s ease, transform 0.65s ease;
+}
+
+.marqueeWrap {
+  opacity: 0;
+  transition: opacity 0.65s 0.25s ease;
+}
+
+/* Triggered by JS when section enters viewport */
+.sectionVisible .inner {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.sectionVisible .inner:last-child {
+  transition-delay: 0.4s;
+}
+
+.sectionVisible .marqueeWrap {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .inner, .marqueeWrap {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
 }
 
 .eyebrow {
@@ -149,14 +185,14 @@
 /* ── Individual logo card ── */
 .logoCard {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-5) var(--space-4);
+  justify-content: center;
+  padding: var(--space-3) var(--space-6);
   background: var(--color-glass-bg);
   border: 1px solid var(--color-glass-border);
   border-radius: var(--radius-xl);
-  min-width: 130px;
+  min-width: 170px;
+  height: 96px;
   backdrop-filter: var(--surface-blur);
   -webkit-backdrop-filter: var(--surface-blur);
   transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.2s ease;
@@ -166,48 +202,17 @@
 
 .logoCard:hover {
   transform: translateY(-5px);
-  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.18);
   border-color: var(--color-border-strong);
 }
 
-/* ── Logo badge (placeholder until real assets arrive) ── */
-.logoBadge {
-  position: relative;
-  width: 56px;
-  height: 56px;
-  border-radius: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  font-size: 14px;
-  font-weight: 800;
-  letter-spacing: -0.5px;
-  /* depth */
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.25);
-  overflow: hidden;
-  flex-shrink: 0;
-}
-
-/* shine overlay */
-.logoBadge::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.22) 0%, transparent 55%);
-  border-radius: inherit;
-}
-
-.logoName {
-  font-size: var(--font-size-2xs);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text-secondary);
-  text-align: center;
-  white-space: nowrap;
-  max-width: 110px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  line-height: var(--line-height-snug);
+/* ── Real insurance logo image ── */
+.logoImg {
+  max-height: 70px;
+  max-width: 140px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
 }
 
 /* ── Disclaimer ── */
@@ -253,13 +258,13 @@
   }
 
   .logoCard {
-    min-width: 110px;
-    padding: var(--space-4) var(--space-3);
+    min-width: 140px;
+    height: 80px;
+    padding: var(--space-3) var(--space-4);
   }
 
-  .logoBadge {
-    width: 48px;
-    height: 48px;
-    font-size: 12px;
+  .logoImg {
+    max-height: 56px;
+    max-width: 120px;
   }
 }
