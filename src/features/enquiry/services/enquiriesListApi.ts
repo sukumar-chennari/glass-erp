@@ -1,11 +1,14 @@
 import { baseApi } from '@/services/baseApi';
 import { ENDPOINTS } from '@/services/api/endpoints';
 
-export type BackendEnquiryStatus = 'SUBMITTED' | 'CONVERTED' | 'LOST';
+export type BackendEnquiryStatus =
+  | 'SUBMITTED'   // enquiry received, not yet actioned
+  | 'CONVERTED'   // converted to a job
+  | 'LOST';       // marked as lost lead
 
 // Shape returned by GET /enquiries and GET /enquiries/:id.
-// Fields beyond the core 4 may be absent on quick-submitted enquiries
-// (filled in later by branch staff via the full admin form).
+// Field names match the backend exactly — mapping to frontend names happens
+// in EnquiryPage mapBackendToFrontend / mapBackendToFormValues.
 export interface BackendEnquiry {
   id:            string;
   status:        BackendEnquiryStatus;
@@ -14,25 +17,30 @@ export interface BackendEnquiry {
   branchId:      string;
   createdAt:     string;
   updatedAt:     string;
-  enquiryNo?:       string | null;
-  source?:          string | null;
-  vehicleBrandId?:  string | null;
-  vehicleBrand?:    string | null;
-  vehicleModel?:    string | null;
-  vehicleYear?:     string | null;
-  vehicleNumber?:   string | null;
-  vehicleType?:     string | null;
-  glassType?:       string | null;
-  paymentType?:     string | null;
-  insurerName?:     string | null;
-  accidentDate?:    string | null;
-  appointmentDate?: string | null;
-  damageNotes?:     string | null;
-  quotedPrice?:     number | null;
-  priceBrand?:      string | null;
-  closeReason?:     string | null;
-  closeNotes?:      string | null;
-  jobRef?:          string | null;
+  enquiryNo?:          string | null;
+  source?:             string | null;
+  vehicleMake?:        string | null;  // brand display name
+  vehicleModel?:       string | null;
+  vehicleYear?:        number | null;  // number, not string
+  vehicleReg?:         string | null;  // registration number
+  vehicleType?:        string | null;
+  glassType?:          string | null;
+  serviceType?:        string | null;
+  paymentType?:        string | null;
+  insurerName?:        string | null;
+  accidentDate?:       string | null;
+  preferredDate?:      string | null;  // ISO datetime string
+  notes?:              string | null;  // damage notes
+  carBrandId?:         string | null;
+  carModelId?:         string | null;
+  carModelVariantId?:  string | null;
+  glassPartTypeId?:    string | null;
+  bodyType?:           string | null;  // e.g. "LMV"
+  quotedPrice?:        number | null;
+  priceBrand?:         string | null;
+  closeReason?:        string | null;
+  closeNotes?:         string | null;
+  jobRef?:             string | null;
 }
 
 export interface GetEnquiriesParams {
@@ -55,24 +63,36 @@ export interface GetEnquiriesResponse {
 // Frontend field → backend field name mapping:
 //   vehicleBrand    → vehicleMake
 //   vehicleNumber   → vehicleReg
+//   vehicleYear     → vehicleYear (number)
 //   appointmentDate → preferredDate
 //   damageNotes     → notes
+//   vehicleBrandId  → carBrandId
+//   vehicleModelId  → carModelId
+//   variantId       → carModelVariantId
+//   glassTypeId     → glassPartTypeId
+//   modelBodyType[0]→ bodyType
 export interface UpdateEnquiryPayload {
-  id:            string;
-  customerName?: string;
-  phone?:        string;
-  vehicleMake?:  string;
-  vehicleModel?: string;
-  vehicleYear?:  string;
-  vehicleReg?:   string;
-  glassType?:    string;
-  vehicleType?:  string;
-  source?:       string;
-  paymentType?:  string;
-  insurerName?:  string;
-  accidentDate?: string;
-  preferredDate?: string;
-  notes?:        string;
+  id:                  string;
+  customerName?:       string;
+  phone?:              string;
+  vehicleMake?:        string;
+  vehicleModel?:       string;
+  vehicleYear?:        number;
+  vehicleReg?:         string;
+  glassType?:          string;
+  serviceType?:        string;
+  vehicleType?:        string;
+  source?:             string;
+  paymentType?:        string;
+  insurerName?:        string;
+  accidentDate?:       string;
+  preferredDate?:      string;
+  notes?:              string;
+  carBrandId?:         string;
+  carModelId?:         string;
+  carModelVariantId?:  string;
+  glassPartTypeId?:    string;
+  bodyType?:           string;
 }
 
 export const enquiriesListApi = baseApi.injectEndpoints({

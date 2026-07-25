@@ -64,9 +64,12 @@ const VALID_SOURCES = new Set<string>([
 ]);
 
 function mapBackendStatus(s: BackendEnquiryStatus): EnquiryStatus {
-  if (s === 'CONVERTED') return 'converted';
-  if (s === 'LOST')      return 'closed';
-  return 'pending';
+  switch (s) {
+    case 'SUBMITTED': return 'pending';
+    case 'CONVERTED': return 'converted';
+    case 'LOST':      return 'closed';
+    default:          return 'pending';
+  }
 }
 
 function mapBackendToFrontend(b: BackendEnquiry): Enquiry {
@@ -76,8 +79,8 @@ function mapBackendToFrontend(b: BackendEnquiry): Enquiry {
     enquiryNo:     b.enquiryNo ?? `#${b.id.slice(-6).toUpperCase()}`,
     phone:         b.phone,
     customerName:  b.customerName,
-    vehicleNumber: b.vehicleNumber ?? '',
-    vehicleModel:  [b.vehicleBrand, b.vehicleModel, b.vehicleYear].filter(Boolean).join(' '),
+    vehicleNumber: b.vehicleReg   ?? '',
+    vehicleModel:  [b.vehicleMake, b.vehicleModel, b.vehicleYear].filter(Boolean).join(' '),
     glassType:     b.glassType    ?? '',
     source:        (VALID_SOURCES.has(srcRaw) ? srcRaw : 'other') as EnquirySource,
     status:        mapBackendStatus(b.status),
@@ -87,14 +90,14 @@ function mapBackendToFrontend(b: BackendEnquiry): Enquiry {
     closeNotes:    b.closeNotes   ?? null,
     createdAt:     b.createdAt,
     jobRef:        b.jobRef       ?? null,
-    vehicleBrandId: b.vehicleBrandId ?? undefined,
-    vehicleBrand:   b.vehicleBrand   ?? undefined,
-    vehicleYear:    b.vehicleYear    ?? undefined,
+    vehicleBrandId: b.carBrandId  ?? undefined,
+    vehicleBrand:   b.vehicleMake ?? undefined,
+    vehicleYear:    b.vehicleYear != null ? String(b.vehicleYear) : undefined,
     vehicleType:    (b.vehicleType as Enquiry['vehicleType']) ?? undefined,
     paymentType:    (b.paymentType as Enquiry['paymentType']) ?? undefined,
-    insurerName:    b.insurerName    ?? undefined,
-    damageNotes:    b.damageNotes    ?? undefined,
-    branchId:       b.branchId       ?? undefined,
+    insurerName:    b.insurerName  ?? undefined,
+    damageNotes:    b.notes        ?? undefined,
+    branchId:       b.branchId     ?? undefined,
   };
 }
 
@@ -104,18 +107,28 @@ function mapBackendToFormValues(b: BackendEnquiry): Partial<EnquiryFormValues> {
     phone:           b.phone           ?? '',
     branchId:        b.branchId        ?? '',
     source:          b.source          ?? '',
-    vehicleBrandId:  b.vehicleBrandId  ?? '',
-    vehicleBrand:    b.vehicleBrand    ?? '',
+    // vehicle — brand/model IDs from catalog
+    vehicleBrandId:  b.carBrandId      ?? '',
+    vehicleBrand:    b.vehicleMake     ?? '',
+    vehicleModelId:  b.carModelId      ?? '',
     vehicleModel:    b.vehicleModel    ?? '',
-    vehicleYear:     b.vehicleYear     ?? '',
-    vehicleNumber:   b.vehicleNumber   ?? '',
+    // vehicleYear is a number from backend; form expects string for <select>
+    vehicleYear:     b.vehicleYear != null ? String(b.vehicleYear) : '',
+    vehicleNumber:   b.vehicleReg      ?? '',
     vehicleType:     (b.vehicleType as EnquiryFormValues['vehicleType']) ?? '',
-    glassType:       b.glassType       ?? '',
+    // catalog cascade IDs
+    variantId:       b.carModelVariantId ?? '',
+    glassTypeId:     b.glassPartTypeId   ?? '',
+    glassType:       b.glassType         ?? '',
+    serviceType:     (b.serviceType as EnquiryFormValues['serviceType']) ?? '',
+    // bodyType from backend is a single string; form holds it as string[]
+    modelBodyType:   b.bodyType ? [b.bodyType] : [],
     paymentType:     (b.paymentType as EnquiryFormValues['paymentType']) ?? '',
     insurerName:     b.insurerName     ?? '',
     accidentDate:    b.accidentDate    ?? '',
-    appointmentDate: b.appointmentDate ?? '',
-    damageNotes:     b.damageNotes     ?? '',
+    // preferredDate comes as full ISO datetime — slice to YYYY-MM-DD for <input type="date">
+    appointmentDate: b.preferredDate ? b.preferredDate.slice(0, 10) : '',
+    damageNotes:     b.notes           ?? '',
   };
 }
 
@@ -316,10 +329,14 @@ export function EnquiryPage() {
   // ── List API ──────────────────────────────────────────────────────────
   const LIMIT = 20;
 
+  // price_confirmed is a local-only status (no backend equivalent).
+  // Send SUBMITTED to the backend so those records are fetched,
+  // then the local `filtered` memo narrows to price_confirmed rows.
   const apiStatus: BackendEnquiryStatus | undefined =
-    filter === 'pending'   ? 'SUBMITTED' :
-    filter === 'converted' ? 'CONVERTED' :
-    filter === 'closed'    ? 'LOST'      : undefined;
+    filter === 'pending'         ? 'SUBMITTED' :
+    filter === 'price_confirmed' ? 'SUBMITTED' :
+    filter === 'converted'       ? 'CONVERTED' :
+    filter === 'closed'          ? 'LOST'      : undefined;
 
   const {
     data:      listResponse,
@@ -382,20 +399,28 @@ export function EnquiryPage() {
       // Build payload: only include non-empty fields to avoid overwriting existing data.
       // Map frontend field names → backend field names where they differ.
       const patch: UpdateEnquiryPayload = { id: formEnqId };
-      if (values.customerName.trim()) patch.customerName = values.customerName.trim();
-      if (values.phone)               patch.phone        = values.phone;
-      if (values.vehicleBrand)        patch.vehicleMake  = values.vehicleBrand;
-      if (values.vehicleModel)        patch.vehicleModel = values.vehicleModel;
-      if (values.vehicleYear)         patch.vehicleYear  = values.vehicleYear;
-      if (values.vehicleNumber)       patch.vehicleReg   = values.vehicleNumber;
-      if (values.glassType)           patch.glassType    = values.glassType;
-      if (values.vehicleType)         patch.vehicleType  = values.vehicleType;
-      if (values.source)              patch.source       = values.source;
-      if (values.paymentType)         patch.paymentType  = values.paymentType;
-      if (values.insurerName)         patch.insurerName  = values.insurerName;
-      if (values.accidentDate)        patch.accidentDate = values.accidentDate;
-      if (values.appointmentDate)     patch.preferredDate = values.appointmentDate;
-      if (values.damageNotes)         patch.notes        = values.damageNotes;
+      if (values.customerName.trim())   patch.customerName       = values.customerName.trim();
+      if (values.phone)                 patch.phone              = values.phone;
+      if (values.vehicleBrand)          patch.vehicleMake        = values.vehicleBrand;
+      if (values.vehicleModel)          patch.vehicleModel       = values.vehicleModel;
+      if (values.vehicleYear)           patch.vehicleYear        = parseInt(values.vehicleYear, 10);
+      if (values.vehicleNumber)         patch.vehicleReg         = values.vehicleNumber;
+      if (values.glassType)             patch.glassType          = values.glassType;
+      if (values.serviceType)           patch.serviceType        = values.serviceType;
+      if (values.vehicleType)           patch.vehicleType        = values.vehicleType;
+      if (values.source)                patch.source             = values.source;
+      if (values.paymentType)           patch.paymentType        = values.paymentType;
+      if (values.insurerName)           patch.insurerName        = values.insurerName;
+      if (values.accidentDate)          patch.accidentDate       = values.accidentDate;
+      if (values.appointmentDate)       patch.preferredDate      = values.appointmentDate;
+      if (values.damageNotes)           patch.notes              = values.damageNotes;
+      // catalog IDs — only send when user actually picked values in the cascade
+      if (values.vehicleBrandId)        patch.carBrandId         = values.vehicleBrandId;
+      if (values.vehicleModelId)        patch.carModelId         = values.vehicleModelId;
+      if (values.variantId)             patch.carModelVariantId  = values.variantId;
+      if (values.glassTypeId)           patch.glassPartTypeId    = values.glassTypeId;
+      // bodyType: first entry from the model metadata array (e.g. "LMV")
+      if (values.modelBodyType.length > 0) patch.bodyType        = values.modelBodyType[0];
 
       const result = await updateEnquiry(patch);
 

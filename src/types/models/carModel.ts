@@ -7,6 +7,10 @@ export interface CarModel {
   compare_name: string;
   image:        string | null;
   status:       CarModelStatus;
+  cc:           number | null;
+  ccCondition:  string | null;
+  bodyType:     string[];
+  brand?:       { id: string; name: string };
 }
 
 export interface CarModelPayload {

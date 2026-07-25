@@ -459,6 +459,59 @@ select.input option {
   font-size: 17px;
 }
 
+/* ── Model metadata chips ── */
+.modelMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: -2px;
+}
+
+.metaChip {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 9px;
+  background: var(--form-drawer-accent-bg);
+  border: 1px solid var(--form-drawer-accent-border);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  color: var(--form-drawer-accent-text);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: var(--letter-spacing-normal);
+  white-space: nowrap;
+}
+
+/* ── Catalog loading / empty hint ── */
+.catalogHint {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--font-size-sm);
+  color: var(--form-drawer-text-faint);
+  padding: var(--space-2) var(--space-3);
+  background: var(--form-drawer-surface);
+  border: 1px dashed var(--form-drawer-border);
+  border-radius: var(--radius-lg);
+}
+
+/* ── Optional label suffix ── */
+.optLabel {
+  font-size: var(--font-size-xs);
+  color: var(--form-drawer-text-faint);
+  font-weight: var(--font-weight-normal);
+}
+
+/* ── Loader spin animation ── */
+@keyframes fdSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.spinning {
+  animation: fdSpin 0.8s linear infinite;
+  flex-shrink: 0;
+}
+
 /* ── Insurance block ── */
 .insuranceBlock {
   background: var(--form-drawer-insurance-bg);
