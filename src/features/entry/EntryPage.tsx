@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Navigate, Link } from 'react-router-dom';
 import { MapPin, Phone, ChevronRight, Locate, CheckCircle, Search, Car, X } from 'lucide-react';
+import { SearchableSelect } from '@/components/ui/SearchableSelect';
 import { useAuth } from '@/context/AuthContext';
 import { useLazyGetNearbyBranchesQuery } from './nearbyBranchesApi';
 import type { NearbyBranch } from './nearbyBranchesApi';
@@ -186,22 +187,29 @@ export function EntryPage() {
 
   const [createQuickEnquiry, { isLoading: submitting }] = useCreateQuickEnquiryMutation();
 
-  const { data: carBrands = [] } = useGetCarBrandsQuery({ status: 'ACTIVE' });
-
   // Quick enquiry form state — only customerName/phone/branchId sent to POST /api/v1/enquiries/quick
-  const [customerName,   setCustomerName]   = useState('');
-  const [phone,          setPhone]          = useState('');
-  const [branchId,       setBranchId]       = useState('');
-  const [vehicleBrandId, setVehicleBrandId] = useState('');
-  const [vehicleModelId, setVehicleModelId] = useState('');
-  const [districtSearch, setDistrictSearch] = useState('');
-  const [errors,         setErrors]         = useState<FormErrors>({});
-  const [confirmation,   setConfirmation]   = useState<Confirmation | null>(null);
-  const [locating,       setLocating]       = useState(false);
-  const [gpsError,       setGpsError]       = useState<string | null>(null);
+  const [customerName,    setCustomerName]    = useState('');
+  const [phone,           setPhone]           = useState('');
+  const [branchId,        setBranchId]        = useState('');
+  const [vehicleBrandId,  setVehicleBrandId]  = useState('');
+  const [vehicleBrandName,setVehicleBrandName]= useState('');
+  const [vehicleModelId,  setVehicleModelId]  = useState('');
+  const [vehicleModelName,setVehicleModelName]= useState('');
+  const [districtSearch,  setDistrictSearch]  = useState('');
+  const [brandSearch,     setBrandSearch]     = useState('');
+  const [modelSearch,     setModelSearch]     = useState('');
+  const [errors,          setErrors]          = useState<FormErrors>({});
+  const [confirmation,    setConfirmation]    = useState<Confirmation | null>(null);
+  const [locating,        setLocating]        = useState(false);
+  const [gpsError,        setGpsError]        = useState<string | null>(null);
 
-  const { data: carModels = [] } = useGetCarModelsQuery(
-    vehicleBrandId ? { brandId: vehicleBrandId, status: 'ACTIVE' } : undefined,
+  const { data: carBrands = [], isFetching: brandsLoading } = useGetCarBrandsQuery({
+    status: 'ACTIVE',
+    search: brandSearch || undefined,
+  });
+
+  const { data: carModels = [], isFetching: modelsLoading } = useGetCarModelsQuery(
+    vehicleBrandId ? { brandId: vehicleBrandId, status: 'ACTIVE', search: modelSearch || undefined } : undefined,
     { skip: !vehicleBrandId },
   );
 
@@ -482,17 +490,22 @@ export function EntryPage() {
                 <Car size={13} />
                 Car Brand <span style={{ fontWeight: 400, opacity: 0.6, fontSize: '0.75em' }}>(optional)</span>
               </label>
-              <select
+              <SearchableSelect
                 id="entry-brand"
-                className={styles.select}
                 value={vehicleBrandId}
-                onChange={(e) => { setVehicleBrandId(e.target.value); setVehicleModelId(''); }}
-              >
-                <option value="">Select brand</option>
-                {carBrands.map((b) => (
-                  <option key={b.id} value={b.id}>{b.name}</option>
-                ))}
-              </select>
+                displayValue={vehicleBrandName || undefined}
+                options={carBrands}
+                isLoading={brandsLoading}
+                placeholder="Select brand"
+                onSearch={setBrandSearch}
+                onChange={(id, name) => {
+                  setVehicleBrandId(id);
+                  setVehicleBrandName(name);
+                  setVehicleModelId('');
+                  setVehicleModelName('');
+                  setModelSearch('');
+                }}
+              />
             </div>
 
             {/* Car Model (optional, cascades from brand) */}
@@ -500,20 +513,17 @@ export function EntryPage() {
               <label className={styles.label} htmlFor="entry-model">
                 Car Model <span style={{ fontWeight: 400, opacity: 0.6, fontSize: '0.75em' }}>(optional)</span>
               </label>
-              <select
+              <SearchableSelect
                 id="entry-model"
-                className={styles.select}
                 value={vehicleModelId}
-                onChange={(e) => setVehicleModelId(e.target.value)}
-                disabled={!vehicleBrandId || carModels.length === 0}
-              >
-                <option value="">
-                  {!vehicleBrandId ? 'Select brand first' : carModels.length === 0 ? 'No models available' : 'Select model'}
-                </option>
-                {carModels.map((m) => (
-                  <option key={m.id} value={m.id}>{m.name}</option>
-                ))}
-              </select>
+                displayValue={vehicleModelName || undefined}
+                options={carModels}
+                isLoading={modelsLoading}
+                placeholder={!vehicleBrandId ? 'Select brand first' : 'Select model'}
+                disabled={!vehicleBrandId}
+                onSearch={setModelSearch}
+                onChange={(id, name) => { setVehicleModelId(id); setVehicleModelName(name); }}
+              />
             </div>
 
             <button type="submit" className={styles.submitBtn} disabled={submitting}>

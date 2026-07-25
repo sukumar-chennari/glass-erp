@@ -7,23 +7,28 @@ export const carModelsApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
 
     // GET /api/v1/car-models — paginated { data, total, page, limit } envelope.
-    // Backend filter params: brandId?, status?
+    // Backend filter params: brandId?, status?, search?
     // transformResponse remaps backend field names → frontend model.
-    getCarModels: builder.query<CarModel[], { brandId?: string; status?: CarModelStatus } | void>({
-      ...mockableQuery<CarModel[], { brandId?: string; status?: CarModelStatus } | void>({
+    getCarModels: builder.query<CarModel[], { brandId?: string; status?: CarModelStatus; search?: string } | void>({
+      ...mockableQuery<CarModel[], { brandId?: string; status?: CarModelStatus; search?: string } | void>({
         mockFn: (arg) => {
           let items = carModelMock.list();
-          const a = arg as { brandId?: string; status?: CarModelStatus } | undefined;
+          const a = arg as { brandId?: string; status?: CarModelStatus; search?: string } | undefined;
           if (a?.brandId) items = items.filter((m) => m.brand_id === a.brandId);
           if (a?.status)  items = items.filter((m) => m.status   === a.status);
+          if (a?.search) {
+            const q = a.search.toLowerCase();
+            items = items.filter((m) => m.name.toLowerCase().includes(q));
+          }
           return items;
         },
         url: '/car-models',
         params: (arg) => {
-          const a = arg as { brandId?: string; status?: CarModelStatus } | undefined;
+          const a = arg as { brandId?: string; status?: CarModelStatus; search?: string } | undefined;
           const p: Record<string, unknown> = {};
           if (a?.brandId) p['brandId'] = a.brandId;
           if (a?.status)  p['status']  = a.status;
+          if (a?.search)  p['search']  = a.search;
           return Object.keys(p).length > 0 ? p : undefined;
         },
         transformResponse: (raw) =>

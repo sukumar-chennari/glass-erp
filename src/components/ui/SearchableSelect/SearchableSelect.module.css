@@ -1,0 +1,178 @@
+/*
+ * SearchableSelect — theme via --ss-* custom properties.
+ * Defaults use global Entry-Page tokens. Override per context via className.
+ */
+
+.root {
+  position: relative;
+  width:    100%;
+
+  --ss-bg:          var(--color-bg-input);
+  --ss-border:      var(--color-border-input);
+  --ss-drop-border: var(--color-border);
+  --ss-focus:     var(--color-primary);
+  --ss-text:      var(--color-text-primary);
+  --ss-muted:     var(--color-text-muted);
+  --ss-ph:        var(--color-text-muted);
+  --ss-r:         var(--radius-lg);
+  --ss-fnt:       var(--font-family);
+  --ss-sz:        var(--font-size-base);
+  --ss-py:        var(--space-3);
+  --ss-px:        var(--space-4);
+  --ss-drop-bg:   var(--color-bg-light);   /* solid in all themes — no glass leak */
+  --ss-drop-shad: var(--shadow-lg);
+  --ss-sel-bg:    color-mix(in srgb, var(--color-primary) 14%, var(--color-bg-light));
+  --ss-sel-text:  var(--color-primary);
+  --ss-hover-bg:  var(--color-bg-surface-hover);
+  --ss-err:       var(--color-danger, #dc2626);
+}
+
+/* ── Trigger (closed) ── */
+.trigger {
+  display:         flex;
+  align-items:     center;
+  gap:             var(--space-2);
+  width:           100%;
+  padding:         var(--ss-py) var(--ss-px);
+  background:      var(--ss-bg);
+  border:          1px solid var(--ss-border);
+  border-radius:   var(--ss-r);
+  font-family:     var(--ss-fnt);
+  font-size:       var(--ss-sz);
+  cursor:          pointer;
+  text-align:      left;
+  box-sizing:      border-box;
+  transition:      border-color 0.15s, background 0.15s;
+}
+
+.trigger:focus-visible { outline: none; border-color: var(--ss-focus); }
+.hasErr .trigger       { border-color: var(--ss-err) !important; }
+.isDis .trigger        { opacity: 0.5; cursor: not-allowed; }
+
+.val {
+  color:          var(--ss-text);
+  flex:           1;
+  min-width:      0;
+  white-space:    nowrap;
+  overflow:       hidden;
+  text-overflow:  ellipsis;
+  font-size:      var(--ss-sz);
+}
+
+.ph {
+  color:     var(--ss-ph);
+  flex:      1;
+  font-size: var(--ss-sz);
+}
+
+.caret {
+  color:      var(--ss-muted);
+  flex-shrink:0;
+  transition: transform 0.15s;
+}
+
+/* ── Input box (open) ── */
+.inputBox {
+  display:       flex;
+  align-items:   center;
+  gap:           var(--space-2);
+  width:         100%;
+  padding:       var(--ss-py) var(--ss-px);
+  background:    var(--ss-bg);
+  border:        1px solid var(--ss-focus);
+  border-radius: var(--ss-r);
+  box-sizing:    border-box;
+}
+
+.ico { color: var(--ss-muted); flex-shrink: 0; }
+
+.inp {
+  flex:        1;
+  min-width:   0;
+  border:      none;
+  background:  transparent;
+  font-family: var(--ss-fnt);
+  font-size:   var(--ss-sz);
+  color:       var(--ss-text);
+  outline:     none;
+}
+
+.inp::placeholder { color: var(--ss-ph); }
+
+@keyframes ssSpin { to { transform: rotate(360deg); } }
+
+.spin {
+  color:       var(--ss-muted);
+  flex-shrink: 0;
+  animation:   ssSpin 0.7s linear infinite;
+}
+
+/* ── Dropdown ── */
+.list {
+  position:      absolute;
+  top:           calc(100% + 4px);
+  left:          0;
+  right:         0;
+  z-index:       var(--z-popover, 900);
+  background:    var(--ss-drop-bg);
+  border:        1px solid var(--ss-drop-border, var(--ss-border));
+  border-radius: var(--ss-r);
+  box-shadow:    var(--ss-drop-shad);
+  max-height:    220px;
+  overflow-y:    auto;
+  list-style:    none;
+  margin:        0;
+  padding:       4px 0;
+  animation:     ssSlide 0.12s ease both;
+}
+
+@keyframes ssSlide {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.list::-webkit-scrollbar       { width: 4px; }
+.list::-webkit-scrollbar-thumb { background: var(--ss-border); border-radius: 2px; }
+
+.opt {
+  display:        flex;
+  align-items:    center;
+  justify-content:space-between;
+  padding:        var(--space-2) var(--ss-px);
+  font-size:      var(--ss-sz);
+  color:          var(--ss-text);
+  cursor:         pointer;
+  transition:     background 0.1s;
+}
+
+.optLabel {
+  flex:          1;
+  min-width:     0;
+  overflow:      hidden;
+  text-overflow: ellipsis;
+  white-space:   nowrap;
+}
+
+.optCur { background: var(--ss-hover-bg); }
+
+.optSel {
+  background:  var(--ss-sel-bg);
+  color:       var(--ss-sel-text);
+  font-weight: var(--font-weight-medium, 500);
+}
+
+.check {
+  color:       var(--ss-sel-text);
+  flex-shrink: 0;
+  margin-left: var(--space-2);
+}
+
+.msg {
+  display:     flex;
+  align-items: center;
+  gap:         var(--space-2);
+  padding:     var(--space-3) var(--ss-px);
+  font-size:   var(--font-size-sm, 0.875rem);
+  color:       var(--ss-muted);
+  cursor:      default;
+}

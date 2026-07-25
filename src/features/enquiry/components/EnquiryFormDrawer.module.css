@@ -300,6 +300,24 @@ select.input option {
   color: var(--form-drawer-text);
 }
 
+/* ── SearchableSelect override — maps --ss-* to form-drawer tokens ── */
+.ssDrawer {
+  --ss-bg:          var(--form-drawer-surface);
+  --ss-border:      var(--form-drawer-border);
+  --ss-focus:       var(--form-drawer-border-focus);
+  --ss-text:        var(--form-drawer-text);
+  --ss-muted:       var(--form-drawer-text-muted);
+  --ss-ph:          var(--form-drawer-text-faint);
+  --ss-drop-bg:     var(--form-drawer-card-bg);
+  --ss-drop-border: var(--form-drawer-border);
+  --ss-sel-bg:      var(--form-drawer-opt-active-bg);
+  --ss-sel-text:    var(--form-drawer-accent-text);
+  --ss-hover-bg:    var(--form-drawer-opt-hover-bg);
+  --ss-err:         var(--form-drawer-error);
+  --ss-py:          var(--space-2);
+  --ss-px:          var(--space-3);
+}
+
 .phoneRow {
   display: flex;
   gap: var(--space-2);

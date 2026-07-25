@@ -2,32 +2,34 @@ import { useState, useEffect } from 'react';
 import { X, ChevronRight, ChevronLeft, Check, AlertCircle, Lock } from 'lucide-react';
 import { useGetCarBrandsQuery } from '@/features/settings/services/carBrandsApi';
 import { useGetCarModelsQuery } from '@/features/settings/services/carModelsApi';
-import type { CarBrand } from '@/types/models/carBrand';
 import { useAuth } from '@/context/AuthContext';
+
+import { SearchableSelect } from '@/components/ui/SearchableSelect';
 import styles from './EnquiryFormDrawer.module.css';
 
 export interface EnquiryFormValues {
-  customerName:   string;
-  phone:          string;
-  branchId:       string;
-  source:         string;
-  vehicleBrandId: string;
-  vehicleBrand:   string;
-  vehicleModel:   string;
-  vehicleYear:    string;
-  vehicleNumber:  string;
-  vehicleType:    'Private' | 'Commercial' | '';
-  glassType:      string;
-  paymentType:    'Cash' | 'Insurance' | '';
-  insurerName:    string;
-  accidentDate:   string;
-  appointmentDate:string;
-  damageNotes:    string;
+  customerName:    string;
+  phone:           string;
+  branchId:        string;
+  source:          string;
+  vehicleBrandId:  string;
+  vehicleBrand:    string;
+  vehicleModelId:  string; // internal id tracking; not sent to API
+  vehicleModel:    string; // model name — this is what PATCH/submit API expects
+  vehicleYear:     string;
+  vehicleNumber:   string;
+  vehicleType:     'Private' | 'Commercial' | '';
+  glassType:       string;
+  paymentType:     'Cash' | 'Insurance' | '';
+  insurerName:     string;
+  accidentDate:    string;
+  appointmentDate: string;
+  damageNotes:     string;
 }
 
 export const EMPTY_FORM: EnquiryFormValues = {
   customerName: '', phone: '', branchId: '', source: '',
-  vehicleBrandId: '', vehicleBrand: '', vehicleModel: '',
+  vehicleBrandId: '', vehicleBrand: '', vehicleModelId: '', vehicleModel: '',
   vehicleYear: '', vehicleNumber: '', vehicleType: '',
   glassType: '', paymentType: '', insurerName: '',
   accidentDate: '', appointmentDate: '', damageNotes: '',
@@ -91,11 +93,13 @@ export function EnquiryFormDrawer({
   const { session } = useAuth();
   const sessionBranch = session?.branch ?? null;
 
-  const [step,       setStep]       = useState(1);
-  const [form,       setForm]       = useState<EnquiryFormValues>({ ...EMPTY_FORM, ...initialValues });
-  const [errors,     setErrors]     = useState<FormErrors>({});
+  const [step,        setStep]        = useState(1);
+  const [form,        setForm]        = useState<EnquiryFormValues>({ ...EMPTY_FORM, ...initialValues });
+  const [errors,      setErrors]      = useState<FormErrors>({});
   // tracks whether the most-recent Next attempt on each step failed — drives indicator error badge
-  const [stepErrors, setStepErrors] = useState<Record<number, boolean>>({});
+  const [stepErrors,  setStepErrors]  = useState<Record<number, boolean>>({});
+  const [brandSearch, setBrandSearch] = useState('');
+  const [modelSearch, setModelSearch] = useState('');
 
   useEffect(() => {
     if (isOpen) {
@@ -107,6 +111,8 @@ export function EnquiryFormDrawer({
       setStep(1);
       setErrors({});
       setStepErrors({});
+      setBrandSearch('');
+      setModelSearch('');
     }
   // initialValues identity changes on every render — spread once at open
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -120,9 +126,12 @@ export function EnquiryFormDrawer({
   }, [isOpen, onClose]);
 
   // Hooks must be called before any conditional return.
-  const { data: carBrands = [], isLoading: brandsLoading } = useGetCarBrandsQuery({ status: 'ACTIVE' });
-  const { data: carModels = [], isLoading: modelsLoading } = useGetCarModelsQuery(
-    form.vehicleBrandId ? { brandId: form.vehicleBrandId, status: 'ACTIVE' } : undefined,
+  const { data: carBrands = [], isFetching: brandsLoading } = useGetCarBrandsQuery({
+    status: 'ACTIVE',
+    search: brandSearch || undefined,
+  });
+  const { data: carModels = [], isFetching: modelsLoading } = useGetCarModelsQuery(
+    form.vehicleBrandId ? { brandId: form.vehicleBrandId, status: 'ACTIVE', search: modelSearch || undefined } : undefined,
     { skip: !form.vehicleBrandId },
   );
 
@@ -135,15 +144,15 @@ export function EnquiryFormDrawer({
     setErrors((e) => ({ ...e, [key]: undefined }));
   }
 
-  // Brand change resets model — must update three fields atomically.
-  // RC autofill entry point: call handleBrandChange(id) then set('vehicleModel', name).
-  function handleBrandChange(brandId: string) {
-    const brand: CarBrand | undefined = carBrands.find((b) => b.id === brandId);
+  // Brand change resets model — clears all four model/brand fields atomically.
+  function handleBrandChange(brandId: string, brandName: string) {
+    setModelSearch('');
     setForm((p) => ({
       ...p,
-      vehicleBrandId: brandId,
-      vehicleBrand:   brand?.name ?? '',
-      vehicleModel:   '', // stale model cleared — user must reselect
+      vehicleBrandId:  brandId,
+      vehicleBrand:    brandName,
+      vehicleModelId:  '',
+      vehicleModel:    '',
     }));
     setErrors((e) => ({ ...e, vehicleBrand: undefined, vehicleModel: undefined }));
   }
@@ -402,24 +411,20 @@ export function EnquiryFormDrawer({
                   <label className={styles.lbl} htmlFor="efd-vehicleBrand">
                     Car Brand <span className={styles.req}>*</span>
                   </label>
-                  <select
+                  <SearchableSelect
                     id="efd-vehicleBrand"
-                    className={`${styles.input} ${errors.vehicleBrandId ? styles.inputErr : ''}`}
                     value={form.vehicleBrandId}
-                    onChange={(e) => handleBrandChange(e.target.value)}
-                    onBlur={() => handleBlur('vehicleBrandId')}
-                    disabled={brandsLoading}
-                    aria-required="true"
-                    aria-invalid={!!errors.vehicleBrandId}
-                    aria-describedby={errors.vehicleBrandId ? 'err-vehicleBrand' : undefined}
-                  >
-                    <option value="">
-                      {brandsLoading ? 'Loading brands…' : 'Select brand'}
-                    </option>
-                    {carBrands.map((b) => (
-                      <option key={b.id} value={b.id}>{b.name}</option>
-                    ))}
-                  </select>
+                    displayValue={form.vehicleBrand || undefined}
+                    options={carBrands}
+                    isLoading={brandsLoading}
+                    placeholder="Select brand"
+                    error={!!errors.vehicleBrandId}
+                    ariaInvalid={!!errors.vehicleBrandId}
+                    ariaDescribedBy={errors.vehicleBrandId ? 'err-vehicleBrand' : undefined}
+                    onSearch={setBrandSearch}
+                    onChange={handleBrandChange}
+                    className={styles.ssDrawer}
+                  />
                   {errors.vehicleBrandId && (
                     <span id="err-vehicleBrand" className={styles.err} data-form-err role="alert">
                       {errors.vehicleBrandId}
@@ -433,29 +438,24 @@ export function EnquiryFormDrawer({
                       <span className={styles.req}> *</span>
                     )}
                   </label>
-                  <select
+                  <SearchableSelect
                     id="efd-vehicleModel"
-                    className={`${styles.input} ${errors.vehicleModel ? styles.inputErr : ''}`}
-                    value={form.vehicleModel}
-                    onChange={(e) => set('vehicleModel', e.target.value)}
-                    onBlur={() => handleBlur('vehicleModel')}
-                    disabled={!form.vehicleBrandId || modelsLoading}
-                    aria-invalid={!!errors.vehicleModel}
-                    aria-describedby={errors.vehicleModel ? 'err-vehicleModel' : undefined}
-                  >
-                    <option value="">
-                      {!form.vehicleBrandId
-                        ? 'Select brand first'
-                        : modelsLoading
-                          ? 'Loading models…'
-                          : carModels.length === 0
-                            ? 'No models available'
-                            : 'Select model'}
-                    </option>
-                    {carModels.map((m) => (
-                      <option key={m.id} value={m.name}>{m.name}</option>
-                    ))}
-                  </select>
+                    value={form.vehicleModelId}
+                    displayValue={form.vehicleModel || undefined}
+                    options={carModels}
+                    isLoading={modelsLoading}
+                    placeholder={!form.vehicleBrandId ? 'Select brand first' : 'Select model'}
+                    disabled={!form.vehicleBrandId}
+                    error={!!errors.vehicleModel}
+                    ariaInvalid={!!errors.vehicleModel}
+                    ariaDescribedBy={errors.vehicleModel ? 'err-vehicleModel' : undefined}
+                    onSearch={setModelSearch}
+                    onChange={(id, name) => {
+                      setForm((p) => ({ ...p, vehicleModelId: id, vehicleModel: name }));
+                      setErrors((e) => ({ ...e, vehicleModel: undefined }));
+                    }}
+                    className={styles.ssDrawer}
+                  />
                   {errors.vehicleModel && (
                     <span id="err-vehicleModel" className={styles.err} data-form-err role="alert">
                       {errors.vehicleModel}

@@ -7,18 +7,26 @@ export const carBrandsApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
 
     // GET /api/v1/car-brands — returns { data, total, page, limit } envelope.
-    // Optional ?status=ACTIVE|INACTIVE backend filter; arg is void when no filter is active.
-    getCarBrands: builder.query<CarBrand[], { status?: CarBrandStatus } | void>({
-      ...mockableQuery<CarBrand[], { status?: CarBrandStatus } | void>({
+    // Optional ?status=ACTIVE|INACTIVE&search=<term> backend filters.
+    getCarBrands: builder.query<CarBrand[], { status?: CarBrandStatus; search?: string } | void>({
+      ...mockableQuery<CarBrand[], { status?: CarBrandStatus; search?: string } | void>({
         mockFn: (arg) => {
-          const items = carBrandMock.list();
-          const status = (arg as { status?: CarBrandStatus } | undefined)?.status;
-          return status ? items.filter((b) => b.status === status) : items;
+          let items = carBrandMock.list();
+          const a = arg as { status?: CarBrandStatus; search?: string } | undefined;
+          if (a?.status) items = items.filter((b) => b.status === a.status);
+          if (a?.search) {
+            const q = a.search.toLowerCase();
+            items = items.filter((b) => b.name.toLowerCase().includes(q));
+          }
+          return items;
         },
         url: '/car-brands',
         params: (arg) => {
-          const status = (arg as { status?: CarBrandStatus } | undefined)?.status;
-          return status ? { status } : undefined;
+          const a = arg as { status?: CarBrandStatus; search?: string } | undefined;
+          const p: Record<string, unknown> = {};
+          if (a?.status) p['status'] = a.status;
+          if (a?.search) p['search'] = a.search;
+          return Object.keys(p).length > 0 ? p : undefined;
         },
         transformResponse: (raw) =>
           normalizeArray<Record<string, unknown>>(raw).map((b) => ({
