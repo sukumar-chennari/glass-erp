@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { CheckCircle2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import windexLogo from '../../../assets/images/windex-transparent-logo.png';
+import windexLogo from '../../../assets/images/windex-logo.png';
 import styles from './AuthCard.module.css';
 
 interface AuthCardProps {

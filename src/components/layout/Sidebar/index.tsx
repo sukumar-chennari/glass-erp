@@ -3,7 +3,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import * as LucideIcons from 'lucide-react';
 import { ChevronLeft, LogOut } from 'lucide-react';
-import windexLogo from '../../../../assets/images/windex-transparent-logo.png';
+import windexLogo from '../../../../assets/images/windex-logo.png';
 import { Spinner } from '@/components/ui/Spinner';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
