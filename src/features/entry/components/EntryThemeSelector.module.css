@@ -1,0 +1,161 @@
+/* EntryThemeSelector — compact theme picker for the Entry Page header.
+   Uses the same shared token system as the rest of the app;
+   adapts to both light and dark themes automatically. */
+
+.wrap {
+  position: relative;
+  display: inline-flex;
+}
+
+/* ── Trigger button — visually matches the loginBtn ── */
+.trigger {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border-strong);
+  background: var(--color-btn-secondary-bg);
+  color: var(--color-btn-secondary-text);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
+  font-family: var(--font-family);
+  white-space: nowrap;
+}
+
+.trigger:hover {
+  background: var(--color-btn-secondary-hover-bg);
+  border-color: var(--color-btn-secondary-hover-border);
+  color: var(--color-btn-secondary-hover-text);
+}
+
+.trigger:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+/* Hide the text label on narrow screens, keep just the icon */
+@media (max-width: 480px) {
+  .triggerLabel { display: none; }
+}
+
+/* ── Popover panel ── */
+.popover {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: var(--z-modal);
+  background: var(--color-modal-bg);
+  border: 1px solid var(--color-modal-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl);
+  backdrop-filter: var(--modal-blur);
+  -webkit-backdrop-filter: var(--modal-blur);
+  padding: var(--space-3);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2);
+  min-width: 260px;
+  animation: popIn 0.14s ease-out both;
+}
+
+@keyframes popIn {
+  from { opacity: 0; transform: translateY(-6px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)    scale(1);    }
+}
+
+/* On narrow screens, anchor left so it doesn't overflow the viewport */
+@media (max-width: 480px) {
+  .popover {
+    right: auto;
+    left: 0;
+  }
+}
+
+/* ── Theme card ── */
+.card {
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-2);
+  cursor: pointer;
+  background: var(--color-bg-subtle);
+  transition: border-color 0.15s, transform 0.12s, box-shadow 0.12s;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-family: var(--font-family);
+  text-align: left;
+}
+
+.card:hover {
+  border-color: var(--color-border-strong);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.card:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+.cardActive {
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 0 0 2px var(--color-focus-ring) !important;
+}
+
+/* ── Swatch strip (sidebar preview + body preview) ── */
+.swatch {
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  height: 40px;
+  display: flex;
+  border-width: 1px;
+  border-style: solid;
+}
+
+.swatchSidebar {
+  flex: 0 0 28%;
+}
+
+.swatchBody {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 4px;
+  gap: 3px;
+}
+
+.swatchHeader {
+  height: 8px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+/* ── Meta row (primary dot + label + check) ── */
+.meta {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+}
+
+.label {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  flex: 1;
+  line-height: 1;
+}
+
+.check {
+  color: var(--color-primary);
+  flex-shrink: 0;
+}

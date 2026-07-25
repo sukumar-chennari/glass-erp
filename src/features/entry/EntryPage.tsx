@@ -10,7 +10,8 @@ import { useGetCarModelsQuery } from '@/features/settings/services/carModelsApi'
 import { getRoleDefaultRoute } from '@/utils/roleRouting';
 import { ROUTES } from '@/constants/routes';
 import { InsurancePartners } from './components/InsurancePartners';
-import windexLogo from '../../../assets/images/windex-transparent-logo.png';
+import { EntryThemeSelector } from './components/EntryThemeSelector';
+import windexLogo from '../../../assets/images/windex-logo.png';
 import styles from './EntryPage.module.css';
 
 // ── Types ────────────────────────────────────────────────────
@@ -65,9 +66,12 @@ function TopBar() {
           +91 98480 00000
         </a>
       </div>
-      <Link to={ROUTES.LOGIN} className={styles.loginBtn}>
-        Staff Login
-      </Link>
+      <div className={styles.topBarActions}>
+        <EntryThemeSelector />
+        <Link to={ROUTES.LOGIN} className={styles.loginBtn}>
+          Staff Login
+        </Link>
+      </div>
     </header>
   );
 }
