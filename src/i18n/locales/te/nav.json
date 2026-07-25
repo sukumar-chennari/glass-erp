@@ -18,8 +18,8 @@
   },
   "sidebar": {
     "brand": {
-      "name": "Glass ERP Pro",
-      "tagline": "ఆటోమొబైల్ గ్లాస్ ERP"
+      "name": "WindX",
+      "tagline": "ఆటో గ్లాస్ ప్లాట్‌ఫామ్"
     },
     "user": {
       "role": "అడ్మిన్",
@@ -44,7 +44,7 @@
     }
   },
   "header": {
-    "appFallback": "Glass ERP Pro",
+    "appFallback": "WindX",
     "aria": {
       "openNav": "నావిగేషన్ తెరవండి",
       "messages": "సందేశాలు",

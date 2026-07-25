@@ -18,8 +18,8 @@
   },
   "sidebar": {
     "brand": {
-      "name": "Glass ERP Pro",
-      "tagline": "Automobile Glass ERP"
+      "name": "WindX",
+      "tagline": "Auto Glass Platform"
     },
     "user": {
       "role": "Admin",
@@ -44,7 +44,7 @@
     }
   },
   "header": {
-    "appFallback": "Glass ERP Pro",
+    "appFallback": "WindX",
     "aria": {
       "openNav": "Open navigation",
       "messages": "Messages",

@@ -19,7 +19,7 @@
     "note": "✓ Save once — every customer gets the same link automatically."
   },
   "whatsapp": {
-    "message": "Hello! 👋\n\nPlease fill in our *Glass Service Enquiry Form* so we can assist you quickly:\n\n🔗 {{url}}\n\n_Tap the link, fill in your vehicle & glass details and submit. It takes less than a minute!_ 🪟\n\n— *Glass ERP Pro*"
+    "message": "Hello! 👋\n\nPlease fill in our *Glass Service Enquiry Form* so we can assist you quickly:\n\n🔗 {{url}}\n\n_Tap the link, fill in your vehicle & glass details and submit. It takes less than a minute!_ 🪟\n\n— *WindX*"
   },
   "messages": {
     "invalidPhone": "Enter a valid 10-digit WhatsApp number.",
