@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Navigate, Link } from 'react-router-dom';
-import { MapPin, Phone, ChevronRight, Locate, CheckCircle, Search, Car } from 'lucide-react';
+import { MapPin, Phone, ChevronRight, Locate, CheckCircle, Search, Car, X } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useLazyGetNearbyBranchesQuery } from './nearbyBranchesApi';
 import type { NearbyBranch } from './nearbyBranchesApi';
@@ -118,48 +118,50 @@ interface ConfirmationViewProps {
 }
 
 function ConfirmationView({ confirmation, onReset }: ConfirmationViewProps) {
-  const trackUrl = `${ROUTES.TRACK}?phone=${encodeURIComponent(confirmation.phone)}`;
   return (
-    <>
-      <TopBar />
-      <div className={styles.confirmWrap}>
-        <div className={styles.confirmCard}>
-          <div className={styles.confirmIconWrap}>
-            <CheckCircle size={28} />
+    <div className={styles.confirmOverlay} role="dialog" aria-modal="true" aria-label="Booking Confirmation">
+      <div className={styles.confirmCard}>
+        <button className={styles.confirmClose} onClick={onReset} aria-label="Close">
+          <X size={18} />
+        </button>
+
+        <div className={styles.confirmIconWrap}>
+          <CheckCircle size={28} />
+        </div>
+        <h2 className={styles.confirmTitle}>Request Submitted!</h2>
+        <p className={styles.confirmSub}>
+          Your service request has been received. Our team will contact you shortly.
+        </p>
+
+        <div className={styles.confirmDetails}>
+          <div className={styles.confirmRow}>
+            <span>Reference</span>
+            <strong>{confirmation.enquiryId || '—'}</strong>
           </div>
-          <h2 className={styles.confirmTitle}>Request Submitted!</h2>
-          <p className={styles.confirmSub}>
-            Your service request has been received. Our team will contact you shortly.
-          </p>
-          <div className={styles.confirmDetails}>
-            <div className={styles.confirmRow}>
-              <span>Reference</span>
-              <strong>{confirmation.enquiryId || '—'}</strong>
-            </div>
-            <div className={styles.confirmRow}>
-              <span>Name</span>
-              <strong>{confirmation.customerName}</strong>
-            </div>
-            <div className={styles.confirmRow}>
-              <span>Mobile</span>
-              <strong>+91 {confirmation.phone}</strong>
-            </div>
-            <div className={styles.confirmRow}>
-              <span>Branch</span>
-              <strong>{confirmation.branchName}</strong>
-            </div>
+          <div className={styles.confirmRow}>
+            <span>Name</span>
+            <strong>{confirmation.customerName}</strong>
           </div>
-          <div className={styles.confirmActions}>
-            <Link to={trackUrl} className={styles.confirmTrackBtn}>
-              Track My Service <ChevronRight size={14} />
-            </Link>
-            <button className={styles.confirmAgainBtn} onClick={onReset}>
-              Submit another request
-            </button>
+          <div className={styles.confirmRow}>
+            <span>Mobile</span>
+            <strong>+91 {confirmation.phone}</strong>
+          </div>
+          <div className={styles.confirmRow}>
+            <span>Branch</span>
+            <strong>{confirmation.branchName}</strong>
           </div>
         </div>
+
+        <div className={styles.confirmActions}>
+          <button className={styles.confirmAgainBtn} onClick={onReset}>
+            Submit another request
+          </button>
+          <button className={styles.confirmCloseBtn} onClick={() => window.location.reload()}>
+            Close
+          </button>
+        </div>
       </div>
-    </>
+    </div>
   );
 }
 
@@ -347,16 +349,6 @@ export function EntryPage() {
     setConfirmation({ enquiryId, branchName, phone, customerName: customerName.trim() });
   }
 
-  // ── Confirmation state ────────────────────────────────────
-
-  if (confirmation) {
-    return (
-      <div className={styles.page}>
-        <ConfirmationView confirmation={confirmation} onReset={() => setConfirmation(null)} />
-      </div>
-    );
-  }
-
   // ── Form ──────────────────────────────────────────────────
 
   return (
@@ -538,6 +530,10 @@ export function EntryPage() {
       </div>
 
       <InsurancePartners />
+
+      {confirmation && (
+        <ConfirmationView confirmation={confirmation} onReset={() => setConfirmation(null)} />
+      )}
     </div>
   );
 }

@@ -608,16 +608,28 @@
   line-height: var(--line-height-relaxed);
 }
 
-/* ── Confirmation screen ── */
-.confirmWrap {
-  flex: 1;
+/* ── Confirmation modal overlay ── */
+.confirmOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--space-8) var(--space-4);
+  padding: var(--space-4);
+  animation: confirmFadeIn 0.2s ease both;
+}
+
+@keyframes confirmFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 .confirmCard {
+  position: relative;
   background: var(--color-glass-bg);
   border: 1px solid var(--color-glass-border);
   border-radius: var(--radius-2xl);
@@ -628,7 +640,29 @@
   backdrop-filter: var(--surface-blur);
   -webkit-backdrop-filter: var(--surface-blur);
   box-shadow: var(--shadow-xl);
-  animation: entryFadeUp 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: entryFadeUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.confirmClose {
+  position: absolute;
+  top: var(--space-4);
+  right: var(--space-4);
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-subtle);
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.confirmClose:hover {
+  background: var(--color-bg-light);
+  color: var(--color-text-primary);
 }
 
 .confirmIconWrap {
@@ -697,29 +731,6 @@
   align-items: center;
 }
 
-.confirmTrackBtn {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-3) var(--space-6);
-  border-radius: var(--radius-lg);
-  background: var(--color-brand-gradient);
-  color: var(--color-text-on-primary);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
-  text-decoration: none;
-  transition: opacity var(--transition-fast);
-}
-
-.confirmTrackBtn:hover {
-  opacity: 0.9;
-  color: var(--color-text-on-primary);
-}
-
-.confirmTrackBtn:focus-visible {
-  outline: 2px solid var(--color-border-focus);
-  outline-offset: 2px;
-}
 
 .confirmAgainBtn {
   background: none;
@@ -736,6 +747,30 @@
 }
 
 .confirmAgainBtn:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+.confirmCloseBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2) var(--space-5);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.confirmCloseBtn:hover {
+  background: var(--color-bg-subtle);
+  color: var(--color-text-primary);
+}
+
+.confirmCloseBtn:focus-visible {
   outline: 2px solid var(--color-border-focus);
   outline-offset: 2px;
 }
