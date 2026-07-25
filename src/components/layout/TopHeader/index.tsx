@@ -1,7 +1,5 @@
-import { Bell, Settings, MessageSquare, Menu } from 'lucide-react';
-import { useLocation } from 'react-router-dom';
+import { Bell, MessageSquare, Menu } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { NAV_ITEMS } from '@/constants/nav';
 import { useAppDispatch } from '@/store/hooks';
 import { toggleMobileSidebar } from '@/store/slices/uiSlice';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
@@ -9,11 +7,8 @@ import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
 import styles from './TopHeader.module.css';
 
 export function TopHeader() {
-  const { t } = useTranslation('nav');
-  const { pathname } = useLocation();
-  const dispatch     = useAppDispatch();
-  const activeItem   = NAV_ITEMS.find((n) => n.path === pathname);
-  const pageTitle    = activeItem ? t(activeItem.id, activeItem.label) : t('header.appFallback');
+  const { t }    = useTranslation('nav');
+  const dispatch = useAppDispatch();
 
   return (
     <header className={styles.header}>
@@ -25,7 +20,6 @@ export function TopHeader() {
         >
           <Menu size={20} />
         </button>
-        <h1 className={styles.pageTitle}>{pageTitle}</h1>
       </div>
 
       <div className={styles.right}>
@@ -51,10 +45,6 @@ export function TopHeader() {
 
         <ThemeToggle />
         <LanguageSwitcher />
-
-        <button className={styles.iconBtn} aria-label={t('header.aria.settings')}>
-          <Settings size={18} />
-        </button>
       </div>
     </header>
   );

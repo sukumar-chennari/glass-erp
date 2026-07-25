@@ -46,13 +46,19 @@
   display:         inline-flex;
   align-items:     center;
   justify-content: center;
-  width:           56px;
-  height:          56px;
-  border-radius:   var(--radius-lg);
+  width:           64px;
+  height:          64px;
+  border-radius:   var(--radius-xl);
   background:      var(--color-brand-gradient);
-  color:           #fff;
   margin-bottom:   var(--space-4);
   box-shadow:      0 6px 24px color-mix(in srgb, var(--color-primary) 40%, transparent);
+  overflow:        hidden;
+}
+
+.logoImg {
+  width:      46px;
+  height:     46px;
+  object-fit: contain;
 }
 
 .logoSuccess {

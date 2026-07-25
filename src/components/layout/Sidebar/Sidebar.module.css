@@ -43,6 +43,13 @@
   flex-shrink:   0;
   box-shadow:    0 8px 32px var(--color-brand-gradient-shadow);
   color:         var(--color-text-on-primary);
+  overflow:      hidden;
+}
+
+.logoImg {
+  width:      34px;
+  height:     34px;
+  object-fit: contain;
 }
 
 .brandText {

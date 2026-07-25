@@ -62,7 +62,7 @@ function TopBar() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          <WhatsAppIcon />
+          <WhatsAppIcon className={styles.headerWhatsAppIcon} />
           +91 98480 00000
         </a>
       </div>
@@ -419,46 +419,6 @@ export function EntryPage() {
               )}
             </div>
 
-            {/* Car Brand (optional) */}
-            <div className={styles.fieldGroup}>
-              <label className={styles.label} htmlFor="entry-brand">
-                <Car size={13} />
-                Car Brand <span style={{ fontWeight: 400, opacity: 0.6, fontSize: '0.75em' }}>(optional)</span>
-              </label>
-              <select
-                id="entry-brand"
-                className={styles.select}
-                value={vehicleBrandId}
-                onChange={(e) => { setVehicleBrandId(e.target.value); setVehicleModelId(''); }}
-              >
-                <option value="">Select brand</option>
-                {carBrands.map((b) => (
-                  <option key={b.id} value={b.id}>{b.name}</option>
-                ))}
-              </select>
-            </div>
-
-            {/* Car Model (optional, cascades from brand) */}
-            <div className={styles.fieldGroup}>
-              <label className={styles.label} htmlFor="entry-model">
-                Car Model <span style={{ fontWeight: 400, opacity: 0.6, fontSize: '0.75em' }}>(optional)</span>
-              </label>
-              <select
-                id="entry-model"
-                className={styles.select}
-                value={vehicleModelId}
-                onChange={(e) => setVehicleModelId(e.target.value)}
-                disabled={!vehicleBrandId || carModels.length === 0}
-              >
-                <option value="">
-                  {!vehicleBrandId ? 'Select brand first' : carModels.length === 0 ? 'No models available' : 'Select model'}
-                </option>
-                {carModels.map((m) => (
-                  <option key={m.id} value={m.id}>{m.name}</option>
-                ))}
-              </select>
-            </div>
-
             {/* Branch */}
             <div className={styles.fieldGroup}>
               <label className={styles.label} htmlFor="entry-district">
@@ -522,6 +482,46 @@ export function EntryPage() {
                   {errors.branchId ?? gpsError}
                 </span>
               )}
+            </div>
+
+            {/* Car Brand (optional) */}
+            <div className={styles.fieldGroup}>
+              <label className={styles.label} htmlFor="entry-brand">
+                <Car size={13} />
+                Car Brand <span style={{ fontWeight: 400, opacity: 0.6, fontSize: '0.75em' }}>(optional)</span>
+              </label>
+              <select
+                id="entry-brand"
+                className={styles.select}
+                value={vehicleBrandId}
+                onChange={(e) => { setVehicleBrandId(e.target.value); setVehicleModelId(''); }}
+              >
+                <option value="">Select brand</option>
+                {carBrands.map((b) => (
+                  <option key={b.id} value={b.id}>{b.name}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Car Model (optional, cascades from brand) */}
+            <div className={styles.fieldGroup}>
+              <label className={styles.label} htmlFor="entry-model">
+                Car Model <span style={{ fontWeight: 400, opacity: 0.6, fontSize: '0.75em' }}>(optional)</span>
+              </label>
+              <select
+                id="entry-model"
+                className={styles.select}
+                value={vehicleModelId}
+                onChange={(e) => setVehicleModelId(e.target.value)}
+                disabled={!vehicleBrandId || carModels.length === 0}
+              >
+                <option value="">
+                  {!vehicleBrandId ? 'Select brand first' : carModels.length === 0 ? 'No models available' : 'Select model'}
+                </option>
+                {carModels.map((m) => (
+                  <option key={m.id} value={m.id}>{m.name}</option>
+                ))}
+              </select>
             </div>
 
             <button type="submit" className={styles.submitBtn} disabled={submitting}>

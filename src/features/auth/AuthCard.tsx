@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
-import { Layers, CheckCircle2 } from 'lucide-react';
+import { CheckCircle2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import windexLogo from '../../../assets/images/windex-transparent-logo.png';
 import styles from './AuthCard.module.css';
 
 interface AuthCardProps {
@@ -36,7 +37,7 @@ export function AuthCard({
           >
             {iconVariant === 'success'
               ? <CheckCircle2 size={28} strokeWidth={1.75} />
-              : <Layers       size={28} strokeWidth={1.75} />
+              : <img src={windexLogo} alt="WindX" className={styles.logoImg} />
             }
           </div>
           <h1 className={styles.title}>{title}</h1>
