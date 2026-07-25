@@ -1,5 +1,6 @@
-import { useState, useMemo, useEffect } from 'react';
-import { Plus, PhoneCall, CheckCircle, ClipboardList, Inbox, Image, Eye } from 'lucide-react';
+import { useState, useMemo, useEffect, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
+import { Plus, PhoneCall, CheckCircle, ClipboardList, Inbox, Image, Eye, Pencil, XCircle, BadgeCheck } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { PageShell, SectionCard } from '@/components/layout/PageShell';
 import { Button } from '@/components/ui/Button';
@@ -247,6 +248,43 @@ function CloseEnquiryModal({ isOpen, onClose, enquiry, onSave }: CloseModalProps
         />
       </div>
     </Modal>
+  );
+}
+
+// ── Icon action button with CSS hover tooltip ─────────────────────────
+interface TipBtnProps {
+  tip:        string;
+  icon:       ReactNode;
+  onClick:    () => void;
+  disabled?:  boolean;
+  colorClass?: string;
+}
+function TipBtn({ tip, icon, onClick, disabled, colorClass }: TipBtnProps) {
+  const [tipPos, setTipPos] = useState<{ x: number; y: number } | null>(null);
+
+  const handleEnter = (e: React.MouseEvent<HTMLSpanElement>) => {
+    const r = e.currentTarget.getBoundingClientRect();
+    setTipPos({ x: Math.round(r.left + r.width / 2), y: Math.round(r.top) });
+  };
+
+  return (
+    <span className={styles.tipWrap} onMouseEnter={handleEnter} onMouseLeave={() => setTipPos(null)}>
+      <button
+        type="button"
+        className={[styles.iconBtn, colorClass].filter(Boolean).join(' ')}
+        onClick={onClick}
+        disabled={disabled}
+        aria-label={tip}
+      >
+        {icon}
+      </button>
+      {tipPos && createPortal(
+        <div className={styles.tipLabel} style={{ left: tipPos.x, top: tipPos.y }}>
+          {tip}
+        </div>,
+        document.body,
+      )}
+    </span>
   );
 }
 
@@ -594,16 +632,16 @@ export function EnquiryPage() {
         <div className={styles.actionCell}>
           {e.status === 'pending' && (
             <>
-              <Button size="sm" variant="ghost" onClick={() => { void openEditForm(e); }} disabled={editLoading}>Edit</Button>
-              <Button size="sm" onClick={() => setPriceTgt(e)}>{t('page.actions.confirmPrice')}</Button>
-              <Button size="sm" variant="ghost" onClick={() => setCloseTgt(e)}>{t('page.actions.close')}</Button>
+              <TipBtn tip="Edit" icon={<Pencil size={14} />} onClick={() => { void openEditForm(e); }} disabled={editLoading} />
+              <TipBtn tip={t('page.actions.confirmPrice')} icon={<BadgeCheck size={14} />} onClick={() => setPriceTgt(e)} colorClass={styles.iconBtnConfirm} />
+              <TipBtn tip={t('page.actions.close')} icon={<XCircle size={14} />} onClick={() => setCloseTgt(e)} colorClass={styles.iconBtnClose} />
             </>
           )}
           {e.status === 'price_confirmed' && (
             <>
-              <Button size="sm" variant="ghost" onClick={() => { void openEditForm(e); }} disabled={editLoading}>Edit</Button>
-              <Button size="sm" variant="primary" onClick={() => handleConvert(e)}>{t('page.actions.convertToJob')}</Button>
-              <Button size="sm" variant="ghost" onClick={() => setCloseTgt(e)}>{t('page.actions.close')}</Button>
+              <TipBtn tip="Edit" icon={<Pencil size={14} />} onClick={() => { void openEditForm(e); }} disabled={editLoading} />
+              <TipBtn tip={t('page.actions.convertToJob')} icon={<ClipboardList size={14} />} onClick={() => handleConvert(e)} colorClass={styles.iconBtnConvert} />
+              <TipBtn tip={t('page.actions.close')} icon={<XCircle size={14} />} onClick={() => setCloseTgt(e)} colorClass={styles.iconBtnClose} />
             </>
           )}
           {e.status === 'converted' && (
