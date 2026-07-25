@@ -9,7 +9,6 @@ import { Input }       from '@/components/ui/Input';
 import { Select }      from '@/components/ui/Select';
 import { Modal }            from '@/components/ui/Modal';
 import { useToast }          from '@/components/ui/Toast';
-import { BulkUploadModal }   from './components/BulkUploadModal';
 import { TableSkeleton } from '@/components/ui/Skeleton';
 import {
   useGetCarModelsQuery,
@@ -90,7 +89,6 @@ export function CarModelsPage() {
 
   const isLoading = modelsLoading || brandsLoading;
 
-  const [bulkOpen,     setBulkOpen]     = useState(false);
   const [modalOpen,    setModalOpen]    = useState(false);
   const [editTarget,   setEditTarget]   = useState<CarModel | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<CarModel | null>(null);
@@ -328,14 +326,9 @@ export function CarModelsPage() {
       heading={t('carModels.heading')}
       description={t('carModels.description')}
       actions={
-        <>
-          <Button variant="secondary" leftIcon={<Upload size={15} />} onClick={() => setBulkOpen(true)}>
-            {t('carModels.actions.bulkUpload')}
-          </Button>
-          <Button leftIcon={<Plus size={15} />} onClick={openAdd}>
-            {t('carModels.actions.add')}
-          </Button>
-        </>
+        <Button leftIcon={<Plus size={15} />} onClick={openAdd}>
+          {t('carModels.actions.add')}
+        </Button>
       }
     >
       <SectionCard>
@@ -396,12 +389,6 @@ export function CarModelsPage() {
           <DataTable columns={columns} data={filtered} />
         )}
       </SectionCard>
-
-      <BulkUploadModal
-        isOpen={bulkOpen}
-        onClose={() => setBulkOpen(false)}
-        entityType="models"
-      />
 
       <Modal
         isOpen={modalOpen}

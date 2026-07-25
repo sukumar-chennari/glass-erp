@@ -81,6 +81,7 @@
     "insuranceRules": "Insurance Rules",
     "carBrands": "Car Brands",
     "carModels": "Car Models",
+    "bulkUpload": "Bulk Upload",
     "aria": "Master data settings"
   },
   "carBrands": {
@@ -379,6 +380,7 @@
     }
   },
   "bulkUpload": {
+    "description": "Upload a catalog workbook (.xlsx) to create or update car brands, models, variants, and glass-pricing data in bulk.",
     "title": "Bulk Upload {{entity}}",
     "templateHint": "Use the correct column headers to ensure a successful import.",
     "downloadTemplate": "Download template",

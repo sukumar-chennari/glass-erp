@@ -131,6 +131,7 @@ export const baseApi = createApi({
     'Enquiry',
     'PriceEstimate',
     'AuthSession',
+    'CatalogRow',
   ],
   endpoints: () => ({}),
 });

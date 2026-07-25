@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Shield, Tag, Layers, type LucideIcon } from 'lucide-react';
+import { Shield, Tag, Layers, UploadCloud, type LucideIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { ROUTES } from '@/constants/routes';
 import styles from './AdminSettingsLanding.module.css';
@@ -46,6 +46,12 @@ export function AdminSettingsLanding() {
       title: t('subnav.carModels'),
       desc:  t('carModels.description'),
       href:  ROUTES.SETTINGS_CAR_MODELS,
+    },
+    {
+      icon:  UploadCloud,
+      title: t('subnav.bulkUpload'),
+      desc:  t('bulkUpload.description'),
+      href:  ROUTES.SETTINGS_BULK_UPLOAD,
     },
   ];
 

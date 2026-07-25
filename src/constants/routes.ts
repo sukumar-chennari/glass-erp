@@ -29,6 +29,7 @@ export const ROUTES = {
   SETTINGS_VEHICLE_MODELS:   '/settings/vehicle-models',
   SETTINGS_CAR_BRANDS:       '/settings/car-brands',
   SETTINGS_CAR_MODELS:       '/settings/car-models',
+  SETTINGS_BULK_UPLOAD:      '/settings/bulk-upload',
   STAFF:             '/staff',
   SUBMIT:            '/submit',
   TRACK:             '/track',
