@@ -1,0 +1,363 @@
+/*
+ * VehiclePickerModal
+ * - Trigger uses --ss-* tokens (compatible with .ssDrawer overrides)
+ * - Modal is a compact 400px centered sheet, independent of context theming
+ */
+
+/* ── Root + --ss-* token defaults ── */
+.root {
+  position: relative;
+  width:    100%;
+
+  --ss-bg:     var(--color-bg-input);
+  --ss-border: var(--color-border-input);
+  --ss-focus:  var(--color-primary);
+  --ss-text:   var(--color-text-primary);
+  --ss-ph:     var(--color-text-muted);
+  --ss-muted:  var(--color-text-muted);
+  --ss-r:      var(--radius-lg);
+  --ss-fnt:    var(--font-family);
+  --ss-sz:     var(--font-size-base);
+  --ss-py:     var(--space-3);
+  --ss-px:     var(--space-4);
+  --ss-err:    var(--color-danger, #dc2626);
+}
+
+/* ── Trigger button ── */
+.trigger {
+  display:       flex;
+  align-items:   center;
+  gap:           var(--space-2);
+  width:         100%;
+  padding:       var(--ss-py) var(--ss-px);
+  background:    var(--ss-bg);
+  border:        1px solid var(--ss-border);
+  border-radius: var(--ss-r);
+  font-family:   var(--ss-fnt);
+  font-size:     var(--ss-sz);
+  cursor:        pointer;
+  text-align:    left;
+  box-sizing:    border-box;
+  transition:    border-color 0.15s, background 0.15s;
+}
+
+.trigger:hover:not(:disabled) { border-color: var(--ss-focus); }
+.trigger:focus-visible         { outline: none; border-color: var(--ss-focus); }
+.triggerErr                    { border-color: var(--ss-err) !important; }
+.triggerDis                    { opacity: 0.5; cursor: not-allowed; }
+
+.triggerVal {
+  color:         var(--ss-text);
+  flex:          1;
+  min-width:     0;
+  white-space:   nowrap;
+  overflow:      hidden;
+  text-overflow: ellipsis;
+  font-size:     var(--ss-sz);
+}
+
+.triggerPh {
+  color:     var(--ss-ph);
+  flex:      1;
+  font-size: var(--ss-sz);
+}
+
+.caret { color: var(--ss-muted); flex-shrink: 0; }
+
+/* ══════════════════════════════════════════
+   MODAL
+   ══════════════════════════════════════════ */
+
+.overlay {
+  position:        fixed;
+  inset:           0;
+  z-index:         var(--z-modal, 1000);
+  background:      rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  padding:         16px;
+  animation:       vpFade 0.15s ease both;
+}
+
+@keyframes vpFade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ── Card ── */
+.modal {
+  background:     #ffffff;
+  border-radius:  18px;
+  width:          100%;
+  max-width:      400px;
+  max-height:     min(560px, calc(100dvh - 48px));
+  overflow:       hidden;
+  display:        flex;
+  flex-direction: column;
+  box-shadow:     0 24px 64px rgba(0, 0, 0, 0.22),
+                  0 2px 8px  rgba(0, 0, 0, 0.08);
+  animation:      vpScale 0.2s cubic-bezier(0.34, 1.4, 0.64, 1) both;
+}
+
+@keyframes vpScale {
+  from { opacity: 0.4; transform: scale(0.92); }
+  to   { opacity: 1;   transform: scale(1); }
+}
+
+/* Theme variants */
+@media (prefers-color-scheme: dark) {
+  .modal { background: #1c2144; }
+}
+:root[data-theme="dark"]   .modal { background: #1c2144; }
+:root[data-theme="windx"]  .modal { background: #1c2144; }
+:root[data-theme="light"]  .modal { background: #ffffff; }
+:root[data-theme="purple"] .modal { background: #ffffff; }
+:root[data-theme="orange"] .modal { background: #ffffff; }
+
+/* ── Header ── */
+.header {
+  display:     flex;
+  align-items: center;
+  gap:         8px;
+  padding:     14px 14px 10px;
+  flex-shrink: 0;
+}
+
+.backBtn {
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  width:           30px;
+  height:          30px;
+  border:          none;
+  border-radius:   50%;
+  background:      transparent;
+  cursor:          pointer;
+  color:           var(--color-text-primary);
+  flex-shrink:     0;
+  transition:      background 0.12s;
+}
+
+.backBtn:hover { background: rgba(0, 0, 0, 0.07); }
+
+@media (prefers-color-scheme: dark) {
+  .backBtn:hover { background: rgba(255, 255, 255, 0.09); }
+}
+:root[data-theme="dark"]  .backBtn:hover,
+:root[data-theme="windx"] .backBtn:hover { background: rgba(255, 255, 255, 0.09); }
+
+.title {
+  font-size:   0.9375rem;
+  font-weight: 700;
+  color:       var(--color-text-primary);
+  margin:      0;
+  line-height: 1;
+}
+
+/* ── Search — pill shape ── */
+.searchWrap {
+  display:       flex;
+  align-items:   center;
+  gap:           8px;
+  margin:        0 12px 10px;
+  padding:       8px 14px;
+  border:        1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 24px;
+  background:    rgba(0, 0, 0, 0.035);
+  flex-shrink: 0;
+}
+
+
+@media (prefers-color-scheme: dark) {
+  .searchWrap {
+    border-color: rgba(255,255,255,0.1);
+    background:   rgba(255,255,255,0.05);
+  }
+}
+:root[data-theme="dark"]  .searchWrap,
+:root[data-theme="windx"] .searchWrap {
+  border-color: rgba(255,255,255,0.1);
+  background:   rgba(255,255,255,0.05);
+}
+
+.searchIco { color: #9ca3af; flex-shrink: 0; }
+
+.searchInput {
+  flex:       1;
+  min-width:  0;
+  border:     none;
+  background: transparent;
+  font-size:  0.875rem;
+  color:      var(--color-text-primary);
+  outline:    none;
+}
+
+.searchInput::placeholder  { color: #9ca3af; }
+.searchInput:focus         { outline: none; }
+.searchInput:focus-visible { outline: none; }
+
+.clearBtn {
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  flex-shrink:     0;
+  width:           20px;
+  height:          20px;
+  border:          none;
+  border-radius:   50%;
+  background:      rgba(0, 0, 0, 0.1);
+  color:           #6b7280;
+  cursor:          pointer;
+  padding:         0;
+  transition:      background 0.12s, color 0.12s;
+}
+
+.clearBtn:hover {
+  background: rgba(0, 0, 0, 0.18);
+  color:      #374151;
+}
+
+@media (prefers-color-scheme: dark) {
+  .clearBtn             { background: rgba(255,255,255,0.12); color: #9ca3af; }
+  .clearBtn:hover       { background: rgba(255,255,255,0.2);  color: #e5e7eb; }
+}
+:root[data-theme="dark"]  .clearBtn,
+:root[data-theme="windx"] .clearBtn       { background: rgba(255,255,255,0.12); color: #9ca3af; }
+:root[data-theme="dark"]  .clearBtn:hover,
+:root[data-theme="windx"] .clearBtn:hover { background: rgba(255,255,255,0.2);  color: #e5e7eb; }
+
+@keyframes vpSpin { to { transform: rotate(360deg); } }
+.spin { flex-shrink: 0; color: #9ca3af; animation: vpSpin 0.7s linear infinite; }
+
+/* ── Scrollable grid area ── */
+.gridWrap {
+  flex:       1;
+  overflow-y: auto;
+  padding:    2px 8px 12px;
+}
+
+.gridWrap::-webkit-scrollbar       { width: 3px; }
+.gridWrap::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 2px; }
+
+.grid {
+  display:               grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap:                   4px;
+  list-style:            none;
+  margin:                0;
+  padding:               0;
+}
+
+/* ── Individual card ── */
+.card {
+  display:         flex;
+  flex-direction:  column;
+  align-items:     center;
+  gap:             6px;
+  padding:         10px 4px 8px;
+  border:          1.5px solid transparent;
+  border-radius:   10px;
+  background:      transparent;
+  cursor:          pointer;
+  width:           100%;
+  text-align:      center;
+  position:        relative;
+  transition:      background 0.12s, border-color 0.12s;
+}
+
+.card:hover { background: rgba(0, 0, 0, 0.04); }
+
+@media (prefers-color-scheme: dark) {
+  .card:hover { background: rgba(255, 255, 255, 0.06); }
+}
+:root[data-theme="dark"]  .card:hover,
+:root[data-theme="windx"] .card:hover { background: rgba(255, 255, 255, 0.06); }
+
+.cardSel {
+  border-color: var(--color-primary);
+  background:   color-mix(in srgb, var(--color-primary) 10%, transparent);
+}
+
+/* ── Brand logo wrapper — always white so logos look correct on any theme ── */
+.imgWrap {
+  width:           64px;
+  height:          44px;
+  background:      #ffffff;
+  border:          1px solid rgba(0, 0, 0, 0.07);
+  border-radius:   8px;
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  overflow:        hidden;
+  flex-shrink:     0;
+}
+
+.imgBrand {
+  max-width:  82%;
+  max-height: 82%;
+  object-fit: contain;
+}
+
+/* ── Model image — landscape cover ── */
+.imgWrapModel {
+  width:         100%;
+  height:        58px;
+  border-radius: 7px;
+  overflow:      hidden;
+  flex-shrink:   0;
+}
+
+.imgModel {
+  width:      100%;
+  height:     100%;
+  object-fit: cover;
+}
+
+/* ── Card label ── */
+.cardName {
+  font-size:     0.6875rem;
+  font-weight:   600;
+  color:         var(--color-text-primary);
+  line-height:   1.3;
+  word-break:    break-word;
+  max-width:     100%;
+  overflow:      hidden;
+  text-overflow: ellipsis;
+  white-space:   nowrap;
+  width:         100%;
+}
+
+/* ── Selected checkmark badge ── */
+.cardCheck {
+  position:         absolute;
+  top:              5px;
+  right:            5px;
+  color:            #ffffff;
+  background:       var(--color-primary);
+  border-radius:    50%;
+  width:            16px;
+  height:           16px;
+  display:          flex;
+  align-items:      center;
+  justify-content:  center;
+  flex-shrink:      0;
+}
+
+/* ── Empty / loading ── */
+.empty {
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  gap:             8px;
+  padding:         36px 16px;
+  color:           var(--color-text-muted);
+  font-size:       0.8125rem;
+}
+
+/* ── Responsive: 2-col on very narrow screens ── */
+@media (max-width: 340px) {
+  .grid { grid-template-columns: repeat(2, 1fr); }
+}

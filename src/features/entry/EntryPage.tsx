@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Navigate, Link } from 'react-router-dom';
 import { MapPin, Phone, ChevronRight, Locate, CheckCircle, Search, Car, X } from 'lucide-react';
-import { SearchableSelect } from '@/components/ui/SearchableSelect';
+import { VehiclePickerModal } from '@/components/ui/VehiclePickerModal';
 import { useAuth } from '@/context/AuthContext';
 import { useLazyGetNearbyBranchesQuery } from './nearbyBranchesApi';
 import type { NearbyBranch } from './nearbyBranchesApi';
@@ -490,8 +490,9 @@ export function EntryPage() {
                 <Car size={13} />
                 Car Brand <span style={{ fontWeight: 400, opacity: 0.6, fontSize: '0.75em' }}>(optional)</span>
               </label>
-              <SearchableSelect
+              <VehiclePickerModal
                 id="entry-brand"
+                type="brand"
                 value={vehicleBrandId}
                 displayValue={vehicleBrandName || undefined}
                 options={carBrands}
@@ -513,8 +514,9 @@ export function EntryPage() {
               <label className={styles.label} htmlFor="entry-model">
                 Car Model <span style={{ fontWeight: 400, opacity: 0.6, fontSize: '0.75em' }}>(optional)</span>
               </label>
-              <SearchableSelect
+              <VehiclePickerModal
                 id="entry-model"
+                type="model"
                 value={vehicleModelId}
                 displayValue={vehicleModelName || undefined}
                 options={carModels}

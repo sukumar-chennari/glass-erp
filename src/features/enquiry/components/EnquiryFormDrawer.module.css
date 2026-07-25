@@ -300,7 +300,7 @@ select.input option {
   color: var(--form-drawer-text);
 }
 
-/* ── SearchableSelect override — maps --ss-* to form-drawer tokens ── */
+/* ── VehiclePickerModal trigger override — maps --ss-* to form-drawer tokens ── */
 .ssDrawer {
   --ss-bg:          var(--form-drawer-surface);
   --ss-border:      var(--form-drawer-border);

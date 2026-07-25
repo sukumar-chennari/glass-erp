@@ -4,7 +4,7 @@ import { useGetCarBrandsQuery } from '@/features/settings/services/carBrandsApi'
 import { useGetCarModelsQuery } from '@/features/settings/services/carModelsApi';
 import { useAuth } from '@/context/AuthContext';
 
-import { SearchableSelect } from '@/components/ui/SearchableSelect';
+import { VehiclePickerModal } from '@/components/ui/VehiclePickerModal';
 import styles from './EnquiryFormDrawer.module.css';
 
 export interface EnquiryFormValues {
@@ -411,8 +411,9 @@ export function EnquiryFormDrawer({
                   <label className={styles.lbl} htmlFor="efd-vehicleBrand">
                     Car Brand <span className={styles.req}>*</span>
                   </label>
-                  <SearchableSelect
+                  <VehiclePickerModal
                     id="efd-vehicleBrand"
+                    type="brand"
                     value={form.vehicleBrandId}
                     displayValue={form.vehicleBrand || undefined}
                     options={carBrands}
@@ -438,8 +439,9 @@ export function EnquiryFormDrawer({
                       <span className={styles.req}> *</span>
                     )}
                   </label>
-                  <SearchableSelect
+                  <VehiclePickerModal
                     id="efd-vehicleModel"
+                    type="model"
                     value={form.vehicleModelId}
                     displayValue={form.vehicleModel || undefined}
                     options={carModels}
