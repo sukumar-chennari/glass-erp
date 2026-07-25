@@ -10,12 +10,12 @@ import { Badge } from '@/components/ui/Badge';
 import { Modal } from '@/components/ui/Modal';
 import { AlertBanner } from '@/components/ui/AlertBanner';
 import { useToast } from '@/components/ui/Toast';
-import { PricingBreakdown } from './components/PricingBreakdown';
 import { SubmissionReviewModal } from './components/SubmissionReviewModal';
 import type { CustomerSubmission } from './types';
 import type { TableColumn, SelectOption } from '@/types/ui';
 import { EnquiryFormDrawer } from './components/EnquiryFormDrawer';
 import type { EnquiryFormValues } from './components/EnquiryFormDrawer';
+import { PriceEstimateModal } from './components/PriceEstimateModal';
 import {
   useGetEnquiriesQuery,
   useLazyGetEnquiryByIdQuery,
@@ -46,14 +46,18 @@ interface Enquiry {
   closeNotes:   string | null;
   createdAt:    string;
   jobRef:       string | null;
-  vehicleBrandId?: string;
-  vehicleBrand?:   string;
-  vehicleYear?:    string;
-  vehicleType?:    'Private' | 'Commercial';
-  paymentType?:    'Cash' | 'Insurance';
-  insurerName?:    string;
-  damageNotes?:    string;
-  branchId?:       string;
+  vehicleBrandId?:     string;
+  vehicleBrand?:       string;
+  vehicleYear?:        string;
+  vehicleType?:        'Private' | 'Commercial';
+  paymentType?:        'Cash' | 'Insurance';
+  insurerName?:        string;
+  damageNotes?:        string;
+  branchId?:           string;
+  // catalog IDs — required for price-estimate gating
+  carModelVariantId?:  string;
+  glassPartTypeId?:    string;
+  bodyType?:           string;
 }
 
 // CustomerSubmission imported from ./types
@@ -90,14 +94,17 @@ function mapBackendToFrontend(b: BackendEnquiry): Enquiry {
     closeNotes:    b.closeNotes   ?? null,
     createdAt:     b.createdAt,
     jobRef:        b.jobRef       ?? null,
-    vehicleBrandId: b.carBrandId  ?? undefined,
-    vehicleBrand:   b.vehicleMake ?? undefined,
-    vehicleYear:    b.vehicleYear != null ? String(b.vehicleYear) : undefined,
-    vehicleType:    (b.vehicleType as Enquiry['vehicleType']) ?? undefined,
-    paymentType:    (b.paymentType as Enquiry['paymentType']) ?? undefined,
-    insurerName:    b.insurerName  ?? undefined,
-    damageNotes:    b.notes        ?? undefined,
-    branchId:       b.branchId     ?? undefined,
+    vehicleBrandId:    b.carBrandId        ?? undefined,
+    vehicleBrand:      b.vehicleMake       ?? undefined,
+    vehicleYear:       b.vehicleYear != null ? String(b.vehicleYear) : undefined,
+    vehicleType:       (b.vehicleType as Enquiry['vehicleType']) ?? undefined,
+    paymentType:       (b.paymentType as Enquiry['paymentType']) ?? undefined,
+    insurerName:       b.insurerName       ?? undefined,
+    damageNotes:       b.notes             ?? undefined,
+    branchId:          b.branchId          ?? undefined,
+    carModelVariantId: b.carModelVariantId ?? undefined,
+    glassPartTypeId:   b.glassPartTypeId   ?? undefined,
+    bodyType:          b.bodyType          ?? undefined,
   };
 }
 
@@ -175,69 +182,6 @@ function fmtDate(iso: string) {
   return new Date(iso).toLocaleDateString('en-IN', {
     month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit',
   });
-}
-
-// ── Confirm Price Modal ───────────────────────────────────────────────
-interface ConfirmPriceModalProps {
-  isOpen:  boolean;
-  onClose: () => void;
-  enquiry: Enquiry | null;
-  onSave:  (price: number, brand: string) => void;
-}
-
-function ConfirmPriceModal({ isOpen, onClose, enquiry, onSave }: ConfirmPriceModalProps) {
-  const { t } = useTranslation(['enquiry', 'common']);
-  const [selectedPrice, setSelectedPrice] = useState<number | null>(null);
-  const [selectedBrand, setSelectedBrand] = useState('');
-
-  function handleClose() {
-    setSelectedPrice(null);
-    setSelectedBrand('');
-    onClose();
-  }
-
-  function handleSave() {
-    if (!selectedPrice) return;
-    onSave(selectedPrice, selectedBrand);
-    setSelectedPrice(null);
-    setSelectedBrand('');
-  }
-
-  return (
-    <Modal
-      isOpen={isOpen}
-      onClose={handleClose}
-      title={t('page.confirmPriceModal.title')}
-      maxWidth="640px"
-      footer={
-        <div className={styles.modalFooter}>
-          <Button variant="ghost" onClick={handleClose}>{'Cancel'}</Button>
-          <Button onClick={handleSave} disabled={!selectedPrice}>
-            {selectedPrice
-              ? t('page.confirmPriceModal.confirmWith', { price: selectedPrice.toLocaleString('en-IN'), brand: selectedBrand })
-              : t('page.confirmPriceModal.selectHint')}
-          </Button>
-        </div>
-      }
-    >
-      <div className={styles.form}>
-        {enquiry && (
-          <div className={styles.enquiryMeta}>
-            <span className={styles.enquiryMetaNo}>{enquiry.enquiryNo}</span>
-            <span>{enquiry.customerName} · {enquiry.vehicleModel}</span>
-            <span className={styles.enquiryMetaGlass}>{enquiry.glassType}</span>
-          </div>
-        )}
-        {enquiry && (
-          <PricingBreakdown
-            glassType={enquiry.glassType}
-            vehicleModel={enquiry.vehicleModel}
-            onSelect={(price, brand) => { setSelectedPrice(price); setSelectedBrand(brand); }}
-          />
-        )}
-      </div>
-    </Modal>
-  );
 }
 
 // ── Close Enquiry Modal ───────────────────────────────────────────────
@@ -453,6 +397,10 @@ export function EnquiryPage() {
       setFormInit(undefined);
       setFormEnqId(undefined);
       setFormEnqNo(undefined);
+      // Auto-open estimate modal when all pricing fields are present on the saved enquiry
+      if (serverRow.carModelVariantId && serverRow.glassPartTypeId && serverRow.bodyType) {
+        setPriceTgt(serverRow);
+      }
       return;
     } else {
       const displayModel = [values.vehicleBrand, values.vehicleModel, values.vehicleYear].filter(Boolean).join(' ') || 'TBD';
@@ -520,16 +468,14 @@ export function EnquiryPage() {
     setPage(1);
   }
 
-  function handleConfirmPrice(price: number, brand: string) {
+  function handleConfirmPrice() {
     if (!priceTgt) return;
     setEnquiries((prev) =>
       prev.map((e) =>
-        e.id === priceTgt.id
-          ? { ...e, status: 'price_confirmed', quotedPrice: price, priceBrand: brand }
-          : e,
+        e.id === priceTgt.id ? { ...e, status: 'price_confirmed' } : e,
       ),
     );
-    toast.success(t('page.toast.priceConfirmed', { price: price.toLocaleString('en-IN'), brand, enquiryNo: priceTgt.enquiryNo }));
+    toast.success(`${priceTgt.enquiryNo} — estimate confirmed`);
     setPriceTgt(null);
   }
 
@@ -866,11 +812,11 @@ export function EnquiryPage() {
         enquiryNo={formMode === 'update' ? formEnqNo : undefined}
         isSaving={formMode === 'update' && updateSaving}
       />
-      <ConfirmPriceModal
+      <PriceEstimateModal
         isOpen={!!priceTgt}
         onClose={() => setPriceTgt(null)}
         enquiry={priceTgt}
-        onSave={handleConfirmPrice}
+        onConfirm={handleConfirmPrice}
       />
       <CloseEnquiryModal
         isOpen={!!closeTgt}

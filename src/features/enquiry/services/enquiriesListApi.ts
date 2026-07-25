@@ -122,6 +122,8 @@ export const enquiriesListApi = baseApi.injectEndpoints({
       invalidatesTags: (_result, _error, arg) => [
         { type: 'Enquiry' as const, id: arg.id },
         'Enquiry',
+        // invalidate stale estimate so modal re-fetches if pricing fields changed
+        { type: 'PriceEstimate' as const, id: arg.id },
       ],
     }),
   }),
