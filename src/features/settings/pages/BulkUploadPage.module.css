@@ -522,6 +522,29 @@
 /* Horizontal scroll wrapper for the table (many brand columns) */
 .catalogTableWrap { overflow-x: auto; }
 
+/* Vehicle cell */
+.vehicleCell {
+  display:        flex;
+  flex-direction: column;
+  gap:            2px;
+}
+
+.vehicleBrand {
+  font-size:   var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color:       var(--color-text);
+  white-space: nowrap;
+}
+
+.vehicleModel {
+  font-size:   var(--font-size-xs);
+  color:       var(--color-text-muted);
+  white-space: nowrap;
+  font-weight: var(--font-weight-medium);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
 /* Variant cell */
 .variantCell {
   display:        flex;
@@ -536,17 +559,36 @@
   white-space: nowrap;
 }
 
-.variantSub {
+.variantPeriod {
   font-size:   var(--font-size-xs);
   color:       var(--color-text-muted);
   white-space: nowrap;
+  opacity:     0.8;
 }
 
-.variantPeriod {
-  font-size:   var(--font-size-xs);
-  color:       var(--color-text-faint, var(--color-text-muted));
+/* Glass part cell */
+.glassCell {
+  display:        flex;
+  flex-direction: column;
+  gap:            2px;
+}
+
+.glassType {
+  font-size:   var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color:       var(--color-text);
   white-space: nowrap;
-  opacity:     0.8;
+}
+
+.glassDesc {
+  font-size:     var(--font-size-xs);
+  color:         var(--color-text-muted);
+  white-space:   nowrap;
+  overflow:      hidden;
+  text-overflow: ellipsis;
+  max-width:     180px;
+  opacity:       0.75;
+  font-style:    italic;
 }
 
 .metaVal {

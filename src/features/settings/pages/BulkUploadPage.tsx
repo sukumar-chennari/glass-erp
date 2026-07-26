@@ -166,13 +166,23 @@ function CatalogSection({
 
   const columns = useMemo<TableColumn<CatalogPricingRow>[]>(() => [
     {
+      key:    'carBrand',
+      header: 'Vehicle',
+      width:  '180px',
+      render: (row) => (
+        <div className={styles.vehicleCell}>
+          <span className={styles.vehicleBrand}>{row.carBrand || '—'}</span>
+          <span className={styles.vehicleModel}>{row.carModel || '—'}</span>
+        </div>
+      ),
+    },
+    {
       key:    'variantName',
       header: 'Variant',
-      width:  '240px',
+      width:  '200px',
       render: (row) => (
         <div className={styles.variantCell}>
           <span className={styles.variantName}>{row.variantName || '—'}</span>
-          <span className={styles.variantSub}>{row.carBrand} · {row.carModel}</span>
           {row.period && <span className={styles.variantPeriod}>{row.period}</span>}
         </div>
       ),
@@ -180,7 +190,15 @@ function CatalogSection({
     {
       key:    'glassPartType',
       header: 'Glass Part',
-      width:  '160px',
+      width:  '190px',
+      render: (row) => (
+        <div className={styles.glassCell}>
+          <span className={styles.glassType}>{row.glassPartType || '—'}</span>
+          {row.description && row.description.length > 0 && (
+            <span className={styles.glassDesc}>{row.description.join(' · ')}</span>
+          )}
+        </div>
+      ),
     },
     {
       key:    'cc',

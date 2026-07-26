@@ -18,6 +18,7 @@ export interface CatalogPricingRow {
   period:        string;
   cc:            number | null;
   bodyType:      string;   // joined array, e.g. "LMV"
+  description:   string[]; // array of part description strings
   prices:        Record<string, number>;  // { AIS: 545, SG: 1, ... }
 }
 
@@ -114,6 +115,11 @@ export const catalogApi = baseApi.injectEndpoints({
           const variantId      = String(row['variantId']      ?? '');
           const glassPartTypeId = String(row['glassPartTypeId'] ?? '');
 
+          const descRaw   = row['description'];
+          const description: string[] = Array.isArray(descRaw)
+            ? (descRaw as unknown[]).map(String)
+            : typeof descRaw === 'string' ? [descRaw] : [];
+
           return {
             id:              `${variantId}_${glassPartTypeId}`,
             variantId,
@@ -125,6 +131,7 @@ export const catalogApi = baseApi.injectEndpoints({
             period:          String(row['period']        ?? ''),
             cc:              typeof row['cc'] === 'number' ? row['cc'] : null,
             bodyType,
+            description,
             prices,
           };
         });
