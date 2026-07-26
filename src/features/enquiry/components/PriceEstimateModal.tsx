@@ -1,4 +1,5 @@
-import { Loader2, AlertCircle, RefreshCw, CheckCircle, Info } from 'lucide-react';
+import { useState } from 'react';
+import { Loader2, AlertCircle, RefreshCw, CheckCircle, Info, CheckCircle2 } from 'lucide-react';
 import { useGetPriceEstimateQuery } from '@/services/priceEstimateApi';
 import type { PriceQuote } from '@/services/priceEstimateApi';
 import { Modal } from '@/components/ui/Modal';
@@ -16,36 +17,54 @@ function isPricingReady(e: {
 }
 
 function fmt(n: number | null | undefined): string {
-  if (n == null) return 'Not available';
+  if (n == null) return 'N/A';
   return `₹${n.toLocaleString('en-IN')}`;
 }
 
 // ── Quote tile ───────────────────────────────────────────────────────────────
 
-function QuoteTile({ quote }: { quote: PriceQuote }) {
-  const noTotal = quote.total == null;
+interface QuoteTileProps {
+  quote:    PriceQuote;
+  selected: boolean;
+  onSelect: () => void;
+}
+
+function QuoteTile({ quote, selected, onSelect }: QuoteTileProps) {
+  const unavailable = quote.total == null;
   return (
-    <div className={`${styles.tile} ${noTotal ? styles.tileUnavailable : ''}`}>
-      <div className={styles.tileBrand}>{quote.brand}</div>
-      <div className={styles.tileRows}>
-        <div className={styles.tileRow}>
-          <span className={styles.tileRowLabel}>Glass</span>
-          <span className={styles.tileRowVal}>{fmt(quote.glassPrice)}</span>
-        </div>
-        <div className={styles.tileRow}>
-          <span className={styles.tileRowLabel}>Labour</span>
-          <span className={styles.tileRowVal}>{fmt(quote.labourCharges)}</span>
-        </div>
-        <div className={styles.tileRow}>
-          <span className={styles.tileRowLabel}>Sealant</span>
-          <span className={styles.tileRowVal}>{fmt(quote.sealantCharges)}</span>
-        </div>
+    <button
+      type="button"
+      className={[
+        styles.tile,
+        selected    ? styles.tileSelected    : '',
+        unavailable ? styles.tileUnavailable : '',
+      ].filter(Boolean).join(' ')}
+      onClick={unavailable ? undefined : onSelect}
+      disabled={unavailable}
+      aria-pressed={selected}
+    >
+      {/* Brand + check */}
+      <div className={styles.tileBrand}>
+        <span>{quote.brand}</span>
+        {selected && <CheckCircle2 size={14} className={styles.tileCheck} />}
       </div>
-      <div className={`${styles.tileTotal} ${noTotal ? styles.tileTotalUnavailable : ''}`}>
-        <span className={styles.tileTotalLabel}>Total</span>
-        <span className={styles.tileTotalVal}>{fmt(quote.total)}</span>
+
+      {/* Glass price */}
+      <div className={styles.tileGlassSection}>
+        <span className={styles.tileGlassLabel}>Glass</span>
+        <span className={styles.tileGlassVal}>
+          {unavailable ? 'Not available' : fmt(quote.glassPrice)}
+        </span>
       </div>
-    </div>
+
+      {/* Total */}
+      <div className={`${styles.tileTotal} ${unavailable ? styles.tileTotalUnavailable : ''}`}>
+        <span className={styles.tileTotalLabel}>TOTAL</span>
+        <span className={styles.tileTotalVal}>
+          {unavailable ? '—' : fmt(quote.total)}
+        </span>
+      </div>
+    </button>
   );
 }
 
@@ -70,6 +89,7 @@ interface PriceEstimateModalProps {
 // ── Component ────────────────────────────────────────────────────────────────
 
 export function PriceEstimateModal({ isOpen, onClose, enquiry, onConfirm }: PriceEstimateModalProps) {
+  const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
   const pricingReady = enquiry != null && isPricingReady(enquiry);
 
   const {
@@ -82,7 +102,6 @@ export function PriceEstimateModal({ isOpen, onClose, enquiry, onConfirm }: Pric
     skip: !isOpen || !enquiry || !pricingReady,
   });
 
-  // Derive error kind from RTK error shape
   const errStatus = (error as { status?: number } | undefined)?.status;
   const errKind: 'missing-fields' | 'not-found' | 'generic' =
     !pricingReady      ? 'missing-fields' :
@@ -90,21 +109,33 @@ export function PriceEstimateModal({ isOpen, onClose, enquiry, onConfirm }: Pric
     errStatus === 404  ? 'not-found'      :
     'generic';
 
-  const hasQuotes  = Array.isArray(quotes) && quotes.length > 0;
+  const hasQuotes = Array.isArray(quotes) && quotes.length > 0;
+  const canConfirm = hasQuotes && selectedBrand != null;
+
+  function handleConfirm() {
+    if (!canConfirm) return;
+    onConfirm();
+    setSelectedBrand(null);
+  }
+
+  function handleClose() {
+    setSelectedBrand(null);
+    onClose();
+  }
 
   return (
     <Modal
       isOpen={isOpen}
-      onClose={onClose}
+      onClose={handleClose}
       title="Price Estimate"
       maxWidth="560px"
       footer={
         <div className={styles.footer}>
-          <Button variant="ghost" onClick={onClose}>Close</Button>
+          <Button variant="ghost" onClick={handleClose}>Close</Button>
           {hasQuotes && (
-            <Button onClick={onConfirm}>
+            <Button onClick={handleConfirm} disabled={!canConfirm}>
               <CheckCircle size={14} />
-              Confirm Quote
+              {canConfirm ? 'Confirm Quote' : 'Select a brand'}
             </Button>
           )}
         </div>
@@ -122,7 +153,6 @@ export function PriceEstimateModal({ isOpen, onClose, enquiry, onConfirm }: Pric
 
       {/* ── States ── */}
 
-      {/* Missing pricing fields */}
       {!pricingReady && (
         <div className={styles.state}>
           <AlertCircle size={28} className={styles.stateIconWarn} />
@@ -134,7 +164,6 @@ export function PriceEstimateModal({ isOpen, onClose, enquiry, onConfirm }: Pric
         </div>
       )}
 
-      {/* Loading */}
       {pricingReady && isLoading && (
         <div className={styles.state}>
           <Loader2 size={28} className={styles.stateIconSpin} />
@@ -143,7 +172,6 @@ export function PriceEstimateModal({ isOpen, onClose, enquiry, onConfirm }: Pric
         </div>
       )}
 
-      {/* Error */}
       {pricingReady && !isLoading && isError && (
         <div className={styles.state}>
           <AlertCircle size={28} className={styles.stateIconErr} />
@@ -170,7 +198,6 @@ export function PriceEstimateModal({ isOpen, onClose, enquiry, onConfirm }: Pric
         </div>
       )}
 
-      {/* Empty — API returned no quotes */}
       {pricingReady && !isLoading && !isError && !hasQuotes && (
         <div className={styles.state}>
           <Info size={28} className={styles.stateIconInfo} />
@@ -185,19 +212,23 @@ export function PriceEstimateModal({ isOpen, onClose, enquiry, onConfirm }: Pric
       {/* Quote tiles */}
       {pricingReady && !isLoading && !isError && hasQuotes && (
         <>
+          <p className={styles.selectHint}>Select a brand to confirm the price estimate</p>
           <div className={styles.tiles}>
             {quotes.map((q) => (
-              <QuoteTile key={q.brand} quote={q} />
+              <QuoteTile
+                key={q.brand}
+                quote={q}
+                selected={selectedBrand === q.brand}
+                onSelect={() => setSelectedBrand(q.brand)}
+              />
             ))}
           </div>
 
-          {/* Disclaimer */}
           <div className={styles.disclaimer}>
             <Info size={13} className={styles.disclaimerIcon} />
             <span>
-              This is a system-generated estimate based on the vehicle and glass details provided.
-              Final pricing may vary slightly depending on the actual vehicle inspection,
-              glass availability, fitment requirements, and branch confirmation.
+              System-generated estimate based on vehicle and glass details.
+              Final pricing may vary after physical inspection and branch confirmation.
             </span>
           </div>
         </>

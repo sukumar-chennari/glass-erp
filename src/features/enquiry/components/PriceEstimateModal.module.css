@@ -1,4 +1,4 @@
-/* PriceEstimateModal — read-only quote tiles from /price-estimate API */
+/* PriceEstimateModal — selectable quote tiles (Glass + Total only) */
 
 .context {
   display: flex;
@@ -7,7 +7,7 @@
   gap: 8px;
   padding: var(--space-3) var(--space-1) var(--space-4);
   border-bottom: 1px solid var(--color-border);
-  margin-bottom: var(--space-4);
+  margin-bottom: var(--space-3);
 }
 
 .contextNo {
@@ -22,94 +22,115 @@
   color: var(--color-text-muted);
 }
 
-/* ── Quote tiles grid ── */
+/* ── Select hint ── */
+.selectHint {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  margin: 0 0 var(--space-3) var(--space-1);
+}
+
+/* ── Tiles grid ── */
 .tiles {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
   gap: var(--space-3);
   margin-bottom: var(--space-4);
 }
 
+/* ── Individual tile (button) ── */
 .tile {
   display: flex;
   flex-direction: column;
   background: var(--color-bg-card, var(--color-bg-light));
-  border: 1px solid var(--color-border);
+  border: 1.5px solid var(--color-border);
   border-radius: var(--radius-xl);
   overflow: hidden;
-  transition: box-shadow var(--transition-fast);
+  cursor: pointer;
+  text-align: left;
+  padding: 0;
+  transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
 }
 
-.tile:hover {
-  box-shadow: var(--shadow-md);
+.tile:not(:disabled):hover {
+  border-color: color-mix(in srgb, var(--color-primary, #f59e0b) 50%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary, #f59e0b) 12%, transparent);
 }
 
-.tileUnavailable {
-  opacity: 0.7;
+.tile:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
 }
 
+/* Selected state */
+.tileSelected {
+  border-color: var(--color-primary, #f59e0b) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary, #f59e0b) 18%, transparent) !important;
+  background: color-mix(in srgb, var(--color-primary, #f59e0b) 5%, var(--color-bg-card, var(--color-bg-light)));
+}
+
+/* ── Brand header ── */
 .tileBrand {
-  padding: 10px var(--space-3) 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px var(--space-3) 8px;
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-bold);
   text-transform: uppercase;
   letter-spacing: var(--letter-spacing-wide);
   color: var(--color-primary);
-  background: var(--color-primary-subtle, rgba(var(--color-primary-rgb, 245 158 11) / 0.08));
+  background: color-mix(in srgb, var(--color-primary, #f59e0b) 8%, transparent);
   border-bottom: 1px solid var(--color-border);
 }
 
-.tileRows {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  padding: var(--space-2) 0;
-  flex: 1;
+.tileCheck {
+  color: var(--color-primary);
+  flex-shrink: 0;
 }
 
-.tileRow {
+/* ── Glass price section ── */
+.tileGlassSection {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 5px var(--space-3);
-  font-size: var(--font-size-xs);
-  border-bottom: 1px solid var(--color-border-subtle, var(--color-border));
+  padding: var(--space-3) var(--space-3);
+  flex: 1;
 }
 
-.tileRow:last-child {
-  border-bottom: none;
-}
-
-.tileRowLabel {
-  color: var(--color-text-muted);
-}
-
-.tileRowVal {
-  color: var(--color-text);
+.tileGlassLabel {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary, var(--color-text-muted));
   font-weight: var(--font-weight-medium);
+}
+
+.tileGlassVal {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary, var(--color-text));
   font-variant-numeric: tabular-nums;
 }
 
+/* ── Total bar ── */
 .tileTotal {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 9px var(--space-3);
-  background: var(--color-primary-subtle, rgba(var(--color-primary-rgb, 245 158 11) / 0.08));
-  border-top: 1.5px solid var(--color-primary);
+  padding: 8px var(--space-3);
+  background: color-mix(in srgb, var(--color-primary, #f59e0b) 8%, transparent);
+  border-top: 1.5px solid var(--color-primary, #f59e0b);
 }
 
 .tileTotalUnavailable {
-  background: var(--color-bg-light);
+  background: var(--color-bg-subtle);
   border-top-color: var(--color-border);
 }
 
 .tileTotalLabel {
   font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text-muted);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-secondary, var(--color-text-muted));
   text-transform: uppercase;
-  letter-spacing: var(--letter-spacing-normal);
+  letter-spacing: 0.06em;
 }
 
 .tileTotalVal {
@@ -121,7 +142,6 @@
 
 .tileTotalUnavailable .tileTotalVal {
   color: var(--color-text-muted);
-  font-size: var(--font-size-sm);
   font-weight: var(--font-weight-normal);
 }
 
@@ -160,17 +180,9 @@
   animation: peSpin 0.8s linear infinite;
 }
 
-.stateIconWarn {
-  color: var(--color-warning, #f59e0b);
-}
-
-.stateIconErr {
-  color: var(--color-danger, #ef4444);
-}
-
-.stateIconInfo {
-  color: var(--color-text-muted);
-}
+.stateIconWarn { color: var(--color-warning, #f59e0b); }
+.stateIconErr  { color: var(--color-danger, #ef4444);  }
+.stateIconInfo { color: var(--color-text-muted);       }
 
 @keyframes peSpin {
   from { transform: rotate(0deg); }
