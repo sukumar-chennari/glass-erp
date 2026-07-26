@@ -252,23 +252,16 @@
 }
 
 .heroLogoMark {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 80px;
-  height: 80px;
-  border-radius: var(--radius-xl);
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 8px 24px var(--color-brand-gradient-shadow);
+  width:         80px;
+  height:        80px;
   margin-bottom: var(--space-6);
-  overflow: hidden;
 }
 
 .heroLogoImg {
-  width:      100%;
-  height:     100%;
-  object-fit: cover;
+  width:      80px;
+  height:     80px;
+  object-fit: contain;
+  display:    block;
 }
 
 .heroTitle {

@@ -35,21 +35,14 @@
 .logoBox {
   width:         48px;
   height:        48px;
-  border-radius: 14px;
-  background:    var(--color-brand-gradient);
-  display:       flex;
-  align-items:   center;
-  justify-content:center;
   flex-shrink:   0;
-  box-shadow:    0 8px 32px var(--color-brand-gradient-shadow);
-  color:         var(--color-text-on-primary);
-  overflow:      hidden;
 }
 
 .logoImg {
-  width:      100%;
-  height:     100%;
-  object-fit: cover;
+  width:      48px;
+  height:     48px;
+  object-fit: contain;
+  display:    block;
 }
 
 .brandText {
