@@ -116,6 +116,7 @@ export function CarBrandsPage() {
           <div className={styles.brandThumbWrap}>
             {b.image && (
               <img
+                key={b.image}
                 src={b.image}
                 alt={b.name}
                 className={styles.brandThumb}
@@ -253,6 +254,7 @@ export function CarBrandsPage() {
       if ('data' in result) {
         toast.success(t('carBrands.toast.updated', { name: payload.name }));
         closeModal();
+        void refetch();
       } else {
         const err = result.error as { status?: number };
         if (err?.status === 404) {
@@ -269,6 +271,7 @@ export function CarBrandsPage() {
       if ('data' in result) {
         toast.success(t('carBrands.toast.added', { name: payload.name }));
         closeModal();
+        void refetch();
       } else {
         const msg = extractApiError(result.error) ?? t('carBrands.toast.addFailed');
         toast.error(msg);
