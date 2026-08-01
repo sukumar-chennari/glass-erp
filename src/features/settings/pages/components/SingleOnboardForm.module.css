@@ -1,0 +1,325 @@
+/* SingleOnboardForm — uses --form-drawer-* tokens for theme consistency */
+
+/* ── Form shell ── */
+.form {
+  display:        flex;
+  flex-direction: column;
+  gap:            var(--space-7, 28px);
+  padding-top:    var(--space-1);
+}
+
+/* ── Section ── */
+.section {
+  display:        flex;
+  flex-direction: column;
+  gap:            var(--space-5);
+}
+
+.sectionHead {
+  display:     flex;
+  align-items: baseline;
+  gap:         10px;
+  padding-bottom: var(--space-3);
+  border-bottom:  1px solid var(--form-drawer-border, var(--color-border));
+}
+
+.sectionNum {
+  font-size:          var(--font-size-xs);
+  font-weight:        var(--font-weight-bold);
+  font-variant-numeric: tabular-nums;
+  color:              var(--color-primary);
+  opacity:            0.7;
+  letter-spacing:     0.04em;
+  flex-shrink:        0;
+}
+
+.sectionLabel {
+  font-size:   var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color:       var(--form-drawer-text, var(--color-text-primary));
+  flex-shrink: 0;
+}
+
+.sectionSub {
+  font-size:  var(--font-size-xs);
+  color:      var(--form-drawer-text-muted, var(--color-text-muted));
+  margin-left: auto;
+}
+
+/* ── Grids ── */
+.grid2 {
+  display:               grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap:                   var(--space-5) var(--space-6);
+}
+
+@media (max-width: 660px) {
+  .grid2 { grid-template-columns: 1fr; }
+}
+
+/* ── Field ── */
+.field {
+  display:        flex;
+  flex-direction: column;
+  gap:            var(--space-2);
+}
+
+/* ── Label row: label + mode pill on the same line ── */
+.labelRow {
+  display:     flex;
+  align-items: center;
+  gap:         var(--space-2);
+  min-height:  20px;
+}
+
+.label {
+  font-size:   var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color:       var(--form-drawer-text-secondary, var(--color-text-secondary));
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.req {
+  color: var(--form-drawer-error, var(--color-danger-text, #ef4444));
+  margin-left: 2px;
+}
+
+.loadingTag {
+  font-size:   var(--font-size-xs);
+  color:       var(--form-drawer-text-muted, var(--color-text-muted));
+  font-weight: var(--font-weight-normal);
+  font-style:  italic;
+  margin-left: var(--space-1);
+}
+
+/* ── Mode pill (Existing | New) ── */
+.modePill {
+  display:       inline-flex;
+  border:        1px solid var(--form-drawer-border, var(--color-border));
+  border-radius: var(--radius-full);
+  overflow:      hidden;
+  margin-left:   auto;
+  flex-shrink:   0;
+}
+
+.modePillBtn {
+  padding:     2px 10px;
+  font-size:   10px;
+  font-weight: var(--font-weight-semibold);
+  font-family: var(--font-family);
+  letter-spacing: 0.03em;
+  background:  transparent;
+  border:      none;
+  cursor:      pointer;
+  color:       var(--form-drawer-text-muted, var(--color-text-muted));
+  transition:  background var(--transition-fast), color var(--transition-fast);
+  white-space: nowrap;
+  line-height: 1.8;
+}
+
+.modePillBtn:hover:not(.modePillActive) {
+  background: var(--form-drawer-surface-hover, rgba(255,255,255,0.07));
+  color:      var(--form-drawer-text, var(--color-text-primary));
+}
+
+.modePillActive {
+  background: var(--color-primary);
+  color:      #fff;
+  cursor:     default;
+}
+
+/* ── Auto-fill badge ── */
+.autoFill {
+  margin-left:  auto;
+  font-size:    10px;
+  font-weight:  var(--font-weight-medium);
+  color:        var(--color-primary);
+  opacity:      0.8;
+  white-space:  nowrap;
+  letter-spacing: 0.02em;
+}
+
+/* ── Form controls (input + select) ── */
+.control {
+  width:         100%;
+  height:        38px;
+  padding:       0 var(--space-3);
+  background:    var(--form-drawer-surface, var(--color-bg-input, rgba(255,255,255,0.05)));
+  border:        1px solid var(--form-drawer-border, var(--color-border-input));
+  border-radius: var(--radius-lg);
+  font-size:     var(--font-size-sm);
+  font-family:   var(--font-family);
+  color:         var(--form-drawer-text, var(--color-text-primary));
+  outline:       none;
+  transition:    border-color var(--transition-fast), background var(--transition-fast), box-shadow var(--transition-fast);
+  box-sizing:    border-box;
+  appearance:    none;
+}
+
+/* Select arrow */
+.control:is(select) {
+  padding-right: 32px;
+  cursor:        pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+}
+
+.control:focus {
+  border-color: var(--form-drawer-border-focus, var(--color-primary));
+  background:   var(--form-drawer-surface-hover, rgba(255,255,255,0.08));
+  box-shadow:   0 0 0 3px color-mix(in srgb, var(--color-primary) 15%, transparent);
+}
+
+.control:disabled {
+  opacity: 0.45;
+  cursor:  not-allowed;
+}
+
+.control::placeholder { color: var(--form-drawer-text-faint, var(--color-text-muted)); opacity: 0.6; }
+
+.hasErr {
+  border-color: var(--form-drawer-error, var(--color-danger-text, #ef4444)) !important;
+}
+.hasErr:focus {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-danger-text, #ef4444) 15%, transparent) !important;
+}
+
+/* ── Inline field errors ── */
+.fieldError {
+  font-size:   var(--font-size-xs);
+  color:       var(--form-drawer-error, var(--color-danger-text, #f87171));
+  line-height: 1.4;
+}
+
+/* ── Pricing grid ── */
+.priceGrid {
+  display:               grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap:                   var(--space-3);
+}
+
+@media (max-width: 660px) {
+  .priceGrid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* Price tile — card with brand header + input */
+.priceTile {
+  background:    var(--form-drawer-surface, rgba(255,255,255,0.03));
+  border:        1px solid var(--form-drawer-border, var(--color-border));
+  border-radius: var(--radius-lg);
+  overflow:      hidden;
+  transition:    border-color var(--transition-fast);
+}
+
+.priceTile:focus-within {
+  border-color: var(--form-drawer-border-focus, var(--color-primary));
+  box-shadow:   0 0 0 2px color-mix(in srgb, var(--color-primary) 10%, transparent);
+}
+
+.priceTileLabel {
+  padding:        5px var(--space-3) 4px;
+  font-size:      10px;
+  font-weight:    var(--font-weight-bold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color:          var(--form-drawer-text-secondary, var(--color-text-secondary));
+  background:     color-mix(in srgb, var(--color-primary) 8%, transparent);
+  border-bottom:  1px solid var(--form-drawer-border, var(--color-border));
+}
+
+.priceTileInput {
+  display:     flex;
+  align-items: center;
+  padding:     0 var(--space-3);
+}
+
+.priceCurr {
+  font-size:      var(--font-size-sm);
+  color:          var(--form-drawer-text-muted, var(--color-text-muted));
+  user-select:    none;
+  pointer-events: none;
+  flex-shrink:    0;
+  margin-right:   4px;
+}
+
+.priceInput {
+  flex:        1;
+  height:      36px;
+  background:  transparent;
+  border:      none;
+  outline:     none;
+  font-size:   var(--font-size-sm);
+  font-family: var(--font-family);
+  color:       var(--form-drawer-text, var(--color-text-primary));
+  font-variant-numeric: tabular-nums;
+  min-width:   0;
+  appearance:  none;
+}
+
+.priceInput::placeholder {
+  color:   var(--form-drawer-text-faint, var(--color-text-muted));
+  opacity: 0.5;
+}
+
+/* Remove number spinners */
+.priceInput::-webkit-inner-spin-button,
+.priceInput::-webkit-outer-spin-button { -webkit-appearance: none; }
+.priceInput { -moz-appearance: textfield; }
+
+.priceTileErr {
+  padding:     2px var(--space-3) 4px;
+  font-size:   10px;
+  color:       var(--form-drawer-error, #f87171);
+  line-height: 1.3;
+}
+
+/* Prices alert */
+.pricesAlert {
+  display:     flex;
+  align-items: center;
+  gap:         6px;
+  font-size:   var(--font-size-xs);
+  color:       var(--form-drawer-error, var(--color-danger-text, #ef4444));
+  margin-bottom: var(--space-1);
+}
+
+/* ── API note ── */
+.apiNote {
+  display:       flex;
+  align-items:   flex-start;
+  gap:           10px;
+  padding:       var(--space-3) var(--space-4);
+  background:    color-mix(in srgb, var(--color-warning, #f59e0b) 8%, transparent);
+  border:        1px solid color-mix(in srgb, var(--color-warning, #f59e0b) 25%, transparent);
+  border-radius: var(--radius-lg);
+  font-size:     var(--font-size-xs);
+  color:         var(--form-drawer-text-secondary, var(--color-text-muted));
+  line-height:   1.55;
+}
+
+.apiNoteIcon {
+  flex-shrink: 0;
+  color:       var(--color-warning, #f59e0b);
+  margin-top:  1px;
+}
+
+.apiNoteCode {
+  font-family: var(--font-family-mono);
+  font-size:   0.9em;
+  background:  color-mix(in srgb, var(--color-warning, #f59e0b) 12%, transparent);
+  border-radius: 3px;
+  padding:     1px 4px;
+  color:       inherit;
+}
+
+/* ── Actions ── */
+.actions {
+  display:         flex;
+  align-items:     center;
+  justify-content: flex-end;
+  gap:             var(--space-2);
+  padding-top:     var(--space-4);
+  border-top:      1px solid var(--form-drawer-border, var(--color-border));
+}

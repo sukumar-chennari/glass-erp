@@ -16,6 +16,7 @@ import type {
   CatalogUploadResult,
   CatalogPricingRow,
 } from '@/services/catalogApi';
+import { SingleOnboardForm } from './components/SingleOnboardForm';
 import styles from './BulkUploadPage.module.css';
 
 // ── Constants ──────────────────────────────────────────────────────────────
@@ -287,11 +288,13 @@ function CatalogSection({
 // ── Page ───────────────────────────────────────────────────────────────────
 
 type UploadState = 'idle' | 'uploading' | 'success' | 'error';
+type PageTab = 'bulk' | 'single';
 
 export function BulkUploadPage() {
   const toast    = useToast();
   const inputRef = useRef<HTMLInputElement>(null);
 
+  const [activeTab,    setActiveTab]    = useState<PageTab>('bulk');
   const [file,         setFile]         = useState<File | null>(null);
   const [fileError,    setFileError]    = useState<string | null>(null);
   const [uploadState,  setUploadState]  = useState<UploadState>('idle');
@@ -383,12 +386,39 @@ export function BulkUploadPage() {
 
   return (
     <PageShell
-      heading="Bulk Upload"
-      description="Upload a catalog workbook to create or update brands, models, and glass-pricing data in bulk."
+      heading="Catalog Onboarding"
+      description="Add catalog pricing data via bulk Excel upload or by entering a single vehicle entry manually."
     >
 
-      {/* ── Upload section ── */}
-      <SectionCard>
+      {/* ── Tab toggle ── */}
+      <div className={styles.tabRow}>
+        <button
+          type="button"
+          className={`${styles.tabBtn} ${activeTab === 'bulk' ? styles.tabBtnActive : ''}`}
+          onClick={() => setActiveTab('bulk')}
+        >
+          <UploadCloud size={14} />
+          Bulk Upload
+        </button>
+        <button
+          type="button"
+          className={`${styles.tabBtn} ${activeTab === 'single' ? styles.tabBtnActive : ''}`}
+          onClick={() => setActiveTab('single')}
+        >
+          Single Vehicle Onboard
+        </button>
+      </div>
+
+      {/* ── Single vehicle onboard form ── */}
+      {activeTab === 'single' && (
+        <SectionCard>
+          <SectionHeader title="Single Vehicle Onboard" />
+          <SingleOnboardForm />
+        </SectionCard>
+      )}
+
+      {/* ── Bulk upload section ── */}
+      {activeTab === 'bulk' && <SectionCard>
         <SectionHeader title="Upload Workbook" />
 
         <div className={styles.uploadBody}>
@@ -492,9 +522,9 @@ export function BulkUploadPage() {
           )}
 
         </div>
-      </SectionCard>
+      </SectionCard>}
 
-      {/* ── Catalog listing ── */}
+      {/* ── Catalog listing (always visible) ── */}
       <CatalogSection catalogPage={catalogPage} onPageChange={setCatalogPage} />
 
     </PageShell>
