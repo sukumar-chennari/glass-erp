@@ -10,6 +10,7 @@ import { StatusBadge } from '@/components/ui/Badge';
 import { DataTable } from '@/components/ui/DataTable';
 import { WhatsAppIcon } from '@/components/icons/WhatsAppIcon';
 import { SendWhatsAppModal } from '@/features/whatsapp/SendWhatsAppModal';
+import { WhatsAppFab } from '@/features/whatsapp/WhatsAppFab';
 import { JOB_STATUS, JOB_STATUS_MAP, STOCK_STATUS } from '@/constants/statuses';
 import { useGetJobsQuery } from '@/features/jobs/services/jobsApi';
 import { useGetStockQuery } from '@/features/stock/services/stockApi';
@@ -224,6 +225,21 @@ export function SuperAdminDashboard() {
         </SectionCard>
       )}
 
+      {/* ── WhatsApp CTA ─────────────────────────────────────────────────── */}
+      <div className={styles.waBanner}>
+        <div className={styles.waBannerIcon}>
+          <WhatsAppIcon size={22} />
+        </div>
+        <div className={styles.waBannerBody}>
+          <p className={styles.waBannerTitle}>Send Booking Form via WhatsApp</p>
+          <p className={styles.waBannerDesc}>Share the customer booking form instantly — just enter their number and name.</p>
+        </div>
+        <button className={styles.waBannerBtn} onClick={() => setWaOpen(true)}>
+          <WhatsAppIcon size={15} />
+          Send Form Link
+        </button>
+      </div>
+
       {/* ── Admin Quick Access ───────────────────────────────────────────── */}
       <SectionCard>
         <SectionHeader title="Admin Quick Access" />
@@ -241,18 +257,11 @@ export function SuperAdminDashboard() {
               </Link>
             );
           })}
-          <button className={styles.waQuickBtn} onClick={() => setWaOpen(true)}>
-            <div className={styles.waQuickIcon}><WhatsAppIcon size={18} /></div>
-            <div className={styles.quickBody}>
-              <span className={styles.quickLabel}>Send Form Link</span>
-              <span className={styles.quickDesc}>Share booking form via WhatsApp</span>
-            </div>
-            <ArrowRight size={14} className={styles.quickArrow} />
-          </button>
         </div>
       </SectionCard>
 
       <SendWhatsAppModal isOpen={waOpen} onClose={() => setWaOpen(false)} />
+      <WhatsAppFab onClick={() => setWaOpen(true)} />
     </>
   );
 }

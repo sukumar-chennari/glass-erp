@@ -4,6 +4,7 @@ import { MapPin, Phone, ChevronRight, Locate, CheckCircle, Search, Car, X } from
 import { VehiclePickerModal } from '@/components/ui/VehiclePickerModal';
 import { WhatsAppIcon } from '@/components/icons/WhatsAppIcon';
 import { SendWhatsAppModal } from '@/features/whatsapp/SendWhatsAppModal';
+import { WhatsAppFab } from '@/features/whatsapp/WhatsAppFab';
 import { useAuth } from '@/context/AuthContext';
 import { useLazyGetNearbyBranchesQuery } from './nearbyBranchesApi';
 import type { NearbyBranch } from './nearbyBranchesApi';
@@ -524,18 +525,6 @@ export function EntryPage() {
               )}
             </button>
 
-            <div className={styles.waCta}>
-              <div className={styles.waCtaDivider}><span>or</span></div>
-              <button
-                type="button"
-                className={styles.waCtaBtn}
-                onClick={() => setWaOpen(true)}
-              >
-                <WhatsAppIcon size={15} />
-                Send this form to a customer via WhatsApp
-              </button>
-            </div>
-
             <p className={styles.privacy}>
               By submitting, you agree to be contacted by our service team.
             </p>
@@ -548,6 +537,8 @@ export function EntryPage() {
       {confirmation && (
         <ConfirmationView confirmation={confirmation} onReset={() => setConfirmation(null)} />
       )}
+
+      <WhatsAppFab onClick={() => setWaOpen(true)} />
 
       <SendWhatsAppModal
         isOpen={waOpen}

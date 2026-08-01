@@ -206,30 +206,29 @@
   font-style: italic;
 }
 
-/* ── Quick Actions ───────────────────────────────────────────── */
-.quickActions {
-  padding: var(--space-2) 0;
+/* ── WhatsApp CTA banner (standalone card) ── */
+.waBanner {
+  display:        flex;
+  align-items:    center;
+  gap:            var(--space-5);
+  padding:        var(--space-5) var(--space-6);
+  background:     color-mix(in srgb, #25d366 6%, var(--color-bg-light));
+  border:         1px solid color-mix(in srgb, #25d366 22%, var(--color-border));
+  border-left:    4px solid #25d366;
+  border-radius:  var(--radius-lg);
+  margin-bottom:  var(--space-3);
 }
 
-.waBtn {
-  all:         unset;
-  display:     flex;
-  align-items: center;
-  gap:         var(--space-4);
-  padding:     var(--space-3) var(--space-5);
-  width:       100%;
-  box-sizing:  border-box;
-  cursor:      pointer;
-  border-radius: var(--radius-md);
-  transition:  background var(--transition-fast);
+@media (max-width: 540px) {
+  .waBanner          { flex-direction: column; align-items: flex-start; }
+  .waBannerBtn       { width: 100%; justify-content: center; }
 }
-.waBtn:hover { background: var(--color-bg-subtle); }
 
-.waBtnIcon {
-  width:           36px;
-  height:          36px;
-  border-radius:   var(--radius-md);
-  background:      color-mix(in srgb, #25d366 12%, transparent);
+.waBannerIcon {
+  width:           48px;
+  height:          48px;
+  border-radius:   50%;
+  background:      color-mix(in srgb, #25d366 16%, transparent);
   color:           #25d366;
   display:         flex;
   align-items:     center;
@@ -237,19 +236,46 @@
   flex-shrink:     0;
 }
 
-.waBtnBody {
+.waBannerBody {
+  flex:           1;
   display:        flex;
   flex-direction: column;
-  gap:            1px;
+  gap:            3px;
 }
 
-.waBtnLabel {
+.waBannerTitle {
   font-size:   var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
+  font-weight: var(--font-weight-bold);
   color:       var(--color-text-primary);
+  margin:      0;
 }
 
-.waBtnDesc {
-  font-size: var(--font-size-xs);
-  color:     var(--color-text-muted);
+.waBannerDesc {
+  font-size:   var(--font-size-xs);
+  color:       var(--color-text-secondary);
+  line-height: 1.5;
+  margin:      0;
 }
+
+.waBannerBtn {
+  display:         flex;
+  align-items:     center;
+  gap:             var(--space-2);
+  padding:         10px var(--space-5);
+  background:      #25d366;
+  color:           #fff;
+  border:          none;
+  border-radius:   var(--radius-lg);
+  font-size:       var(--font-size-sm);
+  font-weight:     var(--font-weight-semibold);
+  font-family:     var(--font-family);
+  cursor:          pointer;
+  white-space:     nowrap;
+  flex-shrink:     0;
+  transition:      background var(--transition-fast), box-shadow var(--transition-fast);
+}
+.waBannerBtn:hover {
+  background: #1da851;
+  box-shadow: 0 4px 16px rgba(37, 211, 102, 0.35);
+}
+.waBannerBtn:active { background: #178f43; }

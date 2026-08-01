@@ -7,6 +7,7 @@ import { DataTable } from '@/components/ui/DataTable';
 import { useToast } from '@/components/ui/Toast';
 import { WhatsAppIcon } from '@/components/icons/WhatsAppIcon';
 import { SendWhatsAppModal } from '@/features/whatsapp/SendWhatsAppModal';
+import { WhatsAppFab } from '@/features/whatsapp/WhatsAppFab';
 import { JOB_STATUS, JOB_STATUS_MAP, TECH_STATUS, STOCK_STATUS } from '@/constants/statuses';
 import { useGetJobsQuery, useUpdateJobMutation } from '@/features/jobs/services/jobsApi';
 import { useGetTechniciansQuery } from '@/features/technicians/services/techniciansApi';
@@ -226,21 +227,20 @@ export function BranchManagerDashboard() {
         })}
       </div>
 
-      {/* Quick Actions */}
-      <SectionCard>
-        <SectionHeader title="Quick Actions" />
-        <div className={styles.quickActions}>
-          <button className={styles.waBtn} onClick={() => setWaOpen(true)}>
-            <div className={styles.waBtnIcon}>
-              <WhatsAppIcon size={18} />
-            </div>
-            <div className={styles.waBtnBody}>
-              <span className={styles.waBtnLabel}>Send Form Link</span>
-              <span className={styles.waBtnDesc}>Share booking form via WhatsApp</span>
-            </div>
-          </button>
+      {/* WhatsApp CTA */}
+      <div className={styles.waBanner}>
+        <div className={styles.waBannerIcon}>
+          <WhatsAppIcon size={22} />
         </div>
-      </SectionCard>
+        <div className={styles.waBannerBody}>
+          <p className={styles.waBannerTitle}>Send Booking Form via WhatsApp</p>
+          <p className={styles.waBannerDesc}>Share the booking form with any customer — enter their number and it goes instantly.</p>
+        </div>
+        <button className={styles.waBannerBtn} onClick={() => setWaOpen(true)}>
+          <WhatsAppIcon size={15} />
+          Send Form Link
+        </button>
+      </div>
 
       {/* TAT alerts */}
       {overdueJobs.length > 0 && (
@@ -330,6 +330,7 @@ export function BranchManagerDashboard() {
       />
 
       <SendWhatsAppModal isOpen={waOpen} onClose={() => setWaOpen(false)} />
+      <WhatsAppFab onClick={() => setWaOpen(true)} />
 
     </div>
   );
