@@ -205,3 +205,51 @@
   color: var(--color-text-muted);
   font-style: italic;
 }
+
+/* ── Quick Actions ───────────────────────────────────────────── */
+.quickActions {
+  padding: var(--space-2) 0;
+}
+
+.waBtn {
+  all:         unset;
+  display:     flex;
+  align-items: center;
+  gap:         var(--space-4);
+  padding:     var(--space-3) var(--space-5);
+  width:       100%;
+  box-sizing:  border-box;
+  cursor:      pointer;
+  border-radius: var(--radius-md);
+  transition:  background var(--transition-fast);
+}
+.waBtn:hover { background: var(--color-bg-subtle); }
+
+.waBtnIcon {
+  width:           36px;
+  height:          36px;
+  border-radius:   var(--radius-md);
+  background:      color-mix(in srgb, #25d366 12%, transparent);
+  color:           #25d366;
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  flex-shrink:     0;
+}
+
+.waBtnBody {
+  display:        flex;
+  flex-direction: column;
+  gap:            1px;
+}
+
+.waBtnLabel {
+  font-size:   var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color:       var(--color-text-primary);
+}
+
+.waBtnDesc {
+  font-size: var(--font-size-xs);
+  color:     var(--color-text-muted);
+}

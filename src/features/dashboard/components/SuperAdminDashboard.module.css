@@ -204,3 +204,30 @@
   transition: transform var(--transition-fast);
   flex-shrink: 0;
 }
+
+/* WhatsApp quick action — mirrors .quickLink as a button */
+.waQuickBtn {
+  all:         unset;
+  display:     flex;
+  align-items: center;
+  gap:         var(--space-4);
+  padding:     var(--space-4) var(--space-5);
+  width:       100%;
+  box-sizing:  border-box;
+  cursor:      pointer;
+  transition:  background var(--transition-fast);
+}
+.waQuickBtn:hover { background: var(--color-bg-subtle); }
+.waQuickBtn:hover .quickArrow { transform: translateX(3px); }
+
+.waQuickIcon {
+  width:           36px;
+  height:          36px;
+  border-radius:   var(--radius-md);
+  background:      color-mix(in srgb, #25d366 12%, transparent);
+  color:           #25d366;
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  flex-shrink:     0;
+}

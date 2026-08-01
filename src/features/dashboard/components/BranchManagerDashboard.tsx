@@ -5,6 +5,8 @@ import { Badge, StatusBadge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { DataTable } from '@/components/ui/DataTable';
 import { useToast } from '@/components/ui/Toast';
+import { WhatsAppIcon } from '@/components/icons/WhatsAppIcon';
+import { SendWhatsAppModal } from '@/features/whatsapp/SendWhatsAppModal';
 import { JOB_STATUS, JOB_STATUS_MAP, TECH_STATUS, STOCK_STATUS } from '@/constants/statuses';
 import { useGetJobsQuery, useUpdateJobMutation } from '@/features/jobs/services/jobsApi';
 import { useGetTechniciansQuery } from '@/features/technicians/services/techniciansApi';
@@ -33,6 +35,7 @@ export function BranchManagerDashboard() {
   const { data: stock = [] }       = useGetStockQuery();
   const [updateJob]                = useUpdateJobMutation();
   const [assignTarget, setAssign]  = useState<Job | null>(null);
+  const [waOpen, setWaOpen]        = useState(false);
 
   const today = useMemo(() => new Date().toISOString().slice(0, 10), []);
 
@@ -223,6 +226,22 @@ export function BranchManagerDashboard() {
         })}
       </div>
 
+      {/* Quick Actions */}
+      <SectionCard>
+        <SectionHeader title="Quick Actions" />
+        <div className={styles.quickActions}>
+          <button className={styles.waBtn} onClick={() => setWaOpen(true)}>
+            <div className={styles.waBtnIcon}>
+              <WhatsAppIcon size={18} />
+            </div>
+            <div className={styles.waBtnBody}>
+              <span className={styles.waBtnLabel}>Send Form Link</span>
+              <span className={styles.waBtnDesc}>Share booking form via WhatsApp</span>
+            </div>
+          </button>
+        </div>
+      </SectionCard>
+
       {/* TAT alerts */}
       {overdueJobs.length > 0 && (
         <SectionCard>
@@ -309,6 +328,8 @@ export function BranchManagerDashboard() {
         onClose={() => setAssign(null)}
         onAssign={handleAssign}
       />
+
+      <SendWhatsAppModal isOpen={waOpen} onClose={() => setWaOpen(false)} />
 
     </div>
   );

@@ -160,10 +160,11 @@ export const ENDPOINTS = {
   // quick: unauthenticated fast-capture (Entry Page, POST only).
   // list/byId: authenticated branch-admin read endpoints.
   enquiries: {
-    quick:         'enquiries/quick',
-    list:          '/enquiries',
-    byId:          (id: string) => `/enquiries/${id}`,
-    update:        (id: string) => `/enquiries/${id}`,
-    priceEstimate: (id: string) => `/enquiries/${id}/price-estimate`,
+    quick:             'enquiries/quick',
+    list:              '/enquiries',
+    byId:              (id: string) => `/enquiries/${id}`,
+    update:            (id: string) => `/enquiries/${id}`,
+    priceEstimate:     (id: string) => `/enquiries/${id}/price-estimate`,
+    sendWhatsAppLink:  '/enquiries/send-whatsapp-link',
   },
 } as const;

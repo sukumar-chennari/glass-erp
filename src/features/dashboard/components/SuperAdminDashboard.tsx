@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   AlertTriangle, CheckCircle2, Wrench, Clock,
@@ -8,6 +8,8 @@ import {
 import { SectionCard, SectionHeader } from '@/components/layout/PageShell';
 import { StatusBadge } from '@/components/ui/Badge';
 import { DataTable } from '@/components/ui/DataTable';
+import { WhatsAppIcon } from '@/components/icons/WhatsAppIcon';
+import { SendWhatsAppModal } from '@/features/whatsapp/SendWhatsAppModal';
 import { JOB_STATUS, JOB_STATUS_MAP, STOCK_STATUS } from '@/constants/statuses';
 import { useGetJobsQuery } from '@/features/jobs/services/jobsApi';
 import { useGetStockQuery } from '@/features/stock/services/stockApi';
@@ -64,6 +66,7 @@ export function SuperAdminDashboard() {
   const { data: jobs      = [] } = useGetJobsQuery();
   const { data: stock     = [] } = useGetStockQuery();
   const { data: branchPerf = [] } = useGetBranchPerformanceQuery();
+  const [waOpen, setWaOpen] = useState(false);
 
   const today = useMemo(() => new Date().toISOString().slice(0, 10), []);
 
@@ -238,8 +241,18 @@ export function SuperAdminDashboard() {
               </Link>
             );
           })}
+          <button className={styles.waQuickBtn} onClick={() => setWaOpen(true)}>
+            <div className={styles.waQuickIcon}><WhatsAppIcon size={18} /></div>
+            <div className={styles.quickBody}>
+              <span className={styles.quickLabel}>Send Form Link</span>
+              <span className={styles.quickDesc}>Share booking form via WhatsApp</span>
+            </div>
+            <ArrowRight size={14} className={styles.quickArrow} />
+          </button>
         </div>
       </SectionCard>
+
+      <SendWhatsAppModal isOpen={waOpen} onClose={() => setWaOpen(false)} />
     </>
   );
 }
