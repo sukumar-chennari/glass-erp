@@ -1,8 +1,9 @@
 import { baseApi } from '@/services/baseApi';
 import { mockableQuery, mockableMutation } from '@/services/mockUtils';
 import { userMock } from '@/mocks/adminUsers';
-import type { AppUser, StaffListResponse, StaffCreatePayload, StaffUpdatePayload, UserCreatePayload } from '@/types/models/appUser';
+import type { AppUser, StaffListResponse, StaffCreatePayload, StaffUpdatePayload, UserCreatePayload, SuperAdminStaffCreatePayload } from '@/types/models/appUser';
 import { FRONTEND_TO_BACKEND_ROLE } from '@/types/models/appUser';
+import { ENDPOINTS } from '@/services/api/endpoints';
 
 export const usersApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -72,6 +73,18 @@ export const usersApi = baseApi.injectEndpoints({
       invalidatesTags: ['AppUser'],
     }),
 
+    // POST /api/v1/staff — SUPER_ADMIN scope.
+    // Body: { name, phone, role, branchId } — branch is explicit, not session-inferred.
+    // Always hits the real API (no mock wrapper) so it stays in sync with the live backend.
+    createStaffBySuperAdmin: builder.mutation<AppUser, SuperAdminStaffCreatePayload>({
+      query: (body) => ({
+        url:    ENDPOINTS.staff.create,
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: ['AppUser'],
+    }),
+
     // PATCH /api/v1/staff/:id — confirmed live contract.
     // Accepts only { name, isActive } in the body; id is URL-only.
     updateStaff: builder.mutation<AppUser, StaffUpdatePayload>({
@@ -91,5 +104,6 @@ export const {
   useGetUsersQuery,
   useCreateUserMutation,
   useCreateStaffMutation,
+  useCreateStaffBySuperAdminMutation,
   useUpdateStaffMutation,
 } = usersApi;

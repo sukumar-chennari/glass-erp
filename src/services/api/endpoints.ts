@@ -82,6 +82,12 @@ export const ENDPOINTS = {
     resendInvite: (id: string) => `/settings/users/${id}/resend-invite`,
   },
 
+  staff: {
+    create: '/staff',
+    list:   '/staff',
+    update: (id: string) => `/staff/${id}`,
+  },
+
   // ── Operations ─────────────────────────────────────────────────────
   customers: {
     list:   '/customers',

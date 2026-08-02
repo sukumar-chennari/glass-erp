@@ -62,3 +62,12 @@ export interface UserCreatePayload {
   role:     AppRole;
   branchId: string | null;
 }
+
+// Payload for POST /api/v1/staff when called by SUPER_ADMIN.
+// branchId must be provided explicitly (unlike branch_manager scope where it's session-inferred).
+export interface SuperAdminStaffCreatePayload {
+  name:     string;
+  phone:    string;
+  role:     BackendStaffRole;
+  branchId: string;
+}

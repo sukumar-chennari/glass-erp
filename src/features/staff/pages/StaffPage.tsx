@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Plus, Pencil, Users, AlertCircle } from 'lucide-react';
+import { Pencil, Users, AlertCircle } from 'lucide-react';
 import { PageShell, SectionCard } from '@/components/layout/PageShell';
 import { DataTable }     from '@/components/ui/DataTable';
 import { StatusBadge }   from '@/components/ui/Badge';
@@ -10,17 +10,12 @@ import { Modal }         from '@/components/ui/Modal';
 import { useToast }      from '@/components/ui/Toast';
 import { TableSkeleton } from '@/components/ui/Skeleton';
 import { useAuth, useHasPermission } from '@/context/AuthContext';
-import { useGetUsersQuery, useCreateStaffMutation, useUpdateStaffMutation } from '@/features/settings/services/usersApi';
-import type { AppUser, BackendStaffRole, UserStatus } from '@/types/models/appUser';
+import { useGetUsersQuery, useUpdateStaffMutation } from '@/features/settings/services/usersApi';
+import type { AppUser, UserStatus } from '@/types/models/appUser';
 import type { TableColumn, SelectOption } from '@/types/ui';
 import styles from './StaffPage.module.css';
 
 // ── Constants ──────────────────────────────────────────────────────────────────
-
-const ROLE_OPTS: SelectOption[] = [
-  { value: 'FRONTOFFICE', label: 'Front Office' },
-  { value: 'TECHNICIAN',  label: 'Technician'   },
-];
 
 const ACTIVE_OPTS: SelectOption[] = [
   { value: 'true',  label: 'Active'   },
@@ -78,19 +73,6 @@ const BASE_COLUMNS: TableColumn<AppUser>[] = [
 
 // ── Form types ─────────────────────────────────────────────────────────────────
 
-interface StaffForm {
-  name:  string;
-  phone: string;
-  role:  BackendStaffRole;
-}
-
-interface FormErrors {
-  name?:  string;
-  phone?: string;
-}
-
-const EMPTY_FORM: StaffForm = { name: '', phone: '', role: 'FRONTOFFICE' };
-
 interface EditForm {
   name:     string;
   isActive: string; // 'true' | 'false' — string for Select value
@@ -110,18 +92,12 @@ export function StaffPage() {
   const canWrite = useHasPermission('staff:write');
 
   const { data, isLoading, isError, refetch } = useGetUsersQuery();
-  const [createStaff, { isLoading: creating }] = useCreateStaffMutation();
   const [updateStaff, { isLoading: updating }] = useUpdateStaffMutation();
 
   const staff = data?.data ?? [];
 
   // ── Search ────────────────────────────────────────────────────────────
   const [search, setSearch] = useState('');
-
-  // ── Add modal ─────────────────────────────────────────────────────────
-  const [modalOpen, setModalOpen] = useState(false);
-  const [form,      setForm]      = useState<StaffForm>(EMPTY_FORM);
-  const [errors,    setErrors]    = useState<FormErrors>({});
 
   // ── Edit modal ────────────────────────────────────────────────────────
   const [editModalOpen, setEditModalOpen] = useState(false);
@@ -164,34 +140,6 @@ export function StaffPage() {
   }, [canWrite]);
 
   // ── Helpers ───────────────────────────────────────────────────────────
-  function set(key: keyof StaffForm, val: string) {
-    setForm((f) => ({ ...f, [key]: val }));
-    if (errors[key as keyof FormErrors]) setErrors((e) => ({ ...e, [key]: undefined }));
-  }
-
-  function validate(): boolean {
-    const errs: FormErrors = {};
-    if (!form.name.trim())  errs.name  = 'Name is required';
-    if (!form.phone.trim()) errs.phone = 'Phone number is required';
-    else if (!/^\d{10,15}$/.test(form.phone.replace(/[\s\-+()]/g, ''))) {
-      errs.phone = 'Enter a valid phone number (10–15 digits)';
-    }
-    setErrors(errs);
-    return Object.keys(errs).length === 0;
-  }
-
-  function openModal() {
-    setForm(EMPTY_FORM);
-    setErrors({});
-    setModalOpen(true);
-  }
-
-  function closeModal() {
-    setModalOpen(false);
-    setForm(EMPTY_FORM);
-    setErrors({});
-  }
-
   function openEdit(u: AppUser) {
     setEditTarget(u);
     setEditForm({ name: u.name, isActive: String(u.isActive) });
@@ -238,32 +186,12 @@ export function StaffPage() {
     closeEditModal();
   }
 
-  async function handleSubmit() {
-    if (!validate()) return;
-    const name = form.name.trim();
-    const result = await createStaff({ name, phone: form.phone.trim(), role: form.role });
-    if ('error' in result) {
-      const err = result.error as { status?: unknown };
-      if (err.status === 409) {
-        setErrors({ phone: 'This phone number is already registered.' });
-      } else {
-        toast.error('Failed to add staff member. Please try again.');
-      }
-      return;
-    }
-    toast.success(`${name} added to ${session?.branch?.name ?? 'your branch'}.`);
-    closeModal();
-  }
-
   const branchLabel = session?.branch?.name ?? null;
 
   return (
     <PageShell
       heading="Staff"
       description={`Manage front office and technician staff${branchLabel ? ` at ${branchLabel}` : ''}.`}
-      actions={canWrite ? (
-        <Button leftIcon={<Plus size={15} />} onClick={openModal}>Add Staff</Button>
-      ) : undefined}
     >
       <SectionCard>
         {/* ── Toolbar ───────────────────────────────────────────────── */}
@@ -297,11 +225,8 @@ export function StaffPage() {
             <p className={styles.emptyDesc}>
               {search
                 ? 'Try adjusting your search.'
-                : 'Add your first staff member to get started.'}
+                : 'Staff members will appear here once they have been onboarded.'}
             </p>
-            {!search && canWrite && (
-              <Button leftIcon={<Plus size={14} />} size="sm" onClick={openModal}>Add Staff</Button>
-            )}
           </div>
         )}
 
@@ -309,52 +234,6 @@ export function StaffPage() {
           <DataTable columns={columns} data={filtered} />
         )}
       </SectionCard>
-
-      {/* ── Add Staff Modal ───────────────────────────────────────────── */}
-      <Modal
-        isOpen={modalOpen}
-        onClose={closeModal}
-        title="Add Staff Member"
-        footer={
-          <div className={styles.modalFooter}>
-            <Button variant="ghost" onClick={closeModal}>Cancel</Button>
-            <Button onClick={handleSubmit} loading={creating}>Add Staff</Button>
-          </div>
-        }
-      >
-        <div className={styles.form}>
-          {branchLabel && (
-            <p className={styles.branchNote}>
-              Adding to <strong>{branchLabel}</strong>
-            </p>
-          )}
-          <Input
-            label="Full Name"
-            value={form.name}
-            onChange={(e) => set('name', e.target.value)}
-            placeholder="e.g. Ravi Kumar"
-            error={errors.name}
-            required
-            fullWidth
-            autoFocus
-          />
-          <Input
-            label="Phone Number"
-            value={form.phone}
-            onChange={(e) => set('phone', e.target.value)}
-            placeholder="10-digit mobile number"
-            error={errors.phone}
-            required
-            fullWidth
-          />
-          <Select
-            label="Role"
-            options={ROLE_OPTS}
-            value={form.role}
-            onChange={(e) => set('role', e.target.value)}
-          />
-        </div>
-      </Modal>
 
       {/* ── Edit Staff Modal ──────────────────────────────────────────── */}
       <Modal

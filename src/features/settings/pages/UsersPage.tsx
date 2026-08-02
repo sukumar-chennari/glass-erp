@@ -1,7 +1,7 @@
 import { useState, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { UserPlus, ArrowLeft, Search } from 'lucide-react';
+import { UserPlus, Users, ArrowLeft, Search } from 'lucide-react';
 import { PageShell, SectionCard } from '@/components/layout/PageShell';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -10,11 +10,13 @@ import { DataTable } from '@/components/ui/DataTable';
 import { Badge, StatusBadge } from '@/components/ui/Badge';
 import { Modal } from '@/components/ui/Modal';
 import { useToast } from '@/components/ui/Toast';
+import { useAuth } from '@/context/AuthContext';
 import { useGetUsersQuery, useCreateUserMutation } from '@/features/settings/services/usersApi';
 import { useResendInviteMutation } from '@/services/auth/authApi';
 import type { AppUser, AppRole, UserStatus, UserCreatePayload } from '@/types/models/appUser';
 import type { TableColumn, SelectOption } from '@/types/ui';
 import { ROUTES } from '@/constants/routes';
+import { AddStaffDrawer } from './components/AddStaffDrawer';
 import styles from './UsersPage.module.css';
 
 // ── Constants ──────────────────────────────────────────────────────────
@@ -72,17 +74,19 @@ interface FormErrors {
 export function UsersPage() {
   const { t } = useTranslation(['settings', 'common']);
   const toast = useToast();
+  const { session } = useAuth();
   const { data: staffRes, isLoading, isError } = useGetUsersQuery();
   const users = staffRes?.data ?? [];
   const [createUser,    { isLoading: saving    }] = useCreateUserMutation();
   const [resendInvite,  { isLoading: resending }] = useResendInviteMutation();
 
-  const [modalOpen,    setModal]        = useState(false);
-  const [form,         setForm]         = useState<UserForm>(EMPTY_FORM);
-  const [formErrors,   setFormErrors]   = useState<FormErrors>({});
-  const [roleFilter,   setRoleFilter]   = useState('');
-  const [branchFilter, setBranchFilter] = useState('');
-  const [search,       setSearch]       = useState('');
+  const [modalOpen,      setModal]          = useState(false);
+  const [addStaffOpen,   setAddStaffOpen]   = useState(false);
+  const [form,           setForm]           = useState<UserForm>(EMPTY_FORM);
+  const [formErrors,     setFormErrors]     = useState<FormErrors>({});
+  const [roleFilter,     setRoleFilter]     = useState('');
+  const [branchFilter,   setBranchFilter]   = useState('');
+  const [search,         setSearch]         = useState('');
 
   // ── Filter options ─────────────────────────────────────────────────
   const ROLE_FILTER_OPTIONS = useMemo<SelectOption[]>(() => [
@@ -248,9 +252,20 @@ export function UsersPage() {
       heading={t('users.heading')}
       description={t('users.description')}
       actions={
-        <Button leftIcon={<UserPlus size={16} />} onClick={openModal}>
-          {t('users.actions.invite')}
-        </Button>
+        <>
+          {session?.role === 'super_admin' && (
+            <Button
+              leftIcon={<Users size={15} />}
+              variant="secondary"
+              onClick={() => setAddStaffOpen(true)}
+            >
+              Add Staff
+            </Button>
+          )}
+          <Button leftIcon={<UserPlus size={16} />} onClick={openModal}>
+            {t('users.actions.invite')}
+          </Button>
+        </>
       }
     >
       <Link to={ROUTES.SETTINGS} className={styles.back}>
@@ -388,6 +403,11 @@ export function UsersPage() {
           </p>
         </div>
       </Modal>
+
+      <AddStaffDrawer
+        isOpen={addStaffOpen}
+        onClose={() => setAddStaffOpen(false)}
+      />
     </PageShell>
   );
 }
