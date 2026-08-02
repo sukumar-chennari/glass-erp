@@ -545,6 +545,7 @@ export function EntryPage() {
         onClose={() => setWaOpen(false)}
         initialPhone={phone}
         initialName={customerName.trim()}
+        initialBranchId={branchId}
       />
     </div>
   );
