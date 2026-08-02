@@ -1,0 +1,252 @@
+/* CreateSuperAdminDrawer — uses --form-drawer-* tokens for theme consistency */
+
+/* ── Body ── */
+.body {
+  display:        flex;
+  flex-direction: column;
+  gap:            var(--space-5);
+}
+
+/* ── Header banner ── */
+.headerBanner {
+  display:       flex;
+  align-items:   flex-start;
+  gap:           8px;
+  padding:       10px var(--space-4);
+  background:    color-mix(in srgb, var(--color-warning, #f59e0b) 8%, transparent);
+  border:        1px solid color-mix(in srgb, var(--color-warning, #f59e0b) 22%, transparent);
+  border-radius: var(--radius-lg);
+  font-size:     var(--font-size-xs);
+  color:         var(--color-text-secondary);
+  line-height:   1.55;
+}
+
+.bannerIcon {
+  color:       var(--color-warning, #f59e0b);
+  flex-shrink: 0;
+  margin-top:  1px;
+}
+
+/* ── Fields ── */
+.field {
+  display:        flex;
+  flex-direction: column;
+  gap:            var(--space-2);
+}
+
+.label {
+  font-size:      var(--font-size-xs);
+  font-weight:    var(--font-weight-semibold);
+  color:          var(--form-drawer-text-secondary, var(--color-text-secondary));
+  letter-spacing: 0.02em;
+}
+
+.req {
+  color:       #ef4444;
+  margin-left: 2px;
+}
+
+/* ── Regular input ── */
+.input {
+  width:         100%;
+  height:        40px;
+  padding:       0 var(--space-3);
+  background:    var(--form-drawer-surface, rgba(255,255,255,0.05));
+  border:        1px solid var(--form-drawer-border, var(--color-border));
+  border-radius: var(--radius-lg);
+  font-size:     var(--font-size-sm);
+  font-family:   var(--font-family);
+  color:         var(--form-drawer-text, var(--color-text-primary));
+  outline:       none;
+  box-sizing:    border-box;
+  transition:    border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+.input:focus {
+  border-color: var(--form-drawer-border-focus, var(--color-primary));
+  box-shadow:   0 0 0 3px color-mix(in srgb, var(--color-primary) 15%, transparent);
+}
+.input::placeholder { color: var(--color-text-muted); opacity: 0.6; }
+
+.inputErr { border-color: #ef4444 !important; }
+.inputErr:focus {
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12) !important;
+}
+
+/* ── Password row ── */
+.passwordRow {
+  display:       flex;
+  align-items:   stretch;
+  border:        1px solid var(--form-drawer-border, var(--color-border));
+  border-radius: var(--radius-lg);
+  overflow:      hidden;
+  background:    var(--form-drawer-surface, rgba(255,255,255,0.05));
+  transition:    border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+.passwordRow:focus-within {
+  border-color: var(--form-drawer-border-focus, var(--color-primary));
+  box-shadow:   0 0 0 3px color-mix(in srgb, var(--color-primary) 15%, transparent);
+}
+.passwordRowErr,
+.passwordRowErr:focus-within {
+  border-color: #ef4444 !important;
+  box-shadow:   0 0 0 3px rgba(239, 68, 68, 0.12) !important;
+}
+
+.passwordInput {
+  flex:        1;
+  height:      40px;
+  padding:     0 var(--space-3);
+  background:  transparent;
+  border:      none;
+  outline:     none;
+  font-size:   var(--font-size-sm);
+  font-family: var(--font-family);
+  color:       var(--form-drawer-text, var(--color-text-primary));
+  min-width:   0;
+}
+.passwordInput::placeholder { color: var(--color-text-muted); opacity: 0.6; }
+
+.eyeBtn {
+  width:           40px;
+  flex-shrink:     0;
+  background:      transparent;
+  border:          none;
+  cursor:          pointer;
+  color:           var(--color-text-muted);
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  transition:      color var(--transition-fast);
+}
+.eyeBtn:hover { color: var(--color-text-primary); }
+
+/* ── Field errors + hints ── */
+.fieldErr {
+  font-size:   var(--font-size-xs);
+  color:       #ef4444;
+  line-height: 1.4;
+}
+
+.hint {
+  font-size:   var(--font-size-xs);
+  color:       var(--color-text-muted);
+  line-height: 1.5;
+}
+
+/* ── Footer row ── */
+.footerRow {
+  display:         flex;
+  align-items:     center;
+  justify-content: flex-end;
+  gap:             var(--space-2);
+  width:           100%;
+}
+
+/* ── Result states ── */
+.resultWrap {
+  display:        flex;
+  flex-direction: column;
+  align-items:    center;
+  text-align:     center;
+  gap:            var(--space-4);
+  padding:        var(--space-5) 0;
+}
+
+.successCircle,
+.errorCircle {
+  width:           64px;
+  height:          64px;
+  border-radius:   50%;
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+}
+.successCircle {
+  background: color-mix(in srgb, var(--color-success, #22c55e) 12%, transparent);
+  color:      var(--color-success, #22c55e);
+}
+.errorCircle {
+  background: color-mix(in srgb, #ef4444 12%, transparent);
+  color:      #ef4444;
+}
+
+.resultTitle {
+  font-size:   var(--font-size-base);
+  font-weight: var(--font-weight-bold);
+  color:       var(--color-text-primary);
+  margin:      0;
+}
+
+.resultDesc {
+  font-size:   var(--font-size-sm);
+  color:       var(--color-text-secondary);
+  line-height: 1.55;
+  margin:      0;
+  max-width:   320px;
+}
+
+/* ── Account summary card (success) ── */
+.accountCard {
+  width:         100%;
+  max-width:     300px;
+  border:        1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow:      hidden;
+}
+
+.accountRow {
+  display:         flex;
+  justify-content: space-between;
+  align-items:     center;
+  padding:         8px var(--space-4);
+  font-size:       var(--font-size-xs);
+  border-bottom:   1px solid var(--color-border);
+  gap:             var(--space-4);
+}
+.accountRow:last-child { border-bottom: none; }
+
+.accountKey {
+  color:       var(--color-text-muted);
+  flex-shrink: 0;
+}
+
+.accountVal {
+  color:       var(--color-text-primary);
+  font-weight: var(--font-weight-medium);
+  text-align:  right;
+  word-break:  break-all;
+}
+
+.roleChip {
+  display:       inline-block;
+  background:    color-mix(in srgb, var(--color-primary) 10%, transparent);
+  color:         var(--color-primary);
+  border-radius: var(--radius-full);
+  padding:       2px 8px;
+  font-size:     11px;
+  font-weight:   var(--font-weight-semibold);
+}
+
+.securityNote {
+  font-size:   var(--font-size-xs);
+  color:       var(--color-text-muted);
+  font-style:  italic;
+  text-align:  center;
+  max-width:   280px;
+  line-height: 1.5;
+  margin:      0;
+}
+
+/* ── Restricted access ── */
+.restricted {
+  display:        flex;
+  flex-direction: column;
+  align-items:    center;
+  gap:            var(--space-3);
+  padding:        var(--space-6) var(--space-4);
+  text-align:     center;
+  font-size:      var(--font-size-sm);
+  color:          var(--color-text-secondary);
+}
+
+.restrictedIcon { color: #ef4444; }

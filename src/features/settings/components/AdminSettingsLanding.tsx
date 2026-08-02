@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Shield, Tag, Layers, UploadCloud, type LucideIcon } from 'lucide-react';
+import { Shield, Tag, Layers, UploadCloud, ShieldCheck, type LucideIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { ROUTES } from '@/constants/routes';
 import styles from './AdminSettingsLanding.module.css';
@@ -52,6 +52,12 @@ export function AdminSettingsLanding() {
       title: t('subnav.bulkUpload'),
       desc:  t('bulkUpload.description'),
       href:  ROUTES.SETTINGS_BULK_UPLOAD,
+    },
+    {
+      icon:  ShieldCheck,
+      title: 'Super Admins',
+      desc:  'Create Super Admin accounts with full platform access.',
+      href:  ROUTES.SETTINGS_SUPER_ADMINS,
     },
   ];
 

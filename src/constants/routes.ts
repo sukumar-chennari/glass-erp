@@ -30,6 +30,7 @@ export const ROUTES = {
   SETTINGS_CAR_BRANDS:       '/settings/car-brands',
   SETTINGS_CAR_MODELS:       '/settings/car-models',
   SETTINGS_BULK_UPLOAD:      '/settings/bulk-upload',
+  SETTINGS_SUPER_ADMINS:     '/settings/super-admins',
   STAFF:             '/staff',
   SUBMIT:            '/submit',
   TRACK:             '/track',

@@ -31,6 +31,21 @@ export interface ChangePasswordPayload {
 }
 export interface ResendInvitePayload { userId: string }
 
+export interface CreateSuperAdminPayload {
+  name:     string;
+  email:    string;
+  password: string;
+}
+
+export interface CreateSuperAdminResponse {
+  id?:        string;
+  name?:      string;
+  email?:     string;
+  role?:      string;
+  isActive?:  boolean;
+  createdAt?: string;
+}
+
 // ── Helpers (mock-only) ───────────────────────────────────────────────────────
 
 const SESSION_KEYS = ['erp-session-v2', 'erp-session-v1'] as const;
@@ -166,6 +181,17 @@ export const authApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ['AppUser'],
     }),
+
+    // POST /api/v1/auth/super-admin — SUPER_ADMIN only; creates another SUPER_ADMIN account.
+    // Always real HTTP (no mock wrapper) — privileged action must go to the real API.
+    createSuperAdmin: builder.mutation<CreateSuperAdminResponse, CreateSuperAdminPayload>({
+      query: (body) => ({
+        url:    ENDPOINTS.auth.createSuperAdmin,
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: ['AppUser'],
+    }),
   }),
   overrideExisting: false,
 });
@@ -181,4 +207,5 @@ export const {
   useResetPasswordMutation,
   useChangePasswordMutation,
   useResendInviteMutation,
+  useCreateSuperAdminMutation,
 } = authApi;

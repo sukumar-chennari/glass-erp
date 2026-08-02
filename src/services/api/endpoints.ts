@@ -40,6 +40,8 @@ export const ENDPOINTS = {
     // ── Not yet active on backend ───────────────────────────────────────
     me:             '/auth/me',           // GET — stub ready; activate in http.ts getSession
     refresh:        '/auth/refresh',      // POST — stub ready; activate in http.ts getSession
+    // ── Admin management ───────────────────────────────────────────────
+    createSuperAdmin: '/auth/super-admin',  // POST — SUPER_ADMIN only
     // ── Legacy (kept for mock compatibility) ────────────────────────────
     login:          '/auth/login',
     verifyOtp:      '/auth/verify-otp',

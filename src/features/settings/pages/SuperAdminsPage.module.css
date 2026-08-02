@@ -1,0 +1,320 @@
+/* SuperAdminsPage */
+
+/* ── Back link ── */
+.back {
+  display:      inline-flex;
+  align-items:  center;
+  gap:          6px;
+  font-size:    var(--font-size-xs);
+  font-weight:  var(--font-weight-medium);
+  color:        var(--color-text-muted);
+  text-decoration: none;
+  margin-bottom: var(--space-4);
+  transition:   color var(--transition-fast);
+}
+.back:hover { color: var(--color-text-primary); }
+
+/* ── Form shell ── */
+.form {
+  max-width:      520px;
+  margin:         0 auto;
+  display:        flex;
+  flex-direction: column;
+  gap:            var(--space-6);
+}
+
+/* ── Access banner ── */
+.banner {
+  display:       flex;
+  align-items:   flex-start;
+  gap:           10px;
+  padding:       12px var(--space-4);
+  background:    color-mix(in srgb, var(--color-warning, #f59e0b) 8%, transparent);
+  border:        1px solid color-mix(in srgb, var(--color-warning, #f59e0b) 22%, transparent);
+  border-radius: var(--radius-lg);
+  font-size:     var(--font-size-xs);
+  color:         var(--color-text-secondary);
+  line-height:   1.6;
+}
+
+.bannerIcon {
+  color:       var(--color-warning, #f59e0b);
+  flex-shrink: 0;
+  margin-top:  1px;
+}
+
+/* ── Fields ── */
+.fields {
+  display:        flex;
+  flex-direction: column;
+  gap:            var(--space-5);
+}
+
+.field {
+  display:        flex;
+  flex-direction: column;
+  gap:            var(--space-2);
+}
+
+.label {
+  font-size:      var(--font-size-xs);
+  font-weight:    var(--font-weight-semibold);
+  color:          var(--color-text-secondary);
+  letter-spacing: 0.025em;
+}
+
+.req {
+  color:       var(--color-danger, #ef4444);
+  margin-left: 2px;
+}
+
+/* ── Inputs ── */
+.input {
+  width:         100%;
+  height:        42px;
+  padding:       0 var(--space-3);
+  background:    var(--color-bg-input, var(--color-surface));
+  border:        1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  font-size:     var(--font-size-sm);
+  font-family:   var(--font-family);
+  color:         var(--color-text-primary);
+  outline:       none;
+  box-sizing:    border-box;
+  transition:    border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+.input:focus {
+  border-color: var(--color-primary);
+  box-shadow:   0 0 0 3px color-mix(in srgb, var(--color-primary) 14%, transparent);
+}
+.input::placeholder { color: var(--color-text-muted); opacity: 0.55; }
+
+.inputErr { border-color: var(--color-danger, #ef4444) !important; }
+.inputErr:focus {
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.13) !important;
+}
+
+/* ── Password row ── */
+.passwordRow {
+  display:       flex;
+  align-items:   stretch;
+  border:        1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow:      hidden;
+  background:    var(--color-bg-input, var(--color-surface));
+  transition:    border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+.passwordRow:focus-within {
+  border-color: var(--color-primary);
+  box-shadow:   0 0 0 3px color-mix(in srgb, var(--color-primary) 14%, transparent);
+}
+.passwordRowErr,
+.passwordRowErr:focus-within {
+  border-color: var(--color-danger, #ef4444) !important;
+  box-shadow:   0 0 0 3px rgba(239, 68, 68, 0.13) !important;
+}
+
+.passwordInput {
+  flex:        1;
+  height:      42px;
+  padding:     0 var(--space-3);
+  background:  transparent;
+  border:      none;
+  outline:     none;
+  font-size:   var(--font-size-sm);
+  font-family: var(--font-family);
+  color:       var(--color-text-primary);
+  min-width:   0;
+}
+.passwordInput::placeholder { color: var(--color-text-muted); opacity: 0.55; }
+
+.eyeBtn {
+  width:           42px;
+  flex-shrink:     0;
+  background:      transparent;
+  border:          none;
+  cursor:          pointer;
+  color:           var(--color-text-muted);
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  transition:      color var(--transition-fast);
+  border-left:     1px solid var(--color-border);
+}
+.eyeBtn:hover { color: var(--color-text-primary); }
+
+/* ── Field errors ── */
+.fieldErr {
+  font-size:   var(--font-size-xs);
+  color:       var(--color-danger, #ef4444);
+  line-height: 1.4;
+}
+
+/* ── Password requirements checklist ── */
+.pwChecklist {
+  display:        flex;
+  flex-direction: column;
+  gap:            5px;
+  max-height:     0;
+  overflow:       hidden;
+  opacity:        0;
+  transition:     max-height 0.22s ease, opacity 0.18s ease;
+}
+
+.pwChecklistVisible {
+  max-height: 160px;
+  opacity:    1;
+}
+
+.pwCheckItem {
+  display:     flex;
+  align-items: center;
+  gap:         7px;
+  font-size:   var(--font-size-xs);
+  color:       var(--color-text-muted);
+  transition:  color var(--transition-fast);
+}
+
+.pwCheckMet { color: var(--color-success, #22c55e); }
+
+.pwCheckDot {
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  width:           16px;
+  height:          16px;
+  flex-shrink:     0;
+}
+
+.pwDotCircle {
+  width:        7px;
+  height:       7px;
+  border-radius: 50%;
+  background:   var(--color-border);
+  display:      block;
+}
+
+.pwCheckLabel { line-height: 1.35; }
+
+/* ── Server error ── */
+.serverErr {
+  display:       flex;
+  align-items:   flex-start;
+  gap:           8px;
+  padding:       10px var(--space-4);
+  background:    color-mix(in srgb, var(--color-danger, #ef4444) 7%, transparent);
+  border:        1px solid color-mix(in srgb, var(--color-danger, #ef4444) 22%, transparent);
+  border-radius: var(--radius-lg);
+  font-size:     var(--font-size-xs);
+  color:         var(--color-danger, #ef4444);
+  line-height:   1.55;
+}
+
+.serverErrIcon { flex-shrink: 0; margin-top: 1px; }
+
+/* ── Form actions ── */
+.actions {
+  display:         flex;
+  align-items:     center;
+  justify-content: flex-end;
+  gap:             var(--space-2);
+  padding-top:     var(--space-4);
+  border-top:      1px solid var(--color-border);
+}
+
+/* ── Success state ── */
+.successWrap {
+  display:        flex;
+  flex-direction: column;
+  align-items:    center;
+  text-align:     center;
+  gap:            var(--space-4);
+  padding:        var(--space-6) var(--space-4);
+  max-width:      480px;
+  margin:         0 auto;
+}
+
+.successIconWrap {
+  width:           72px;
+  height:          72px;
+  border-radius:   50%;
+  background:      color-mix(in srgb, var(--color-success, #22c55e) 11%, transparent);
+  color:           var(--color-success, #22c55e);
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+}
+
+.successTitle {
+  font-size:   var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color:       var(--color-text-primary);
+  margin:      0;
+}
+
+.successDesc {
+  font-size:   var(--font-size-sm);
+  color:       var(--color-text-secondary);
+  line-height: 1.6;
+  margin:      0;
+}
+
+/* ── Account summary card (success) ── */
+.accountCard {
+  width:         100%;
+  max-width:     320px;
+  border:        1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow:      hidden;
+}
+
+.accountRow {
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+  padding:         9px var(--space-4);
+  font-size:       var(--font-size-xs);
+  border-bottom:   1px solid var(--color-border);
+  gap:             var(--space-4);
+}
+.accountRow:last-child { border-bottom: none; }
+
+.accountKey {
+  color:       var(--color-text-muted);
+  flex-shrink: 0;
+}
+
+.accountVal {
+  color:       var(--color-text-primary);
+  font-weight: var(--font-weight-medium);
+  text-align:  right;
+  word-break:  break-all;
+}
+
+.roleChip {
+  display:       inline-block;
+  background:    color-mix(in srgb, var(--color-primary) 10%, transparent);
+  color:         var(--color-primary);
+  border-radius: var(--radius-full);
+  padding:       2px 9px;
+  font-size:     11px;
+  font-weight:   var(--font-weight-semibold);
+  letter-spacing: 0.02em;
+}
+
+.securityNote {
+  font-size:   var(--font-size-xs);
+  color:       var(--color-text-muted);
+  font-style:  italic;
+  max-width:   300px;
+  line-height: 1.55;
+  margin:      0;
+}
+
+.successActions {
+  display:     flex;
+  align-items: center;
+  gap:         var(--space-2);
+  flex-wrap:   wrap;
+  justify-content: center;
+}
