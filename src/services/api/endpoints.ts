@@ -156,6 +156,13 @@ export const ENDPOINTS = {
     branchSummary: '/reports/branch-summary',
   },
 
+  // ── Catalog ─────────────────────────────────────────────────────────────
+  catalog: {
+    list:          '/catalog',
+    upload:        '/catalog/upload',
+    createVehicle: '/catalog/vehicles',
+  },
+
   // ── Enquiries ───────────────────────────────────────────────────────
   // quick: unauthenticated fast-capture (Entry Page, POST only).
   // list/byId: authenticated branch-admin read endpoints.

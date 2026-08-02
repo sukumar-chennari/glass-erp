@@ -1,5 +1,6 @@
 import { baseApi } from '@/services/baseApi';
 import { mockableQuery, normalizeArray } from '@/services/mockUtils';
+import { ENDPOINTS } from '@/services/api/endpoints';
 import type { CatalogVariant, CatalogGlassType } from '@/types/models/catalog';
 
 // ── Catalog listing ──────────────────────────────────────────────────────────
@@ -32,6 +33,33 @@ export interface CatalogListResponse {
   total: number;
   page:  number;
   limit: number;
+}
+
+// ── Single vehicle onboard ───────────────────────────────────────────────────
+
+export interface GlassPricingPayload {
+  glassPartTypeName: string;
+  description:       string[];
+  prices:            Array<{ glassBrandName: string; price: number }>;
+}
+
+export interface CreateVehiclePayload {
+  brandName:    string;
+  modelName:    string;
+  bodyType:     string[];
+  cc:           number;
+  variantName:  string;
+  period:       string;
+  glassPricing?: GlassPricingPayload[];
+}
+
+export interface CreateVehicleResponse {
+  id?:                  string;
+  variantId?:           string;
+  brandCreated?:        boolean;
+  modelCreated?:        boolean;
+  variantCreated?:      boolean;
+  glassPartTypeCreated?: boolean;
 }
 
 // ── Upload result ────────────────────────────────────────────────────────────
@@ -156,6 +184,17 @@ export const catalogApi = baseApi.injectEndpoints({
       invalidatesTags: ['CatalogRow'],
     }),
 
+    // POST /api/v1/catalog/vehicles — create a single vehicle entry with optional glass pricing.
+    // invalidatesTags: ['CatalogRow'] refreshes the catalog list after a successful submission.
+    createVehicle: builder.mutation<CreateVehicleResponse, CreateVehiclePayload>({
+      query: (body) => ({
+        url:    ENDPOINTS.catalog.createVehicle,
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: ['CatalogRow'],
+    }),
+
     // GET /api/v1/catalog/variants/{variantId}/glass-types/{glassPartTypeId}/descriptions
     // Response: plain string[]
     getDescriptions: builder.query<string[], { variantId: string; glassPartTypeId: string }>({
@@ -177,4 +216,5 @@ export const {
   useGetGlassTypesQuery,
   useGetDescriptionsQuery,
   useUploadCatalogMutation,
+  useCreateVehicleMutation,
 } = catalogApi;

@@ -323,3 +323,114 @@
   padding-top:     var(--space-4);
   border-top:      1px solid var(--form-drawer-border, var(--color-border));
 }
+
+/* ── Submit spinner ── */
+.btnSpinner {
+  display:          inline-block;
+  width:            14px;
+  height:           14px;
+  border:           2px solid rgba(255,255,255,0.35);
+  border-top-color: #fff;
+  border-radius:    50%;
+  animation:        soBtnSpin 0.65s linear infinite;
+  flex-shrink:      0;
+}
+@keyframes soBtnSpin { to { transform: rotate(360deg); } }
+
+/* ── Optional tag (inline badge beside section label) ── */
+.optTag {
+  display:       inline-block;
+  font-size:     9px;
+  font-weight:   var(--font-weight-semibold);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color:         var(--color-text-muted);
+  background:    color-mix(in srgb, var(--color-border) 40%, transparent);
+  border-radius: var(--radius-full);
+  padding:       1px 6px;
+  vertical-align: middle;
+  margin-left:   4px;
+}
+
+/* ── Success panel ── */
+.successPanel {
+  display:        flex;
+  flex-direction: column;
+  align-items:    center;
+  text-align:     center;
+  gap:            var(--space-4);
+  padding:        var(--space-8, 40px) var(--space-5);
+}
+
+.successIcon {
+  width:           72px;
+  height:          72px;
+  border-radius:   50%;
+  background:      color-mix(in srgb, var(--color-success, #22c55e) 12%, transparent);
+  color:           var(--color-success, #22c55e);
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  flex-shrink:     0;
+}
+
+.successTitle {
+  font-size:   var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color:       var(--color-text-primary);
+  margin:      0;
+}
+
+.successDesc {
+  font-size:   var(--font-size-sm);
+  color:       var(--color-text-secondary);
+  margin:      0;
+  line-height: 1.55;
+}
+
+.successMeta {
+  width:         100%;
+  max-width:     280px;
+  border:        1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow:      hidden;
+}
+
+.successMetaRow {
+  display:         flex;
+  justify-content: space-between;
+  align-items:     center;
+  padding:         8px var(--space-4);
+  font-size:       var(--font-size-xs);
+  color:           var(--color-text-secondary);
+  border-bottom:   1px solid var(--color-border);
+}
+.successMetaRow:last-child { border-bottom: none; }
+
+.metaCreated {
+  font-weight: var(--font-weight-semibold);
+  color:       var(--color-success, #22c55e);
+}
+
+.metaReused {
+  font-weight: var(--font-weight-semibold);
+  color:       var(--color-text-muted);
+}
+
+.addAnotherBtn {
+  height:        40px;
+  padding:       0 var(--space-5);
+  background:    var(--color-primary);
+  color:         #fff;
+  border:        none;
+  border-radius: var(--radius-lg);
+  font-size:     var(--font-size-sm);
+  font-weight:   var(--font-weight-semibold);
+  font-family:   var(--font-family);
+  cursor:        pointer;
+  transition:    background var(--transition-fast), box-shadow var(--transition-fast);
+}
+.addAnotherBtn:hover {
+  background: color-mix(in srgb, var(--color-primary) 85%, #000);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--color-primary) 35%, transparent);
+}

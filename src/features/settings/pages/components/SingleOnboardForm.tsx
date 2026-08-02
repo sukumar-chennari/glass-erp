@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
-import { AlertCircle, CheckCircle2 } from 'lucide-react';
+import { CheckCircle2 } from 'lucide-react';
 import { useGetCarBrandsQuery } from '@/features/settings/services/carBrandsApi';
 import { useGetCarModelsQuery } from '@/features/settings/services/carModelsApi';
 import {
   useGetVariantsQuery,
   useGetGlassTypesQuery,
   useGetDescriptionsQuery,
+  useCreateVehicleMutation,
 } from '@/services/catalogApi';
+import type { CreateVehiclePayload, CreateVehicleResponse } from '@/services/catalogApi';
 import { useToast } from '@/components/ui/Toast';
 import { Button } from '@/components/ui/Button';
 import styles from './SingleOnboardForm.module.css';
@@ -75,19 +77,24 @@ function validate(form: FormValues): FormErrors {
   if (form.variantMode === 'select' ? !form.variantId : !form.variantManual.trim())
     e.variant = 'Variant is required';
   if (!form.periodValue.trim()) e.period = 'Period / generation is required';
-  if (form.glassTypeMode === 'select' ? !form.glassTypeId : !form.glassTypeManual.trim())
-    e.glassType = 'Glass type is required';
 
-  let anyPriceErr = false;
+  // Glass section is optional — validate glass type only if the user has started filling it
+  const hasAnyGlassField = (
+    (form.glassTypeMode === 'select' ? !!form.glassTypeId : !!form.glassTypeManual.trim()) ||
+    PRICE_FIELDS.some(({ key }) => !!form[key].trim())
+  );
+  if (hasAnyGlassField &&
+      (form.glassTypeMode === 'select' ? !form.glassTypeId : !form.glassTypeManual.trim())) {
+    e.glassType = 'Glass type is required when pricing is specified';
+  }
+
   for (const { key, label } of PRICE_FIELDS) {
     const raw = form[key].trim();
     if (!raw) continue;
     const n = Number(raw);
-    if (isNaN(n)) { (e as Record<string, string>)[key] = `${label}: must be a number`; anyPriceErr = true; }
-    else if (n < 0) { (e as Record<string, string>)[key] = `${label}: cannot be negative`; anyPriceErr = true; }
+    if (isNaN(n)) (e as Record<string, string>)[key] = `${label}: must be a number`;
+    else if (n < 0) (e as Record<string, string>)[key] = `${label}: cannot be negative`;
   }
-  if (!anyPriceErr && !PRICE_FIELDS.some(({ key }) => form[key].trim()))
-    e.prices = 'At least one brand price is required';
 
   return e;
 }
@@ -132,9 +139,11 @@ function AutoFillBadge({ show, text = 'Auto-filled' }: { show: boolean; text?: s
 
 export function SingleOnboardForm() {
   const toast = useToast();
+  const [createVehicle, { isLoading: submitting }] = useCreateVehicleMutation();
   const [form, setForm] = useState<FormValues>(INITIAL);
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitted, setSubmitted] = useState(false);
+  const [successData, setSuccessData] = useState<CreateVehicleResponse | null>(null);
 
   const effectiveBrandId   = form.brandMode   === 'select' ? form.brandId    : '';
   const effectiveModelId   = form.modelMode   === 'select' ? form.modelId    : '';
@@ -232,14 +241,55 @@ export function SingleOnboardForm() {
   }
 
   // ── Submit ──
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSubmitted(true);
     const errs = validate(form);
     if (Object.keys(errs).length > 0) { setErrors(errs); return; }
-    toast.info('Form validated. Single entry submission API is not yet configured — connect the backend endpoint to enable saving.');
+
+    const brandName = form.brandMode === 'select'
+      ? (brands?.find(b => b.id === form.brandId)?.name ?? form.brandId)
+      : form.brandManual.trim();
+    const modelName = form.modelMode === 'select'
+      ? (models?.find(m => m.id === form.modelId)?.name ?? form.modelId)
+      : form.modelManual.trim();
+    const variantName = form.variantMode === 'select'
+      ? (variants?.find(v => v.id === form.variantId)?.variantName ?? form.variantId)
+      : form.variantManual.trim();
+    const glassTypeName = form.glassTypeMode === 'select'
+      ? (glassTypes?.find(g => g.id === form.glassTypeId)?.name ?? '')
+      : form.glassTypeManual.trim();
+
+    const descValue = (form.descMode === 'select' ? form.descSelected : form.descManual).trim();
+    const validPrices = PRICE_FIELDS
+      .filter(({ key }) => form[key].trim() !== '' && !isNaN(Number(form[key])))
+      .map(({ key, label }) => ({ glassBrandName: label, price: Number(form[key]) }));
+
+    const payload: CreateVehiclePayload = {
+      brandName,
+      modelName,
+      bodyType:   [form.bodyTypeValue.trim()],
+      cc:         Number(form.ccValue),
+      variantName,
+      period:     form.periodValue.trim(),
+      ...(glassTypeName ? {
+        glassPricing: [{
+          glassPartTypeName: glassTypeName,
+          description:       descValue ? [descValue] : [],
+          prices:            validPrices,
+        }],
+      } : {}),
+    };
+
+    try {
+      const result = await createVehicle(payload).unwrap();
+      setSuccessData(result);
+    } catch (err: unknown) {
+      const e = err as { data?: { message?: string } };
+      toast.error(e?.data?.message ?? 'Failed to save vehicle. Please try again.');
+    }
   }
-  function handleReset() { setForm(INITIAL); setErrors({}); setSubmitted(false); }
+  function handleReset() { setForm(INITIAL); setErrors({}); setSubmitted(false); setSuccessData(null); }
 
   // ── Derived ──
   const selectedModel  = models?.find(m => m.id === form.modelId);
@@ -256,8 +306,60 @@ export function SingleOnboardForm() {
     return opts.defaultLabel;
   }
 
+  if (successData !== null) {
+    return (
+      <div className={styles.successPanel}>
+        <div className={styles.successIcon}><CheckCircle2 size={40} /></div>
+        <h3 className={styles.successTitle}>Vehicle Added!</h3>
+        <p className={styles.successDesc}>The catalog entry was saved successfully.</p>
+        {(successData.brandCreated !== undefined ||
+          successData.modelCreated !== undefined ||
+          successData.variantCreated !== undefined ||
+          successData.glassPartTypeCreated !== undefined) && (
+          <div className={styles.successMeta}>
+            {successData.brandCreated !== undefined && (
+              <div className={styles.successMetaRow}>
+                <span>Brand</span>
+                <span className={successData.brandCreated ? styles.metaCreated : styles.metaReused}>
+                  {successData.brandCreated ? 'Created' : 'Reused'}
+                </span>
+              </div>
+            )}
+            {successData.modelCreated !== undefined && (
+              <div className={styles.successMetaRow}>
+                <span>Model</span>
+                <span className={successData.modelCreated ? styles.metaCreated : styles.metaReused}>
+                  {successData.modelCreated ? 'Created' : 'Reused'}
+                </span>
+              </div>
+            )}
+            {successData.variantCreated !== undefined && (
+              <div className={styles.successMetaRow}>
+                <span>Variant</span>
+                <span className={successData.variantCreated ? styles.metaCreated : styles.metaReused}>
+                  {successData.variantCreated ? 'Created' : 'Reused'}
+                </span>
+              </div>
+            )}
+            {successData.glassPartTypeCreated !== undefined && (
+              <div className={styles.successMetaRow}>
+                <span>Glass Type</span>
+                <span className={successData.glassPartTypeCreated ? styles.metaCreated : styles.metaReused}>
+                  {successData.glassPartTypeCreated ? 'Created' : 'Reused'}
+                </span>
+              </div>
+            )}
+          </div>
+        )}
+        <button className={styles.addAnotherBtn} onClick={handleReset}>
+          Add Another Vehicle
+        </button>
+      </div>
+    );
+  }
+
   return (
-    <form className={styles.form} onSubmit={handleSubmit} noValidate>
+    <form className={styles.form} onSubmit={(e) => void handleSubmit(e)} noValidate>
 
       {/* ══ Section 1: Vehicle Details ══════════════════════════════════════ */}
       <div className={styles.section}>
@@ -394,7 +496,7 @@ export function SingleOnboardForm() {
       <div className={styles.section}>
         <div className={styles.sectionHead}>
           <span className={styles.sectionNum}>02</span>
-          <span className={styles.sectionLabel}>Glass Details</span>
+          <span className={styles.sectionLabel}>Glass Details <span className={styles.optTag}>Optional</span></span>
         </div>
 
         <div className={styles.grid2}>
@@ -469,14 +571,8 @@ export function SingleOnboardForm() {
         <div className={styles.sectionHead}>
           <span className={styles.sectionNum}>03</span>
           <span className={styles.sectionLabel}>Brand-wise Pricing</span>
-          <span className={styles.sectionSub}>Leave any brand blank to omit it from this entry</span>
+          <span className={styles.sectionSub}>Leave blank to submit vehicle only</span>
         </div>
-
-        {errors.prices && (
-          <div className={styles.pricesAlert}>
-            <AlertCircle size={12} /><span>{errors.prices}</span>
-          </div>
-        )}
 
         <div className={styles.priceGrid}>
           {PRICE_FIELDS.map(({ key, label }) => {
@@ -500,24 +596,15 @@ export function SingleOnboardForm() {
         </div>
       </div>
 
-      {/* ══ API note ══════════════════════════════════════════════════════════ */}
-      <div className={styles.apiNote}>
-        <AlertCircle size={14} className={styles.apiNoteIcon} />
-        <span>
-          Single entry save API is not yet configured. The form validates correctly — connect the
-          backend <code className={styles.apiNoteCode}>POST /catalog/entries</code> endpoint to
-          enable persistence.
-        </span>
-      </div>
-
       {/* ══ Actions ═══════════════════════════════════════════════════════════ */}
       <div className={styles.actions}>
-        <Button type="button" variant="ghost" size="sm" onClick={handleReset}>
+        <Button type="button" variant="ghost" size="sm" onClick={handleReset} disabled={submitting}>
           Reset form
         </Button>
-        <Button type="submit" size="md">
-          <CheckCircle2 size={14} />
-          Validate &amp; Submit
+        <Button type="submit" size="md" disabled={submitting}>
+          {submitting
+            ? <><span className={styles.btnSpinner} aria-hidden />Saving…</>
+            : <><CheckCircle2 size={14} />Save Vehicle</>}
         </Button>
       </div>
 
